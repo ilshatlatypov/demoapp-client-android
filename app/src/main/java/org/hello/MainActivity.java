@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity
     private static final String PEOPLE = "people";
     private ArrayList<Person> peopleInView = new ArrayList<>();
     private ListView peopleListView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.people_list_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updatePeopleList();
+            }
+        });
+
         peopleListView = (ListView) findViewById(R.id.people_list);
         ArrayAdapter<Person> peopleListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         peopleListView.setAdapter(peopleListAdapter);
@@ -69,7 +79,7 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             people = (ArrayList<Person>) savedInstanceState.getSerializable(PEOPLE);
         }
-        updatePeopleList(people);
+        setPeople(people);
     }
 
     @Override
@@ -104,8 +114,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            new HttpRequestTask().execute();
-            return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -136,18 +145,23 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void updatePeopleList(List<Person> people) {
+    private void updatePeopleList() {
+        new UpdatePeopleListTask().execute();
+    }
+
+    private void setPeople(List<Person> people) {
         ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) peopleListView.getAdapter();
         peopleListAdapter.clear();
         peopleListAdapter.addAll(people);
         this.peopleInView = new ArrayList<>(people);
     }
 
-    private class HttpRequestTask extends AsyncTask<Void, Void, List<Person>> {
+    private class UpdatePeopleListTask extends AsyncTask<Void, Void, List<Person>> {
 
         @Override
         protected List<Person> doInBackground(Void... params) {
             try {
+                Thread.sleep(2000);
                 final String url = "http://192.168.2.11:8080/people";
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
@@ -179,9 +193,11 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<Person> people) {
-            if (people != null) {
-                updatePeopleList(people);
+            if (people == null) {
+                return; // TODO show connection error
             }
+            setPeople(people);
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 }
