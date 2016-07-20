@@ -1,7 +1,11 @@
 package org.hello;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,10 +38,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String PEOPLE = "people";
-    private ArrayList<Person> peopleInView = new ArrayList<>();
-    private ListView peopleListView;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout srlPeople;
+    private ListView lvPeople;
+    private ProgressBar pbPeople;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,29 +67,26 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.people_list_swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        pbPeople = (ProgressBar) findViewById(R.id.pb_people);
+
+        srlPeople = (SwipeRefreshLayout) findViewById(R.id.srl_people);
+        srlPeople.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 updatePeopleList();
             }
         });
 
-        peopleListView = (ListView) findViewById(R.id.people_list);
         ArrayAdapter<Person> peopleListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        peopleListView.setAdapter(peopleListAdapter);
+        lvPeople = (ListView) findViewById(R.id.lv_people);
+        lvPeople.setAdapter(peopleListAdapter);
 
-        List<Person> people = new ArrayList<>();
-        if (savedInstanceState != null) {
-            people = (ArrayList<Person>) savedInstanceState.getSerializable(PEOPLE);
-        }
-        setPeople(people);
+        showProgress(true);
+        updatePeopleList();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(PEOPLE, peopleInView);
+    private void updatePeopleList() {
+        new UpdatePeopleListTask().execute();
     }
 
     @Override
@@ -145,23 +146,46 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void updatePeopleList() {
-        new UpdatePeopleListTask().execute();
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            srlPeople.setVisibility(show ? View.GONE : View.VISIBLE);
+            srlPeople.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    srlPeople.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            pbPeople.setVisibility(show ? View.VISIBLE : View.GONE);
+            pbPeople.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    pbPeople.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            pbPeople.setVisibility(show ? View.VISIBLE : View.GONE);
+            srlPeople.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 
-    private void setPeople(List<Person> people) {
-        ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) peopleListView.getAdapter();
-        peopleListAdapter.clear();
-        peopleListAdapter.addAll(people);
-        this.peopleInView = new ArrayList<>(people);
-    }
 
     private class UpdatePeopleListTask extends AsyncTask<Void, Void, List<Person>> {
 
         @Override
         protected List<Person> doInBackground(Void... params) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(4000);
                 final String url = "http://192.168.2.11:8080/people";
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
@@ -196,8 +220,14 @@ public class MainActivity extends AppCompatActivity
             if (people == null) {
                 return; // TODO show connection error
             }
-            setPeople(people);
-            swipeRefreshLayout.setRefreshing(false);
+
+            ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
+            peopleListAdapter.clear();
+            peopleListAdapter.addAll(people);
+            peopleListAdapter.notifyDataSetChanged();
+
+            showProgress(false);
+            srlPeople.setRefreshing(false);
         }
     }
 }
