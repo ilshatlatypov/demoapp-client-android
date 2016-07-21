@@ -185,7 +185,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected List<Person> doInBackground(Void... params) {
             try {
-                Thread.sleep(4000);
                 final String url = "http://192.168.2.11:8080/people";
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
