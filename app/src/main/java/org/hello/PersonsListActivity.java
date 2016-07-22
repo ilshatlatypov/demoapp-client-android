@@ -35,8 +35,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class PersonsListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final int CREATE_PERSON_REQUEST = 1;
 
     private SwipeRefreshLayout srlPeople;
     private ListView lvPeople;
@@ -53,8 +55,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, NewActivity.class);
-                MainActivity.this.startActivity(intent);
+                openCreatePersonActivity();
             }
         });
 
@@ -83,6 +84,22 @@ public class MainActivity extends AppCompatActivity
 
         showProgress(true);
         updatePeopleList();
+    }
+
+    private void openCreatePersonActivity() {
+        Intent intent = new Intent(this, CreatePersonActivity.class);
+        this.startActivityForResult(intent, CREATE_PERSON_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CREATE_PERSON_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                showProgress(true);
+                updatePeopleList();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void updatePeopleList() {
@@ -193,7 +210,7 @@ public class MainActivity extends AppCompatActivity
                         String.class);
                 return parseAsPeople(responseEntity.getBody());
             } catch (Exception e) {
-                Log.e("MainActivity", e.getMessage(), e);
+                Log.e("PersonsListActivity", e.getMessage(), e);
             }
 
             return null;
