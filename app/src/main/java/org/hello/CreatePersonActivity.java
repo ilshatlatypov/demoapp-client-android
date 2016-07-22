@@ -1,17 +1,13 @@
 package org.hello;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -19,7 +15,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -35,9 +30,8 @@ import org.springframework.web.client.RestTemplate;
 
 public class CreatePersonActivity extends AppCompatActivity {
 
+    private ProgressBarSwitcher progressBarSwitcher;
     private Button bCreate;
-    private ProgressBar pbCreatePerson;
-    private View createPersonForm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +52,7 @@ public class CreatePersonActivity extends AppCompatActivity {
             }
         });
 
-        pbCreatePerson = (ProgressBar) findViewById(R.id.pb_create_person);
-        createPersonForm = findViewById(R.id.create_person_form);
+        progressBarSwitcher = new ProgressBarSwitcher(this, R.id.pb_create_person, R.id.create_person_form);
     }
 
     private void attemptCreate() {
@@ -91,7 +84,7 @@ public class CreatePersonActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             hideKeyboard();
-            showProgress(true);
+            progressBarSwitcher.showProgress(true);
             Person person = new Person(firstName, lastName);
             new CreatePersonTask(person).execute();
         }
@@ -159,7 +152,7 @@ public class CreatePersonActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean success) {
-            showProgress(false);
+            progressBarSwitcher.showProgress(false);
 
             if (success == null) {
                 // TODO show error message in the bottom with retry button
@@ -177,41 +170,7 @@ public class CreatePersonActivity extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            showProgress(false);
-        }
-    }
-
-    // TODO extract this functionality
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            createPersonForm.setVisibility(show ? View.GONE : View.VISIBLE);
-            createPersonForm.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    createPersonForm.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            pbCreatePerson.setVisibility(show ? View.VISIBLE : View.GONE);
-            pbCreatePerson.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    pbCreatePerson.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            pbCreatePerson.setVisibility(show ? View.VISIBLE : View.GONE);
-            createPersonForm.setVisibility(show ? View.GONE : View.VISIBLE);
+            progressBarSwitcher.showProgress(false);
         }
     }
 }

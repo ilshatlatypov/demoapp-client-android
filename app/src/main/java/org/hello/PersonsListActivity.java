@@ -1,28 +1,23 @@
 package org.hello;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +37,7 @@ public class PersonsListActivity extends AppCompatActivity
 
     private SwipeRefreshLayout srlPeople;
     private ListView lvPeople;
-    private ProgressBar pbPeople;
+    private ProgressBarSwitcher progressBarSwitcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +63,7 @@ public class PersonsListActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        pbPeople = (ProgressBar) findViewById(R.id.pb_people);
+        progressBarSwitcher = new ProgressBarSwitcher(this, R.id.pb_people, R.id.srl_people);
 
         srlPeople = (SwipeRefreshLayout) findViewById(R.id.srl_people);
         srlPeople.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -82,7 +77,7 @@ public class PersonsListActivity extends AppCompatActivity
         lvPeople = (ListView) findViewById(R.id.lv_people);
         lvPeople.setAdapter(peopleListAdapter);
 
-        showProgress(true);
+        progressBarSwitcher.showProgress(true);
         updatePeopleList();
     }
 
@@ -95,7 +90,7 @@ public class PersonsListActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CREATE_PERSON_REQUEST) {
             if (resultCode == RESULT_OK) {
-                showProgress(true);
+                progressBarSwitcher.showProgress(true);
                 updatePeopleList();
             }
         }
@@ -163,40 +158,6 @@ public class PersonsListActivity extends AppCompatActivity
         return true;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            srlPeople.setVisibility(show ? View.GONE : View.VISIBLE);
-            srlPeople.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    srlPeople.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            pbPeople.setVisibility(show ? View.VISIBLE : View.GONE);
-            pbPeople.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    pbPeople.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            pbPeople.setVisibility(show ? View.VISIBLE : View.GONE);
-            srlPeople.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-
     private class UpdatePeopleListTask extends AsyncTask<Void, Void, List<Person>> {
 
         @Override
@@ -242,7 +203,7 @@ public class PersonsListActivity extends AppCompatActivity
             peopleListAdapter.addAll(people);
             peopleListAdapter.notifyDataSetChanged();
 
-            showProgress(false);
+            progressBarSwitcher.showProgress(false);
             srlPeople.setRefreshing(false);
         }
     }
