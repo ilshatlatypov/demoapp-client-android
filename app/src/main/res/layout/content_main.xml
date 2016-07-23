@@ -16,20 +16,52 @@
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <org.hello.SwipeRefreshLayoutWithEmpty
         android:id="@+id/srl_people"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ListView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/lv_people"
-            android:paddingTop="@dimen/list_top_bottom_padding"
-            android:paddingBottom="@dimen/list_top_bottom_padding"
-            android:clipToPadding="false"
-            android:divider="@android:color/transparent"/>
+            android:layout_height="match_parent">
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+            <ListView
+                android:id="@+id/lv_people"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/list_top_bottom_padding"
+                android:paddingBottom="@dimen/list_top_bottom_padding"
+                android:clipToPadding="false"
+                android:divider="@android:color/transparent"/>
+
+            <!-- No persons in list -->
+            <RelativeLayout
+                android:id="@android:id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+                    <TextView
+                        android:id="@+id/empty_list_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No persons in list"
+                        android:layout_centerHorizontal="true"/>
+                    <Button
+                        android:id="@+id/button_create_person_from_empty_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Create a person"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/empty_list_text"/>
+                </RelativeLayout>
+            </RelativeLayout>
+            <!-- /No persons in list -->
+
+        </FrameLayout>
+
+    </org.hello.SwipeRefreshLayoutWithEmpty>
 
 </RelativeLayout>

@@ -1,6 +1,9 @@
 package org.hello;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +15,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -76,6 +79,7 @@ public class PersonsListActivity extends AppCompatActivity
         ArrayAdapter<Person> peopleListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         lvPeople = (ListView) findViewById(R.id.lv_people);
         lvPeople.setAdapter(peopleListAdapter);
+        lvPeople.setEmptyView(findViewById(android.R.id.empty));
 
         progressBarSwitcher.showProgress(true);
         updatePeopleList();
@@ -98,7 +102,7 @@ public class PersonsListActivity extends AppCompatActivity
     }
 
     private void updatePeopleList() {
-        new UpdatePeopleListTask().execute();
+        new UpdatePersonsListTask().execute();
     }
 
     @Override
@@ -158,10 +162,31 @@ public class PersonsListActivity extends AppCompatActivity
         return true;
     }
 
-    private class UpdatePeopleListTask extends AsyncTask<Void, Void, List<Person>> {
+    enum TaskResultType {
+        SUCCESS,
+        UNEXPECTED_RESPONSE_CODE,
+        SERVER_UNAVAILABLE,
+        NOT_CONNECTED
+    }
+
+    private class UpdatePersonsListTaskResult {
+        TaskResultType resultType;
+        List<Person> persons;
+
+        public UpdatePersonsListTaskResult(TaskResultType resultType) {
+            this.resultType = resultType;
+        }
+
+        public UpdatePersonsListTaskResult(List<Person> persons) {
+            this.resultType = TaskResultType.SUCCESS;
+            this.persons = persons;
+        }
+    }
+
+    private class UpdatePersonsListTask extends AsyncTask<Void, Void, UpdatePersonsListTaskResult> {
 
         @Override
-        protected List<Person> doInBackground(Void... params) {
+        protected UpdatePersonsListTaskResult doInBackground(Void... params) {
             try {
                 final String url = "http://192.168.2.11:8080/people";
                 RestTemplate restTemplate = new RestTemplate();
@@ -169,16 +194,25 @@ public class PersonsListActivity extends AppCompatActivity
                 ResponseEntity<String> responseEntity = restTemplate.exchange(
                         url, HttpMethod.GET, null,
                         String.class);
-                return parseAsPeople(responseEntity.getBody());
+                HttpStatus httpStatus = responseEntity.getStatusCode();
+                if (httpStatus == HttpStatus.OK) {
+                    List<Person> persons = parseAsPersonsList(responseEntity.getBody());
+                    return new UpdatePersonsListTaskResult(persons);
+                } else {
+                    return new UpdatePersonsListTaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
+                }
             } catch (Exception e) {
-                Log.e("PersonsListActivity", e.getMessage(), e);
+                if (checkConnection(PersonsListActivity.this)) {
+                    return new UpdatePersonsListTaskResult(TaskResultType.SERVER_UNAVAILABLE);
+                } else {
+                    return new UpdatePersonsListTaskResult(TaskResultType.NOT_CONNECTED);
+                }
+                // Log.e("PersonsListActivity", e.getMessage(), e);
             }
-
-            return null;
         }
 
         @NonNull
-        private List<Person> parseAsPeople(String jsonStr) throws JSONException {
+        private List<Person> parseAsPersonsList(String jsonStr) throws JSONException {
             JSONObject json = new JSONObject(jsonStr);
             JSONArray peopleJsonArray = json.getJSONObject("_embedded").getJSONArray("people");
             List<Person> people = new ArrayList<>();
@@ -193,18 +227,33 @@ public class PersonsListActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(List<Person> people) {
-            if (people == null) {
-                return; // TODO show connection error
-            }
-
-            ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
-            peopleListAdapter.clear();
-            peopleListAdapter.addAll(people);
-            peopleListAdapter.notifyDataSetChanged();
-
+        protected void onPostExecute(UpdatePersonsListTaskResult taskResult) {
             progressBarSwitcher.showProgress(false);
             srlPeople.setRefreshing(false);
+
+            switch (taskResult.resultType) {
+                case SUCCESS:
+                    ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
+                    peopleListAdapter.clear();
+                    peopleListAdapter.addAll(taskResult.persons);
+                    peopleListAdapter.notifyDataSetChanged();
+                    break;
+                case UNEXPECTED_RESPONSE_CODE:
+                    // TODO show view "Something is wrong with the request you send." + Retry
+                    break;
+                case SERVER_UNAVAILABLE:
+                    // TODO show v iew "Server is not responding. Please try to send the request later." + Retry
+                    break;
+                case NOT_CONNECTED:
+                    // TODO show view "Error on data. Check your network connection." + Retry
+                    break;
+            }
         }
+    }
+
+    public static boolean checkConnection(Context ctx) {
+        ConnectivityManager connMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }
