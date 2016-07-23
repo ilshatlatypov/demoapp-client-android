@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreatePersonActivity"
+            android:name=".AddPersonActivity"
             android:label="@string/new_activity_title"
             android:parentActivityName=".PersonsListActivity" >
             <!-- Parent activity meta-data to support 4.0 and lower -->

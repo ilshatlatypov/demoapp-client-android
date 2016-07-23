@@ -38,7 +38,7 @@ import java.util.List;
 public class PersonsListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final int CREATE_PERSON_REQUEST = 1;
+    private static final int ADD_PERSON_REQUEST = 1;
 
     private ViewSwitcherNew viewSwitcher;
     private SwipeRefreshLayout srlPeople;
@@ -55,7 +55,7 @@ public class PersonsListActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openCreatePersonActivity();
+                openAddPersonActivity();
             }
         });
 
@@ -91,17 +91,26 @@ public class PersonsListActivity extends AppCompatActivity
             }
         });
 
+        Button buttonAddPerson = (Button) findViewById(R.id.button_create_person_from_empty_list);
+        buttonAddPerson.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAddPersonActivity();
+            }
+        });
+
+
         updatePeopleList();
     }
 
-    private void openCreatePersonActivity() {
-        Intent intent = new Intent(this, CreatePersonActivity.class);
-        this.startActivityForResult(intent, CREATE_PERSON_REQUEST);
+    private void openAddPersonActivity() {
+        Intent intent = new Intent(this, AddPersonActivity.class);
+        this.startActivityForResult(intent, ADD_PERSON_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CREATE_PERSON_REQUEST) {
+        if (requestCode == ADD_PERSON_REQUEST) {
             if (resultCode == RESULT_OK) {
                 viewSwitcher.showProgressBar();
                 updatePeopleList();

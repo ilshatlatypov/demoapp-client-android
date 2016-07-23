@@ -28,7 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-public class CreatePersonActivity extends AppCompatActivity {
+public class AddPersonActivity extends AppCompatActivity {
 
     private ViewSwitcher viewSwitcher;
     private Button bCreate;
@@ -134,7 +134,7 @@ public class CreatePersonActivity extends AppCompatActivity {
                 ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
                 return responseEntity.getStatusCode() == HttpStatus.CREATED;
             } catch (Exception e) {
-                Log.e("CreatePersonActivity", e.getMessage(), e);
+                Log.e("AddPersonActivity", e.getMessage(), e);
             }
             return null;
         }
@@ -159,7 +159,7 @@ public class CreatePersonActivity extends AppCompatActivity {
             }
 
             if (success) {
-                Toast.makeText(CreatePersonActivity.this, R.string.toast_person_created, Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddPersonActivity.this, R.string.toast_person_created, Toast.LENGTH_SHORT).show();
                 Intent returnIntent = new Intent();
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
