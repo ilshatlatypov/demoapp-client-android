@@ -10,6 +10,7 @@
     <string name="prompt_no_persons">No persons in list</string>
     <string name="action_retry">Retry</string>
     <string name="action_add_person">Add a person</string>
+    <string name="action_refresh">Refresh</string>
     <string name="error_unexpected_response">Unexpected response code from server</string>
     <string name="error_server_unavailable">Server is not responding. Please try again later.</string>
     <string name="error_no_connection">Error on getting data from server. Check your network connection.</string>
