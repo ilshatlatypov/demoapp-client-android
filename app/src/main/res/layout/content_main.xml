@@ -9,7 +9,7 @@
     tools:showIn="@layout/app_bar_main">
 
     <ProgressBar
-        android:id="@+id/pb_people"
+        android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:visibility="gone" />
 
     <org.hello.SwipeRefreshLayoutWithEmpty
-        android:id="@+id/srl_people"
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -47,13 +47,13 @@
                         android:id="@+id/empty_list_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No persons in list"
+                        android:text="@string/prompt_no_persons"
                         android:layout_centerHorizontal="true"/>
                     <Button
                         android:id="@+id/button_create_person_from_empty_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Create a person"
+                        android:text="@string/action_add_person"
                         android:layout_centerHorizontal="true"
                         android:layout_below="@id/empty_list_text"/>
                 </RelativeLayout>
@@ -63,5 +63,37 @@
         </FrameLayout>
 
     </org.hello.SwipeRefreshLayoutWithEmpty>
+
+    <!-- Error layout -->
+    <RelativeLayout
+        android:id="@+id/error_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:visibility="gone">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+            <TextView
+                android:id="@+id/error_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAlignment="center"
+                android:layout_centerHorizontal="true"/>
+            <Button
+                android:id="@+id/button_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_retry"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/error_text"/>
+        </RelativeLayout>
+    </RelativeLayout>
+    <!-- /Error layout -->
 
 </RelativeLayout>

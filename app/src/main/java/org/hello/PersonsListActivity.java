@@ -19,7 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,9 +40,9 @@ public class PersonsListActivity extends AppCompatActivity
 
     private static final int CREATE_PERSON_REQUEST = 1;
 
+    private ViewSwitcherNew viewSwitcher;
     private SwipeRefreshLayout srlPeople;
     private ListView lvPeople;
-    private ProgressBarSwitcher progressBarSwitcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +68,9 @@ public class PersonsListActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        progressBarSwitcher = new ProgressBarSwitcher(this, R.id.pb_people, R.id.srl_people);
+        viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
 
-        srlPeople = (SwipeRefreshLayout) findViewById(R.id.srl_people);
+        srlPeople = (SwipeRefreshLayout) findViewById(R.id.main_layout);
         srlPeople.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -81,7 +83,14 @@ public class PersonsListActivity extends AppCompatActivity
         lvPeople.setAdapter(peopleListAdapter);
         lvPeople.setEmptyView(findViewById(android.R.id.empty));
 
-        progressBarSwitcher.showProgress(true);
+        Button buttonRetry = (Button) findViewById(R.id.button_retry);
+        buttonRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updatePeopleList();
+            }
+        });
+
         updatePeopleList();
     }
 
@@ -94,7 +103,7 @@ public class PersonsListActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CREATE_PERSON_REQUEST) {
             if (resultCode == RESULT_OK) {
-                progressBarSwitcher.showProgress(true);
+                viewSwitcher.showProgressBar();
                 updatePeopleList();
             }
         }
@@ -102,6 +111,7 @@ public class PersonsListActivity extends AppCompatActivity
     }
 
     private void updatePeopleList() {
+        viewSwitcher.showProgressBar();
         new UpdatePersonsListTask().execute();
     }
 
@@ -166,27 +176,31 @@ public class PersonsListActivity extends AppCompatActivity
         SUCCESS,
         UNEXPECTED_RESPONSE_CODE,
         SERVER_UNAVAILABLE,
-        NOT_CONNECTED
+        NO_CONNECTION
     }
 
-    private class UpdatePersonsListTaskResult {
+    private class TaskResult {
         TaskResultType resultType;
         List<Person> persons;
 
-        public UpdatePersonsListTaskResult(TaskResultType resultType) {
+        public TaskResult(TaskResultType resultType) {
             this.resultType = resultType;
         }
 
-        public UpdatePersonsListTaskResult(List<Person> persons) {
+        public TaskResult(List<Person> persons) {
             this.resultType = TaskResultType.SUCCESS;
             this.persons = persons;
         }
     }
 
-    private class UpdatePersonsListTask extends AsyncTask<Void, Void, UpdatePersonsListTaskResult> {
+    private class UpdatePersonsListTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
-        protected UpdatePersonsListTaskResult doInBackground(Void... params) {
+        protected TaskResult doInBackground(Void... params) {
+            if (!isConnected(PersonsListActivity.this)) {
+                return new TaskResult(TaskResultType.NO_CONNECTION);
+            }
+
             try {
                 final String url = "http://192.168.2.11:8080/people";
                 RestTemplate restTemplate = new RestTemplate();
@@ -197,17 +211,12 @@ public class PersonsListActivity extends AppCompatActivity
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) {
                     List<Person> persons = parseAsPersonsList(responseEntity.getBody());
-                    return new UpdatePersonsListTaskResult(persons);
+                    return new TaskResult(persons);
                 } else {
-                    return new UpdatePersonsListTaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
+                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
                 }
             } catch (Exception e) {
-                if (checkConnection(PersonsListActivity.this)) {
-                    return new UpdatePersonsListTaskResult(TaskResultType.SERVER_UNAVAILABLE);
-                } else {
-                    return new UpdatePersonsListTaskResult(TaskResultType.NOT_CONNECTED);
-                }
-                // Log.e("PersonsListActivity", e.getMessage(), e);
+                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
             }
         }
 
@@ -227,31 +236,37 @@ public class PersonsListActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(UpdatePersonsListTaskResult taskResult) {
-            progressBarSwitcher.showProgress(false);
+        protected void onPostExecute(TaskResult taskResult) {
             srlPeople.setRefreshing(false);
 
+            if (taskResult.resultType == TaskResultType.SUCCESS) {
+                ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
+                peopleListAdapter.clear();
+                peopleListAdapter.addAll(taskResult.persons);
+                peopleListAdapter.notifyDataSetChanged();
+                viewSwitcher.showMainLayout();
+                return;
+            }
+
+            CharSequence errorMessage = null;
             switch (taskResult.resultType) {
-                case SUCCESS:
-                    ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
-                    peopleListAdapter.clear();
-                    peopleListAdapter.addAll(taskResult.persons);
-                    peopleListAdapter.notifyDataSetChanged();
-                    break;
                 case UNEXPECTED_RESPONSE_CODE:
-                    // TODO show view "Something is wrong with the request you send." + Retry
+                    errorMessage = getText(R.string.error_unexpected_response);
                     break;
                 case SERVER_UNAVAILABLE:
-                    // TODO show v iew "Server is not responding. Please try to send the request later." + Retry
+                    errorMessage = getText(R.string.error_server_unavailable);
                     break;
-                case NOT_CONNECTED:
-                    // TODO show view "Error on data. Check your network connection." + Retry
+                case NO_CONNECTION:
+                    errorMessage = getText(R.string.error_no_connection);
                     break;
             }
+            TextView errorTextView = (TextView) findViewById(R.id.error_text);
+            errorTextView.setText(errorMessage);
+            viewSwitcher.showErrorLayout();
         }
     }
 
-    public static boolean checkConnection(Context ctx) {
+    public static boolean isConnected(Context ctx) {
         ConnectivityManager connMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();

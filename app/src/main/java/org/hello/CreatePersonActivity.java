@@ -30,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class CreatePersonActivity extends AppCompatActivity {
 
-    private ProgressBarSwitcher progressBarSwitcher;
+    private ViewSwitcher viewSwitcher;
     private Button bCreate;
 
     @Override
@@ -52,7 +52,7 @@ public class CreatePersonActivity extends AppCompatActivity {
             }
         });
 
-        progressBarSwitcher = new ProgressBarSwitcher(this, R.id.pb_create_person, R.id.create_person_form);
+        viewSwitcher = new ViewSwitcher(this, R.id.pb_create_person, R.id.create_person_form);
     }
 
     private void attemptCreate() {
@@ -84,7 +84,7 @@ public class CreatePersonActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             hideKeyboard();
-            progressBarSwitcher.showProgress(true);
+            viewSwitcher.showFirst();
             Person person = new Person(firstName, lastName);
             new CreatePersonTask(person).execute();
         }
@@ -152,7 +152,7 @@ public class CreatePersonActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean success) {
-            progressBarSwitcher.showProgress(false);
+            viewSwitcher.showSecond();
 
             if (success == null) {
                 // TODO show error message in the bottom with retry button
@@ -170,7 +170,7 @@ public class CreatePersonActivity extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            progressBarSwitcher.showProgress(false);
+            viewSwitcher.showSecond();
         }
     }
 }
