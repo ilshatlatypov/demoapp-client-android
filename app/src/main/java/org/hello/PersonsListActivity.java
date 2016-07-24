@@ -11,7 +11,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,7 +40,6 @@ public class PersonsListActivity extends AppCompatActivity
     private static final int ADD_PERSON_REQUEST = 1;
 
     private ViewSwitcherNew viewSwitcher;
-    private SwipeRefreshLayout srlPeople;
     private ListView lvPeople;
 
     @Override
@@ -69,14 +67,6 @@ public class PersonsListActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
-
-        srlPeople = (SwipeRefreshLayout) findViewById(R.id.main_layout);
-        srlPeople.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                updatePeopleList();
-            }
-        });
 
         ArrayAdapter<Person> peopleListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         lvPeople = (ListView) findViewById(R.id.lv_people);
@@ -247,7 +237,6 @@ public class PersonsListActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(TaskResult taskResult) {
-            srlPeople.setRefreshing(false);
 
             if (taskResult.resultType == TaskResultType.SUCCESS) {
                 ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
