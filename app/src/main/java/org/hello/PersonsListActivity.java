@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -38,6 +40,7 @@ public class PersonsListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int ADD_PERSON_REQUEST = 1;
+    public static final String EXTRA_PERSON = "person";
 
     private ViewSwitcherNew viewSwitcher;
     private ListView lvPeople;
@@ -73,6 +76,14 @@ public class PersonsListActivity extends AppCompatActivity
         lvPeople.setAdapter(peopleListAdapter);
         lvPeople.setEmptyView(findViewById(android.R.id.empty));
 
+        lvPeople.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Person person = (Person) parent.getItemAtPosition(position);
+                openPersonDetailsActivity(person);
+            }
+        });
+
         Button buttonRetry = (Button) findViewById(R.id.button_retry);
         buttonRetry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +106,12 @@ public class PersonsListActivity extends AppCompatActivity
     private void openAddPersonActivity() {
         Intent intent = new Intent(this, AddPersonActivity.class);
         this.startActivityForResult(intent, ADD_PERSON_REQUEST);
+    }
+
+    private void openPersonDetailsActivity(Person person) {
+        Intent intent = new Intent(this, PersonDetailsActivity.class);
+        intent.putExtra(EXTRA_PERSON, person);
+        this.startActivity(intent);
     }
 
     @Override
@@ -230,6 +247,8 @@ public class PersonsListActivity extends AppCompatActivity
                 Person person = new Person();
                 person.setFirstName(personJson.getString("firstName"));
                 person.setLastName(personJson.getString("lastName"));
+                String selfLink = personJson.getJSONObject("_links").getJSONObject("self").getString("href");
+                person.setSelfLink(selfLink);
                 people.add(person);
             }
             return people;

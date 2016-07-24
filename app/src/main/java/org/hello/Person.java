@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class Person implements Serializable {
 
-    private long id;
+    private String selfLink;
     private String firstName;
     private String lastName;
 
@@ -16,6 +16,14 @@ public class Person implements Serializable {
     public Person(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public String getSelfLink() {
+        return selfLink;
+    }
+
+    public void setSelfLink(String selfLink) {
+        this.selfLink = selfLink;
     }
 
     public String getFirstName() {

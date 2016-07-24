@@ -24,12 +24,16 @@
         <activity
             android:name=".AddPersonActivity"
             android:label="@string/new_activity_title"
-            android:parentActivityName=".PersonsListActivity" >
+            android:parentActivityName=".PersonsListActivity">
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PersonsListActivity" />
         </activity>
+        <activity
+            android:name=".PersonDetailsActivity"
+            android:label="@string/title_person_details"/>
     </application>
 
 </manifest>
