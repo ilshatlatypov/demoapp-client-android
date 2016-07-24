@@ -22,4 +22,6 @@
     <string name="error_field_required">This field is required</string>
     <string name="toast_person_created">Person created</string>
 
+    <string name="action_delete">Delete</string>
+
 </resources>
