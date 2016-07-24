@@ -23,5 +23,6 @@
     <string name="toast_person_created">Person created</string>
 
     <string name="action_delete">Delete</string>
+    <string name="prompt_delete_person">Delete person?</string>
 
 </resources>

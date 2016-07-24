@@ -40,6 +40,7 @@ public class PersonsListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int ADD_PERSON_REQUEST = 1;
+    private static final int PERSON_DETAILS_REQUEST = 2;
     public static final String EXTRA_PERSON = "person";
 
     private ViewSwitcherNew viewSwitcher;
@@ -111,14 +112,18 @@ public class PersonsListActivity extends AppCompatActivity
     private void openPersonDetailsActivity(Person person) {
         Intent intent = new Intent(this, PersonDetailsActivity.class);
         intent.putExtra(EXTRA_PERSON, person);
-        this.startActivity(intent);
+        this.startActivityForResult(intent, PERSON_DETAILS_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ADD_PERSON_REQUEST) {
             if (resultCode == RESULT_OK) {
-                viewSwitcher.showProgressBar();
+                updatePeopleList();
+            }
+        } else if (requestCode == PERSON_DETAILS_REQUEST) {
+            if (resultCode == PersonDetailsActivity.RESULT_PERSON_DELETED) {
+                Snackbar.make(lvPeople, "Person deleted", Snackbar.LENGTH_SHORT).show();
                 updatePeopleList();
             }
         }
