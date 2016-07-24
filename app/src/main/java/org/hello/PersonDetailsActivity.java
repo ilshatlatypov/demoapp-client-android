@@ -119,7 +119,13 @@ public class PersonDetailsActivity extends AppCompatActivity {
                         errorMessage = getString(R.string.error_no_connection);
                         break;
                 }
-                Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_SHORT).show(); // TODO retry
+                Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Retry", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                attemptDelete();
+                            }
+                        }).show();
             }
         }
     }
