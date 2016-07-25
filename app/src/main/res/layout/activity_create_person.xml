@@ -42,7 +42,8 @@
                     android:id="@+id/et_firstname"
                     android:hint="@string/prompt_first_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -53,7 +54,8 @@
                     android:id="@+id/et_lastname"
                     android:hint="@string/prompt_last_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"/>
             </android.support.design.widget.TextInputLayout>
 
             <LinearLayout
