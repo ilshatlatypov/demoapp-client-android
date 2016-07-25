@@ -123,7 +123,7 @@ public class PersonsListActivity extends AppCompatActivity
             }
         } else if (requestCode == PERSON_DETAILS_REQUEST) {
             if (resultCode == PersonDetailsActivity.RESULT_PERSON_DELETED) {
-                Snackbar.make(lvPeople, "Person deleted", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(lvPeople, R.string.prompt_person_deleted, Snackbar.LENGTH_SHORT).show();
                 updatePeopleList();
             }
         }

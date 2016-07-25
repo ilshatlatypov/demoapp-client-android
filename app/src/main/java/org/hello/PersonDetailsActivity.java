@@ -61,7 +61,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
                 .setPositiveButton(getText(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Snackbar.make(baseLayout, "Deletion...", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_SHORT).show();
                         new DeletePersonTask().execute();
                     }
                 })
@@ -120,7 +120,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
                         break;
                 }
                 Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Retry", new View.OnClickListener() {
+                        .setAction(R.string.action_retry, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 attemptDelete();
