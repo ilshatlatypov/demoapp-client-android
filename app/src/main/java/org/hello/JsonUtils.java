@@ -14,6 +14,18 @@ public class JSONUtils {
 
     private JSONUtils() {}
 
+    public static Person parseAsPerson(String jsonStr) {
+        Person person = new Person();
+        try {
+            JSONObject json = new JSONObject(jsonStr);
+            person.setFirstName(json.getString("firstName"));
+            person.setLastName(json.getString("lastName"));
+        } catch (JSONException e) {
+            // TODO handle this
+        }
+        return person;
+    }
+
     public static List<Person> parseAsPersonsList(String jsonStr) throws JSONException {
         JSONObject json = new JSONObject(jsonStr);
         JSONArray peopleJsonArray = json.getJSONObject("_embedded").getJSONArray("people");

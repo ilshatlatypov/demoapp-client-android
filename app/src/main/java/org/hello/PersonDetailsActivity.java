@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,9 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
     public static final int RESULT_PERSON_DELETED = 1;
 
+    private ViewSwitcherNew viewSwitcher;
     private View baseLayout;
-    private Person person;
+    private String personSelfLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +33,18 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
         baseLayout = findViewById(R.id.base_layout);
 
-        person = (Person) getIntent().getSerializableExtra(PersonsListActivity.EXTRA_PERSON);
-        ((TextView) findViewById(R.id.firstname)).setText(person.getFirstName());
-        ((TextView) findViewById(R.id.lastname)).setText(person.getLastName());
+        viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
+        personSelfLink = getIntent().getStringExtra(PersonsListActivity.EXTRA_PERSON_LINK);
+
+        Button buttonRetry = (Button) findViewById(R.id.button_retry);
+        buttonRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptGetPersonDetails();
+            }
+        });
+
+        attemptGetPersonDetails();
     }
 
     @Override
@@ -48,6 +59,12 @@ public class PersonDetailsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void attemptGetPersonDetails() {
+        viewSwitcher.showProgressBar();
+        new GetPersonDetailsTask().execute();
+    }
+
 
     private void attemptDelete() {
         new AlertDialog.Builder(this)
@@ -69,6 +86,57 @@ public class PersonDetailsActivity extends AppCompatActivity {
         return true;
     }
 
+    private class GetPersonDetailsTask extends AsyncTask<Void, Void, TaskResult> {
+
+        @Override
+        protected TaskResult doInBackground(Void... params) {
+            if (!ConnectionUtils.isConnected(PersonDetailsActivity.this)) {
+                return new TaskResult(TaskResultType.NO_CONNECTION);
+            }
+
+            try {
+                String personUrl = PersonDetailsActivity.this.personSelfLink;
+                ResponseEntity<String> responseEntity = RestUtils.getPersonDetails(personUrl);
+                HttpStatus httpStatus = responseEntity.getStatusCode();
+                if (httpStatus == HttpStatus.OK) { // TODO not found
+                    Person person = JSONUtils.parseAsPerson(responseEntity.getBody());
+                    return new TaskResult(person);
+                } else {
+                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
+                }
+            } catch (Exception e) {
+                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(TaskResult taskResult) {
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
+                Person person = (Person) taskResult.getResultObject();
+                ((TextView) findViewById(R.id.firstname)).setText(person.getFirstName());
+                ((TextView) findViewById(R.id.lastname)).setText(person.getLastName());
+                viewSwitcher.showMainLayout();
+                return;
+            }
+
+            String errorMessage = null;
+            switch (taskResult.getResultType()) {
+                case UNEXPECTED_RESPONSE_CODE:
+                    errorMessage = getString(R.string.error_unexpected_response);
+                    break;
+                case SERVER_UNAVAILABLE:
+                    errorMessage = getString(R.string.error_server_unavailable);
+                    break;
+                case NO_CONNECTION:
+                    errorMessage = getString(R.string.error_no_connection);
+                    break;
+            }
+            TextView errorTextView = (TextView) findViewById(R.id.error_text);
+            errorTextView.setText(errorMessage);
+            viewSwitcher.showErrorLayout();
+        }
+    }
+
     private class DeletePersonTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
@@ -78,7 +146,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
             }
 
             try {
-                String personUrl = PersonDetailsActivity.this.person.getSelfLink();
+                String personUrl = PersonDetailsActivity.this.personSelfLink;
                 ResponseEntity<String> responseEntity = RestUtils.deletePerson(personUrl);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.NO_CONTENT) {
@@ -93,30 +161,31 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(TaskResult taskResult) {
-            if (taskResult.resultType == TaskResultType.SUCCESS) {
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
                 setResult(RESULT_PERSON_DELETED, new Intent());
                 finish();
-            } else {
-                String errorMessage = null;
-                switch (taskResult.resultType) {
-                    case UNEXPECTED_RESPONSE_CODE:
-                        errorMessage = getString(R.string.error_unexpected_response);
-                        break;
-                    case SERVER_UNAVAILABLE:
-                        errorMessage = getString(R.string.error_server_unavailable);
-                        break;
-                    case NO_CONNECTION:
-                        errorMessage = getString(R.string.error_no_connection);
-                        break;
-                }
-                Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.action_retry, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                attemptDelete();
-                            }
-                        }).show();
+                return;
             }
+
+            String errorMessage = null;
+            switch (taskResult.getResultType()) {
+                case UNEXPECTED_RESPONSE_CODE:
+                    errorMessage = getString(R.string.error_unexpected_response);
+                    break;
+                case SERVER_UNAVAILABLE:
+                    errorMessage = getString(R.string.error_server_unavailable);
+                    break;
+                case NO_CONNECTION:
+                    errorMessage = getString(R.string.error_no_connection);
+                    break;
+            }
+            Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.action_retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            attemptDelete();
+                        }
+                    }).show();
         }
     }
 }

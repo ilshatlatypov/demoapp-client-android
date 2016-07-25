@@ -30,7 +30,7 @@ public class PersonsListActivity extends AppCompatActivity
 
     private static final int ADD_PERSON_REQUEST = 1;
     private static final int PERSON_DETAILS_REQUEST = 2;
-    public static final String EXTRA_PERSON = "person";
+    public static final String EXTRA_PERSON_LINK = "person_link";
 
     private ViewSwitcherNew viewSwitcher;
     private ListView lvPeople;
@@ -100,7 +100,7 @@ public class PersonsListActivity extends AppCompatActivity
 
     private void openPersonDetailsActivity(Person person) {
         Intent intent = new Intent(this, PersonDetailsActivity.class);
-        intent.putExtra(EXTRA_PERSON, person);
+        intent.putExtra(EXTRA_PERSON_LINK, person.getSelfLink());
         this.startActivityForResult(intent, PERSON_DETAILS_REQUEST);
     }
 
@@ -183,27 +183,6 @@ public class PersonsListActivity extends AppCompatActivity
         return true;
     }
 
-    enum TaskResultType {
-        SUCCESS,
-        UNEXPECTED_RESPONSE_CODE,
-        SERVER_UNAVAILABLE,
-        NO_CONNECTION
-    }
-
-    private class TaskResult {
-        TaskResultType resultType;
-        List<Person> persons;
-
-        public TaskResult(TaskResultType resultType) {
-            this.resultType = resultType;
-        }
-
-        public TaskResult(List<Person> persons) {
-            this.resultType = TaskResultType.SUCCESS;
-            this.persons = persons;
-        }
-    }
-
     private class UpdatePersonsListTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
@@ -229,17 +208,18 @@ public class PersonsListActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(TaskResult taskResult) {
 
-            if (taskResult.resultType == TaskResultType.SUCCESS) {
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
+                List<Person> people = (List<Person>) taskResult.getResultObject();
                 ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
                 peopleListAdapter.clear();
-                peopleListAdapter.addAll(taskResult.persons);
+                peopleListAdapter.addAll(people);
                 peopleListAdapter.notifyDataSetChanged();
                 viewSwitcher.showMainLayout();
                 return;
             }
 
             CharSequence errorMessage = null;
-            switch (taskResult.resultType) {
+            switch (taskResult.getResultType()) {
                 case UNEXPECTED_RESPONSE_CODE:
                     errorMessage = getText(R.string.error_unexpected_response);
                     break;
