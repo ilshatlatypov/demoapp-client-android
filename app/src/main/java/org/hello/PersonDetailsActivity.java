@@ -1,10 +1,7 @@
 package org.hello;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -15,11 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 public class PersonDetailsActivity extends AppCompatActivity {
 
@@ -79,17 +73,13 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!isConnected(PersonDetailsActivity.this)) {
+            if (!ConnectionUtils.isConnected(PersonDetailsActivity.this)) {
                 return new TaskResult(TaskResultType.NO_CONNECTION);
             }
 
             try {
-                String url = PersonDetailsActivity.this.person.getSelfLink();
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-                ResponseEntity<String> responseEntity = restTemplate.exchange(
-                        url, HttpMethod.DELETE, null,
-                        String.class);
+                String personUrl = PersonDetailsActivity.this.person.getSelfLink();
+                ResponseEntity<String> responseEntity = RestUtils.deletePerson(personUrl);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.NO_CONTENT) {
                     return new TaskResult(TaskResultType.SUCCESS);
@@ -128,11 +118,5 @@ public class PersonDetailsActivity extends AppCompatActivity {
                         }).show();
             }
         }
-    }
-
-    public static boolean isConnected(Context ctx) {
-        ConnectivityManager connMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
     }
 }

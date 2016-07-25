@@ -1,9 +1,6 @@
 package org.hello;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,11 +24,8 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -219,17 +213,12 @@ public class PersonsListActivity extends AppCompatActivity
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!isConnected(PersonsListActivity.this)) {
+            if (!ConnectionUtils.isConnected(PersonsListActivity.this)) {
                 return new TaskResult(TaskResultType.NO_CONNECTION);
             }
 
             try {
-                final String url = "http://192.168.2.11:8080/people";
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-                ResponseEntity<String> responseEntity = restTemplate.exchange(
-                        url, HttpMethod.GET, null,
-                        String.class);
+                ResponseEntity<String> responseEntity = RestUtils.getPersonsList();
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) {
                     List<Person> persons = parseAsPersonsList(responseEntity.getBody());
@@ -287,11 +276,5 @@ public class PersonsListActivity extends AppCompatActivity
             errorTextView.setText(errorMessage);
             viewSwitcher.showErrorLayout();
         }
-    }
-
-    public static boolean isConnected(Context ctx) {
-        ConnectivityManager connMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
     }
 }
