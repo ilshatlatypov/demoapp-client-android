@@ -3,7 +3,6 @@ package org.hello;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -21,13 +20,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PersonsListActivity extends AppCompatActivity
@@ -221,7 +216,7 @@ public class PersonsListActivity extends AppCompatActivity
                 ResponseEntity<String> responseEntity = RestUtils.getPersonsList();
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) {
-                    List<Person> persons = parseAsPersonsList(responseEntity.getBody());
+                    List<Person> persons = JSONUtils.parseAsPersonsList(responseEntity.getBody());
                     return new TaskResult(persons);
                 } else {
                     return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
@@ -229,23 +224,6 @@ public class PersonsListActivity extends AppCompatActivity
             } catch (Exception e) {
                 return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
             }
-        }
-
-        @NonNull
-        private List<Person> parseAsPersonsList(String jsonStr) throws JSONException {
-            JSONObject json = new JSONObject(jsonStr);
-            JSONArray peopleJsonArray = json.getJSONObject("_embedded").getJSONArray("people");
-            List<Person> people = new ArrayList<>();
-            for (int i = 0; i < peopleJsonArray.length(); i++) {
-                JSONObject personJson = peopleJsonArray.getJSONObject(i);
-                Person person = new Person();
-                person.setFirstName(personJson.getString("firstName"));
-                person.setLastName(personJson.getString("lastName"));
-                String selfLink = personJson.getJSONObject("_links").getJSONObject("self").getString("href");
-                person.setSelfLink(selfLink);
-                people.add(person);
-            }
-            return people;
         }
 
         @Override

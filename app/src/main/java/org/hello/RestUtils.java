@@ -1,6 +1,9 @@
 package org.hello;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -16,11 +19,12 @@ public class RestUtils {
         REST_TEMPLATE.getMessageConverters().add(new StringHttpMessageConverter());
     }
 
+    private static final String PERSONS_URL = "http://192.168.2.11:8080/people";
+
     private RestUtils() {}
 
     public static ResponseEntity<String> getPersonsList() {
-        final String url = "http://192.168.2.11:8080/people";
-        return REST_TEMPLATE.exchange(url, HttpMethod.GET, null, String.class);
+        return REST_TEMPLATE.exchange(PERSONS_URL, HttpMethod.GET, null, String.class);
     }
 
     public static ResponseEntity<String> getPersonDetails(String personUrl) {
@@ -31,4 +35,10 @@ public class RestUtils {
         return REST_TEMPLATE.exchange(personUrl, HttpMethod.DELETE, null, String.class);
     }
 
+    public static ResponseEntity<String> createPerson(String personJson) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(personJson, headers);
+        return REST_TEMPLATE.exchange(PERSONS_URL, HttpMethod.POST, entity, String.class);
+    }
 }

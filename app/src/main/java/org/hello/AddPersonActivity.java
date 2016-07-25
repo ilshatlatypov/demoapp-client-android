@@ -16,16 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 public class AddPersonActivity extends AppCompatActivity {
 
@@ -115,34 +107,13 @@ public class AddPersonActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                final String url = "http://192.168.2.11:8080/people"; // TODO extract URL and RestTemplate instantiation
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-
-                String jsonStr = toJSON(person).toString();
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-
-                HttpEntity<String> entity = new HttpEntity<>(jsonStr, headers);
-
-                ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+                String personJson = JSONUtils.toJSON(person).toString();
+                ResponseEntity<String> responseEntity = RestUtils.createPerson(personJson);
                 return responseEntity.getStatusCode() == HttpStatus.CREATED;
             } catch (Exception e) {
                 Log.e("AddPersonActivity", e.getMessage(), e);
             }
             return null;
-        }
-
-        private JSONObject toJSON(Person person) {
-            JSONObject json = new JSONObject();
-            try {
-                json.put("firstName", person.getFirstName());
-                json.put("lastName", person.getLastName());
-            } catch (JSONException e) {
-                // TODO handle this
-            }
-            return json;
         }
 
         @Override
