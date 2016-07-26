@@ -5,24 +5,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class AddPersonActivity extends AppCompatActivity {
 
-    private ViewSwitcher viewSwitcher;
     private Button bCreate;
+    private View baseLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +30,8 @@ public class AddPersonActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        baseLayout = findViewById(R.id.base_layout);
+
         bCreate = (Button) findViewById(R.id.b_create);
         bCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,8 +39,6 @@ public class AddPersonActivity extends AppCompatActivity {
                 attemptCreate();
             }
         });
-
-        viewSwitcher = new ViewSwitcher(this, R.id.pb_create_person, R.id.create_person_form);
     }
 
     private void attemptCreate() {
@@ -71,9 +70,8 @@ public class AddPersonActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             hideKeyboard();
-            viewSwitcher.showFirst();
-            Person person = new Person(firstName, lastName);
-            new CreatePersonTask(person).execute();
+            Snackbar.make(baseLayout, R.string.prompt_adding_person, Snackbar.LENGTH_SHORT).show();
+            new CreatePersonTask(new Person(firstName, lastName)).execute();
         }
     }
 
@@ -96,7 +94,7 @@ public class AddPersonActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class CreatePersonTask extends AsyncTask<Void, Void, Boolean> {
+    private class CreatePersonTask extends AsyncTask<Void, Void, TaskResult> {
 
         private final Person person;
 
@@ -105,38 +103,52 @@ public class AddPersonActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected TaskResult doInBackground(Void... params) {
+            if (!ConnectionUtils.isConnected(AddPersonActivity.this)) {
+                return new TaskResult(TaskResultType.NO_CONNECTION);
+            }
+
             try {
                 String personJson = JSONUtils.toJSON(person).toString();
                 ResponseEntity<String> responseEntity = RestUtils.createPerson(personJson);
-                return responseEntity.getStatusCode() == HttpStatus.CREATED;
+                HttpStatus httpStatus = responseEntity.getStatusCode();
+                if (httpStatus == HttpStatus.CREATED) {
+                    return new TaskResult(TaskResultType.SUCCESS);
+                } else {
+                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
+                }
             } catch (Exception e) {
-                Log.e("AddPersonActivity", e.getMessage(), e);
+                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
             }
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean success) {
-            viewSwitcher.showSecond();
-
-            if (success == null) {
-                // TODO show error message in the bottom with retry button
-            }
-
-            if (success) {
-                Toast.makeText(AddPersonActivity.this, R.string.toast_person_created, Toast.LENGTH_SHORT).show();
-                Intent returnIntent = new Intent();
-                setResult(Activity.RESULT_OK, returnIntent);
+        protected void onPostExecute(TaskResult taskResult) {
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
+                setResult(Activity.RESULT_OK, new Intent());
                 finish();
-            } else {
-                // TODO what if success == false
+                return;
             }
-        }
 
-        @Override
-        protected void onCancelled() {
-            viewSwitcher.showSecond();
+            String errorMessage = null;
+            switch (taskResult.getResultType()) {
+                case UNEXPECTED_RESPONSE_CODE:
+                    errorMessage = getString(R.string.error_unexpected_response);
+                    break;
+                case SERVER_UNAVAILABLE:
+                    errorMessage = getString(R.string.error_server_unavailable);
+                    break;
+                case NO_CONNECTION:
+                    errorMessage = getString(R.string.error_no_connection);
+                    break;
+            }
+            Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.action_retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            attemptCreate();
+                        }
+                    }).show();
         }
     }
 }

@@ -22,4 +22,6 @@
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="prompt_deletion">Удаление…</string>
     <string name="prompt_person_deleted">Персона удалена</string>
+    <string name="prompt_adding_person">Добавление персоны...</string>
+    <string name="prompt_person_added">Персона добавлена</string>
 </resources>

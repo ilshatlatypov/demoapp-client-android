@@ -108,10 +108,11 @@ public class PersonsListActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ADD_PERSON_REQUEST) {
             if (resultCode == RESULT_OK) {
+                Snackbar.make(lvPeople, R.string.prompt_person_added, Snackbar.LENGTH_SHORT).show();
                 updatePeopleList();
             }
         } else if (requestCode == PERSON_DETAILS_REQUEST) {
-            if (resultCode == PersonDetailsActivity.RESULT_PERSON_DELETED) {
+            if (resultCode == RESULT_OK) {
                 Snackbar.make(lvPeople, R.string.prompt_person_deleted, Snackbar.LENGTH_SHORT).show();
                 updatePeopleList();
             }

@@ -1,5 +1,6 @@
 package org.hello;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -17,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class PersonDetailsActivity extends AppCompatActivity {
-
-    public static final int RESULT_PERSON_DELETED = 1;
 
     private ViewSwitcherNew viewSwitcher;
     private View baseLayout;
@@ -162,7 +161,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(TaskResult taskResult) {
             if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                setResult(RESULT_PERSON_DELETED, new Intent());
+                setResult(Activity.RESULT_OK, new Intent());
                 finish();
                 return;
             }

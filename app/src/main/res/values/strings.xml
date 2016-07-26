@@ -26,5 +26,7 @@
     <string name="prompt_delete_person">Delete person?</string>
     <string name="prompt_deletion">Deletion…</string>
     <string name="prompt_person_deleted">Person deleted</string>
+    <string name="prompt_adding_person">Adding person...</string>
+    <string name="prompt_person_added">Person added</string>
 
 </resources>
