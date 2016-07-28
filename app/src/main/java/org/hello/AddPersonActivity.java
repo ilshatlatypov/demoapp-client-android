@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.hello.utils.KeyboardUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -69,18 +70,9 @@ public class AddPersonActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            hideKeyboard();
+            KeyboardUtils.hideKeyboard(this);
             Snackbar.make(baseLayout, R.string.prompt_adding_person, Snackbar.LENGTH_SHORT).show();
             new CreatePersonTask(new Person(firstName, lastName)).execute();
-        }
-    }
-
-    private void hideKeyboard() {
-        // Check if no view has focus:
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
