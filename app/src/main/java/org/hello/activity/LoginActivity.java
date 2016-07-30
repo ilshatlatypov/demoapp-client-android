@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -30,17 +31,10 @@ import org.springframework.web.client.RestTemplate;
 import java.nio.charset.Charset;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via login/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -94,8 +88,8 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Reset errors.
-        mLoginView.setError(null);
-        mPasswordView.setError(null);
+        ((TextInputLayout) mLoginView.getParent()).setError(null);
+        ((TextInputLayout) mPasswordView.getParent()).setError(null);
 
         // Store values at the time of the login attempt.
         String login = mLoginView.getText().toString();
@@ -104,20 +98,16 @@ public class LoginActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        // Check for a valid password.
+        if (TextUtils.isEmpty(password)) {
+            ((TextInputLayout) mPasswordView.getParent()).setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
         }
 
-        // Check for a valid email address.
+        // Check for a valid login.
         if (TextUtils.isEmpty(login)) {
-            mLoginView.setError(getString(R.string.error_field_required));
-            focusView = mLoginView;
-            cancel = true;
-        } else if (!isLoginValid(login)) {
-            mLoginView.setError(getString(R.string.error_invalid_login));
+            ((TextInputLayout) mLoginView.getParent()).setError(getString(R.string.error_field_required));
             focusView = mLoginView;
             cancel = true;
         }
@@ -134,16 +124,6 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = new UserLoginTask(login, password);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isLoginValid(String login) {
-        //TODO: Replace this with your own logic
-        return login.length() > 1;
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 3;
     }
 
     /**
@@ -216,8 +196,9 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             } else {
                 showProgress(false);
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                ((TextInputLayout) mPasswordView.getParent()).setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+                KeyboardUtils.showKeyboard(LoginActivity.this);
             }
         }
 
