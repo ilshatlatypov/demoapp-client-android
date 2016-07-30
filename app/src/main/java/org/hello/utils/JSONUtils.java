@@ -1,6 +1,6 @@
 package org.hello.utils;
 
-import org.hello.entity.Person;
+import org.hello.entity.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,41 +15,41 @@ public class JSONUtils {
 
     private JSONUtils() {}
 
-    public static Person parseAsPerson(String jsonStr) {
-        Person person = new Person();
+    public static User parseAsUser(String jsonStr) {
+        User person = new User();
         try {
             JSONObject json = new JSONObject(jsonStr);
-            person.setFirstName(json.getString("firstName"));
-            person.setLastName(json.getString("lastName"));
+            person.setFirstname(json.getString("firstname"));
+            person.setLastname(json.getString("lastname"));
         } catch (JSONException e) {
             // TODO handle this
         }
         return person;
     }
 
-    public static List<Person> parseAsPersonsList(String jsonStr) throws JSONException {
+    public static List<User> parseAsUsersList(String jsonStr) throws JSONException {
         JSONObject json = new JSONObject(jsonStr);
-        JSONArray peopleJsonArray = json.getJSONObject("_embedded").getJSONArray("people");
-        List<Person> people = new ArrayList<>();
+        JSONArray peopleJsonArray = json.getJSONObject("_embedded").getJSONArray("users");
+        List<User> people = new ArrayList<>();
         for (int i = 0; i < peopleJsonArray.length(); i++) {
             JSONObject personJson = peopleJsonArray.getJSONObject(i);
-            Person person = new Person();
+            User person = new User();
 
             String selfLink = personJson.getJSONObject("_links").getJSONObject("self").getString("href");
             person.setSelfLink(selfLink);
-            person.setFirstName(personJson.getString("firstName"));
-            person.setLastName(personJson.getString("lastName"));
+            person.setFirstname(personJson.getString("firstname"));
+            person.setLastname(personJson.getString("lastname"));
 
             people.add(person);
         }
         return people;
     }
 
-    public static JSONObject toJSON(Person person) {
+    public static JSONObject toJSON(User user) {
         JSONObject json = new JSONObject();
         try {
-            json.put("firstName", person.getFirstName());
-            json.put("lastName", person.getLastName());
+            json.put("firstname", user.getFirstname());
+            json.put("lastname", user.getLastname());
         } catch (JSONException e) {
             // TODO handle this
         }

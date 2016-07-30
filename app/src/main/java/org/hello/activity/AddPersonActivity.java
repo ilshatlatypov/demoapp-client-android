@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import org.hello.utils.ConnectionUtils;
-import org.hello.entity.Person;
+import org.hello.entity.User;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
@@ -77,7 +77,7 @@ public class AddPersonActivity extends AppCompatActivity {
         } else {
             KeyboardUtils.hideKeyboard(this);
             Snackbar.make(baseLayout, R.string.prompt_adding_person, Snackbar.LENGTH_SHORT).show();
-            new CreatePersonTask(new Person(firstName, lastName)).execute();
+            new CreatePersonTask(new User(firstName, lastName)).execute();
         }
     }
 
@@ -93,9 +93,9 @@ public class AddPersonActivity extends AppCompatActivity {
 
     private class CreatePersonTask extends AsyncTask<Void, Void, TaskResult> {
 
-        private final Person person;
+        private final User person;
 
-        CreatePersonTask(Person person) {
+        CreatePersonTask(User person) {
             this.person = person;
         }
 

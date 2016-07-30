@@ -8,9 +8,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,10 +28,24 @@ import static org.hello.utils.StringConstants.SLASH;
  */
 public class DigestAuthRestTemplate extends RestTemplate {
 
+    private static DigestAuthRestTemplate instance;
+
     private String login;
     private String password;
 
-    public DigestAuthRestTemplate(String login, String password) {
+    private DigestAuthRestTemplate() {
+
+    }
+
+    public static DigestAuthRestTemplate getInstance() {
+        if (instance == null) {
+            instance = new DigestAuthRestTemplate();
+            instance.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+        }
+        return instance;
+    }
+
+    public void setCredentials(String login, String password) {
         this.login = login;
         this.password = password;
     }

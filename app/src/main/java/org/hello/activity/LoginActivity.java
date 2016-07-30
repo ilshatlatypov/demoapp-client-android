@@ -26,7 +26,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 
@@ -179,7 +178,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             String url = "http://192.168.2.11:8080";
-            RestTemplate restTemplate = new DigestAuthRestTemplate(mLogin, mPassword);
+            DigestAuthRestTemplate restTemplate = DigestAuthRestTemplate.getInstance();
+            restTemplate.setCredentials(mLogin, mPassword);
             restTemplate.setErrorHandler(new MyResponseErrorHandler());
             restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);

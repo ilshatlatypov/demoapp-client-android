@@ -21,7 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.hello.utils.ConnectionUtils;
-import org.hello.entity.Person;
+import org.hello.entity.User;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
@@ -69,7 +69,7 @@ public class PersonsListActivity extends AppCompatActivity
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
 
-        ArrayAdapter<Person> peopleListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        ArrayAdapter<User> peopleListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         lvPeople = (ListView) findViewById(R.id.lv_people);
         lvPeople.setAdapter(peopleListAdapter);
         lvPeople.setEmptyView(findViewById(android.R.id.empty));
@@ -77,7 +77,7 @@ public class PersonsListActivity extends AppCompatActivity
         lvPeople.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Person person = (Person) parent.getItemAtPosition(position);
+                User person = (User) parent.getItemAtPosition(position);
                 openPersonDetailsActivity(person);
             }
         });
@@ -106,7 +106,7 @@ public class PersonsListActivity extends AppCompatActivity
         this.startActivityForResult(intent, ADD_PERSON_REQUEST);
     }
 
-    private void openPersonDetailsActivity(Person person) {
+    private void openPersonDetailsActivity(User person) {
         Intent intent = new Intent(this, PersonDetailsActivity.class);
         intent.putExtra(EXTRA_PERSON_LINK, person.getSelfLink());
         this.startActivityForResult(intent, PERSON_DETAILS_REQUEST);
@@ -204,8 +204,8 @@ public class PersonsListActivity extends AppCompatActivity
                 ResponseEntity<String> responseEntity = RestUtils.getPersonsList();
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) {
-                    List<Person> persons = JSONUtils.parseAsPersonsList(responseEntity.getBody());
-                    return new TaskResult(persons);
+                    List<User> users = JSONUtils.parseAsUsersList(responseEntity.getBody());
+                    return new TaskResult(users);
                 } else {
                     return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
                 }
@@ -218,11 +218,11 @@ public class PersonsListActivity extends AppCompatActivity
         protected void onPostExecute(TaskResult taskResult) {
 
             if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                List<Person> people = (List<Person>) taskResult.getResultObject();
-                ArrayAdapter<Person> peopleListAdapter = (ArrayAdapter<Person>) lvPeople.getAdapter();
-                peopleListAdapter.clear();
-                peopleListAdapter.addAll(people);
-                peopleListAdapter.notifyDataSetChanged();
+                List<User> users = (List<User>) taskResult.getResultObject();
+                ArrayAdapter<User> usersListAdapter = (ArrayAdapter<User>) lvPeople.getAdapter();
+                usersListAdapter.clear();
+                usersListAdapter.addAll(users);
+                usersListAdapter.notifyDataSetChanged();
                 viewSwitcher.showMainLayout();
                 return;
             }

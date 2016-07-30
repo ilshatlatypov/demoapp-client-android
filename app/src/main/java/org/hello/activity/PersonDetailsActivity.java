@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.hello.entity.Person;
+import org.hello.entity.User;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
@@ -106,7 +106,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
                 ResponseEntity<String> responseEntity = RestUtils.getPersonDetails(personUrl);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) { // TODO not found
-                    Person person = JSONUtils.parseAsPerson(responseEntity.getBody());
+                    User person = JSONUtils.parseAsUser(responseEntity.getBody());
                     return new TaskResult(person);
                 } else {
                     return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
@@ -119,9 +119,9 @@ public class PersonDetailsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(TaskResult taskResult) {
             if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                Person person = (Person) taskResult.getResultObject();
-                ((TextView) findViewById(R.id.firstname)).setText(person.getFirstName());
-                ((TextView) findViewById(R.id.lastname)).setText(person.getLastName());
+                User person = (User) taskResult.getResultObject();
+                ((TextView) findViewById(R.id.firstname)).setText(person.getFirstname());
+                ((TextView) findViewById(R.id.lastname)).setText(person.getLastname());
                 viewSwitcher.showMainLayout();
                 return;
             }
