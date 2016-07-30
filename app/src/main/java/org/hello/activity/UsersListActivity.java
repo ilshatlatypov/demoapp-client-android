@@ -49,7 +49,7 @@ public class UsersListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openAddPersonActivity();
+                openAddUserActivity();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -64,8 +64,8 @@ public class UsersListActivity extends AppCompatActivity {
         lvPeople.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                User person = (User) parent.getItemAtPosition(position);
-                openPersonDetailsActivity(person);
+                User user = (User) parent.getItemAtPosition(position);
+                openUserDetailsActivity(user);
             }
         });
 
@@ -77,25 +77,25 @@ public class UsersListActivity extends AppCompatActivity {
             }
         });
 
-        Button buttonAddPerson = (Button) findViewById(R.id.button_create_person_from_empty_list);
-        buttonAddPerson.setOnClickListener(new View.OnClickListener() {
+        Button buttonAddUser = (Button) findViewById(R.id.button_add_user_from_empty_list);
+        buttonAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openAddPersonActivity();
+                openAddUserActivity();
             }
         });
 
         updatePeopleList();
     }
 
-    private void openAddPersonActivity() {
-        Intent intent = new Intent(this, AddPersonActivity.class);
+    private void openAddUserActivity() {
+        Intent intent = new Intent(this, AddUserActivity.class);
         this.startActivityForResult(intent, ADD_USER_REQUEST);
     }
 
-    private void openPersonDetailsActivity(User person) {
-        Intent intent = new Intent(this, PersonDetailsActivity.class);
-        intent.putExtra(EXTRA_USER_LINK, person.getSelfLink());
+    private void openUserDetailsActivity(User user) {
+        Intent intent = new Intent(this, UserDetailsActivity.class);
+        intent.putExtra(EXTRA_USER_LINK, user.getSelfLink());
         this.startActivityForResult(intent, USER_DETAILS_REQUEST);
     }
 
@@ -117,7 +117,7 @@ public class UsersListActivity extends AppCompatActivity {
 
     private void updatePeopleList() {
         viewSwitcher.showProgressBar();
-        new UpdatePersonsListTask().execute();
+        new UpdateUsersListTask().execute();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class UsersListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class UpdatePersonsListTask extends AsyncTask<Void, Void, TaskResult> {
+    private class UpdateUsersListTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
@@ -145,7 +145,7 @@ public class UsersListActivity extends AppCompatActivity {
             }
 
             try {
-                ResponseEntity<String> responseEntity = RestUtils.getPersonsList();
+                ResponseEntity<String> responseEntity = RestUtils.getUsersList();
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) {
                     List<User> users = JSONUtils.parseAsUsersList(responseEntity.getBody());

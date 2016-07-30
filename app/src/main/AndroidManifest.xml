@@ -37,7 +37,7 @@
                 android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name=".activity.AddPersonActivity"
+            android:name=".activity.AddUserActivity"
             android:label="@string/title_add_user"
             android:parentActivityName=".activity.UsersListActivity">
             <meta-data
@@ -45,7 +45,7 @@
                 android:value=".activity.UsersListActivity" />
         </activity>
         <activity
-            android:name=".activity.PersonDetailsActivity"
+            android:name=".activity.UserDetailsActivity"
             android:label="@string/title_user_details"
             android:parentActivityName=".activity.UsersListActivity">
             <meta-data

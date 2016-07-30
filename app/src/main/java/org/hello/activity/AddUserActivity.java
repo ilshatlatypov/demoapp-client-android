@@ -24,7 +24,7 @@ import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class AddPersonActivity extends AppCompatActivity {
+public class AddUserActivity extends AppCompatActivity {
 
     private Button bCreate;
     private View baseLayout;
@@ -32,7 +32,7 @@ public class AddPersonActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_person);
+        setContentView(R.layout.activity_add_user);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -55,18 +55,18 @@ public class AddPersonActivity extends AppCompatActivity {
 
         EditText etFirstName = (EditText) findViewById(R.id.et_firstname);
         EditText etLastName = (EditText) findViewById(R.id.et_lastname);
-        String firstName = etFirstName.getText().toString();
-        String lastName = etLastName.getText().toString();
+        String firstname = etFirstName.getText().toString();
+        String lastname = etLastName.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        if (TextUtils.isEmpty(lastName)) {
+        if (TextUtils.isEmpty(lastname)) {
             tilLastName.setError(getString(R.string.error_field_required));
             focusView = etLastName;
             cancel = true;
         }
-        if (TextUtils.isEmpty(firstName)) {
+        if (TextUtils.isEmpty(firstname)) {
             tilFirstName.setError(getString(R.string.error_field_required));
             focusView = etFirstName;
             cancel = true;
@@ -77,7 +77,7 @@ public class AddPersonActivity extends AppCompatActivity {
         } else {
             KeyboardUtils.hideKeyboard(this);
             Snackbar.make(baseLayout, R.string.prompt_adding_user, Snackbar.LENGTH_SHORT).show();
-            new CreatePersonTask(new User(firstName, lastName)).execute();
+            new AddUserTask(new User(firstname, lastname)).execute();
         }
     }
 
@@ -91,22 +91,22 @@ public class AddPersonActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class CreatePersonTask extends AsyncTask<Void, Void, TaskResult> {
+    private class AddUserTask extends AsyncTask<Void, Void, TaskResult> {
 
-        private final User person;
+        private final User user;
 
-        CreatePersonTask(User person) {
-            this.person = person;
+        AddUserTask(User user) {
+            this.user = user;
         }
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(AddPersonActivity.this)) {
+            if (!ConnectionUtils.isConnected(AddUserActivity.this)) {
                 return new TaskResult(TaskResultType.NO_CONNECTION);
             }
 
             try {
-                String userJson = JSONUtils.toJSON(person).toString();
+                String userJson = JSONUtils.toJSON(user).toString();
                 ResponseEntity<String> responseEntity = RestUtils.createUser(userJson);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.CREATED) {

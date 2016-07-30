@@ -25,7 +25,7 @@ import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class PersonDetailsActivity extends AppCompatActivity {
+public class UserDetailsActivity extends AppCompatActivity {
 
     private ViewSwitcherNew viewSwitcher;
     private View baseLayout;
@@ -34,7 +34,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_person_details);
+        setContentView(R.layout.activity_user_details);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -47,11 +47,11 @@ public class PersonDetailsActivity extends AppCompatActivity {
         buttonRetry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptGetPersonDetails();
+                attemptGetUserDetails();
             }
         });
 
-        attemptGetPersonDetails();
+        attemptGetUserDetails();
     }
 
     @Override
@@ -67,9 +67,9 @@ public class PersonDetailsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void attemptGetPersonDetails() {
+    private void attemptGetUserDetails() {
         viewSwitcher.showProgressBar();
-        new GetPersonDetailsTask().execute();
+        new GetUserDetailsTask().execute();
     }
 
 
@@ -80,7 +80,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_SHORT).show();
-                        new DeletePersonTask().execute();
+                        new DeleteUserTask().execute();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -89,25 +89,25 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.person_details, menu);
+        getMenuInflater().inflate(R.menu.user_details, menu);
         return true;
     }
 
-    private class GetPersonDetailsTask extends AsyncTask<Void, Void, TaskResult> {
+    private class GetUserDetailsTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(PersonDetailsActivity.this)) {
+            if (!ConnectionUtils.isConnected(UserDetailsActivity.this)) {
                 return new TaskResult(TaskResultType.NO_CONNECTION);
             }
 
             try {
-                String personUrl = PersonDetailsActivity.this.userSelfLink;
-                ResponseEntity<String> responseEntity = RestUtils.getPersonDetails(personUrl);
+                String url = UserDetailsActivity.this.userSelfLink;
+                ResponseEntity<String> responseEntity = RestUtils.getUserDetails(url);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) { // TODO not found
-                    User person = JSONUtils.parseAsUser(responseEntity.getBody());
-                    return new TaskResult(person);
+                    User user = JSONUtils.parseAsUser(responseEntity.getBody());
+                    return new TaskResult(user);
                 } else {
                     return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
                 }
@@ -119,9 +119,9 @@ public class PersonDetailsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(TaskResult taskResult) {
             if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                User person = (User) taskResult.getResultObject();
-                ((TextView) findViewById(R.id.firstname)).setText(person.getFirstname());
-                ((TextView) findViewById(R.id.lastname)).setText(person.getLastname());
+                User user = (User) taskResult.getResultObject();
+                ((TextView) findViewById(R.id.firstname)).setText(user.getFirstname());
+                ((TextView) findViewById(R.id.lastname)).setText(user.getLastname());
                 viewSwitcher.showMainLayout();
                 return;
             }
@@ -144,17 +144,17 @@ public class PersonDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private class DeletePersonTask extends AsyncTask<Void, Void, TaskResult> {
+    private class DeleteUserTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(PersonDetailsActivity.this)) {
+            if (!ConnectionUtils.isConnected(UserDetailsActivity.this)) {
                 return new TaskResult(TaskResultType.NO_CONNECTION);
             }
 
             try {
-                String personUrl = PersonDetailsActivity.this.userSelfLink;
-                ResponseEntity<String> responseEntity = RestUtils.deletePerson(personUrl);
+                String url = UserDetailsActivity.this.userSelfLink;
+                ResponseEntity<String> responseEntity = RestUtils.deleteUser(url);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.NO_CONTENT) {
                     return new TaskResult(TaskResultType.SUCCESS);

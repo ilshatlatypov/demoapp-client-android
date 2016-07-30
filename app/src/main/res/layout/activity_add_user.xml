@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:id="@+id/base_layout"
-    tools:context=".activity.AddPersonActivity">
+    tools:context=".activity.AddUserActivity">
 
     <!-- Dummy item to prevent EditText from receiving focus -->
     <View
@@ -18,7 +18,7 @@
         android:layout_height="0px"/>
 
     <ProgressBar
-        android:id="@+id/pb_create_person"
+        android:id="@+id/progress_add_user"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
         android:visibility="gone" />
 
     <ScrollView
-        android:id="@+id/create_person_form"
+        android:id="@+id/from_add_user"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

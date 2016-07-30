@@ -30,7 +30,7 @@
             android:clipToPadding="false"
             android:divider="@android:color/transparent"/>
 
-        <!-- No persons in list -->
+        <!-- No users in list -->
         <RelativeLayout
             android:id="@android:id/empty"
             android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                     android:text="@string/prompt_no_users"
                     android:layout_centerHorizontal="true"/>
                 <Button
-                    android:id="@+id/button_create_person_from_empty_list"
+                    android:id="@+id/button_add_user_from_empty_list"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/action_add_user"
@@ -61,7 +61,7 @@
                     android:layout_below="@id/empty_list_text"/>
             </RelativeLayout>
         </RelativeLayout>
-        <!-- /No persons in list -->
+        <!-- /No users in list -->
 
     </FrameLayout>
 

@@ -16,15 +16,15 @@ public class JSONUtils {
     private JSONUtils() {}
 
     public static User parseAsUser(String jsonStr) {
-        User person = new User();
+        User user = new User();
         try {
             JSONObject json = new JSONObject(jsonStr);
-            person.setFirstname(json.getString("firstname"));
-            person.setLastname(json.getString("lastname"));
+            user.setFirstname(json.getString("firstname"));
+            user.setLastname(json.getString("lastname"));
         } catch (JSONException e) {
             // TODO handle this
         }
-        return person;
+        return user;
     }
 
     public static List<User> parseAsUsersList(String jsonStr) throws JSONException {
@@ -32,15 +32,15 @@ public class JSONUtils {
         JSONArray peopleJsonArray = json.getJSONObject("_embedded").getJSONArray("users");
         List<User> people = new ArrayList<>();
         for (int i = 0; i < peopleJsonArray.length(); i++) {
-            JSONObject personJson = peopleJsonArray.getJSONObject(i);
-            User person = new User();
+            JSONObject userJson = peopleJsonArray.getJSONObject(i);
+            User user = new User();
 
-            String selfLink = personJson.getJSONObject("_links").getJSONObject("self").getString("href");
-            person.setSelfLink(selfLink);
-            person.setFirstname(personJson.getString("firstname"));
-            person.setLastname(personJson.getString("lastname"));
+            String selfLink = userJson.getJSONObject("_links").getJSONObject("self").getString("href");
+            user.setSelfLink(selfLink);
+            user.setFirstname(userJson.getString("firstname"));
+            user.setLastname(userJson.getString("lastname"));
 
-            people.add(person);
+            people.add(user);
         }
         return people;
     }

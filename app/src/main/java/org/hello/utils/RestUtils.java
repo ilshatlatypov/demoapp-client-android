@@ -22,16 +22,16 @@ public class RestUtils {
 
     private RestUtils() {}
 
-    public static ResponseEntity<String> getPersonsList() {
+    public static ResponseEntity<String> getUsersList() {
         return REST_TEMPLATE.exchange(USERS_URL, HttpMethod.GET, null, String.class);
     }
 
-    public static ResponseEntity<String> getPersonDetails(String personUrl) {
-        return REST_TEMPLATE.exchange(personUrl, HttpMethod.GET, null, String.class);
+    public static ResponseEntity<String> getUserDetails(String url) {
+        return REST_TEMPLATE.exchange(url, HttpMethod.GET, null, String.class);
     }
 
-    public static ResponseEntity<String> deletePerson(String personUrl) {
-        return REST_TEMPLATE.exchange(personUrl, HttpMethod.DELETE, null, String.class);
+    public static ResponseEntity<String> deleteUser(String url) {
+        return REST_TEMPLATE.exchange(url, HttpMethod.DELETE, null, String.class);
     }
 
     public static ResponseEntity<String> createUser(String userJson) {
