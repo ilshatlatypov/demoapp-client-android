@@ -1,7 +1,6 @@
-package org.hello;
+package org.hello.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,11 +10,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.hello.utils.ConnectionUtils;
+import org.hello.entity.Person;
+import org.hello.R;
+import org.hello.TaskResult;
+import org.hello.TaskResultType;
+import org.hello.utils.JSONUtils;
 import org.hello.utils.KeyboardUtils;
+import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

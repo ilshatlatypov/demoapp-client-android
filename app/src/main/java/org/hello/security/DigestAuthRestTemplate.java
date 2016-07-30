@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.security;
 
 import android.support.annotation.NonNull;
 
@@ -14,12 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hello.StringConstants.COMMA;
-import static org.hello.StringConstants.COMMA_SPACE;
-import static org.hello.StringConstants.EMPTY;
-import static org.hello.StringConstants.EQUAL;
-import static org.hello.StringConstants.QUOTE;
-import static org.hello.StringConstants.SLASH;
+import static org.hello.utils.StringConstants.COMMA;
+import static org.hello.utils.StringConstants.COMMA_SPACE;
+import static org.hello.utils.StringConstants.EMPTY;
+import static org.hello.utils.StringConstants.EQUAL;
+import static org.hello.utils.StringConstants.QUOTE;
+import static org.hello.utils.StringConstants.SLASH;
 
 /**
  * Created by ilshat on 30.07.16.

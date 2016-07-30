@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.activity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -20,6 +20,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.hello.utils.ConnectionUtils;
+import org.hello.entity.Person;
+import org.hello.R;
+import org.hello.TaskResult;
+import org.hello.TaskResultType;
+import org.hello.ViewSwitcherNew;
+import org.hello.utils.JSONUtils;
+import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

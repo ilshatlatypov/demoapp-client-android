@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.security;
 
 import org.springframework.http.HttpAuthentication;
 import org.springframework.http.HttpMethod;
@@ -7,7 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import static org.hello.StringConstants.COLON;
+import static org.hello.utils.StringConstants.COLON;
 
 /**
  * Created by ilshat on 30.07.16.

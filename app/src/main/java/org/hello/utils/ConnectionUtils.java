@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

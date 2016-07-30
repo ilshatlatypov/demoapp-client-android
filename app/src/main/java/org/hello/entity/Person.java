@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.entity;
 
 import java.io.Serializable;
 

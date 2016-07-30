@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -17,6 +17,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.hello.MyResponseErrorHandler;
+import org.hello.R;
+import org.hello.security.DigestAuthRestTemplate;
 import org.hello.utils.KeyboardUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;

@@ -1,5 +1,6 @@
-package org.hello;
+package org.hello.utils;
 
+import org.hello.entity.Person;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

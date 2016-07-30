@@ -1,4 +1,4 @@
-package org.hello;
+package org.hello.utils;
 
 /**
  * Created by ilshat on 30.07.16.
