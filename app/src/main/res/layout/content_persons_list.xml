@@ -50,13 +50,13 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textAlignment="center"
-                    android:text="@string/prompt_no_persons"
+                    android:text="@string/prompt_no_users"
                     android:layout_centerHorizontal="true"/>
                 <Button
                     android:id="@+id/button_create_person_from_empty_list"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/action_add_person"
+                    android:text="@string/action_add_user"
                     android:layout_centerHorizontal="true"
                     android:layout_below="@id/empty_list_text"/>
             </RelativeLayout>

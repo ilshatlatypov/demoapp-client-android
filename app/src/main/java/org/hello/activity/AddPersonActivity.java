@@ -76,7 +76,7 @@ public class AddPersonActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             KeyboardUtils.hideKeyboard(this);
-            Snackbar.make(baseLayout, R.string.prompt_adding_person, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(baseLayout, R.string.prompt_adding_user, Snackbar.LENGTH_SHORT).show();
             new CreatePersonTask(new User(firstName, lastName)).execute();
         }
     }
@@ -106,8 +106,8 @@ public class AddPersonActivity extends AppCompatActivity {
             }
 
             try {
-                String personJson = JSONUtils.toJSON(person).toString();
-                ResponseEntity<String> responseEntity = RestUtils.createPerson(personJson);
+                String userJson = JSONUtils.toJSON(person).toString();
+                ResponseEntity<String> responseEntity = RestUtils.createUser(userJson);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.CREATED) {
                     return new TaskResult(TaskResultType.SUCCESS);

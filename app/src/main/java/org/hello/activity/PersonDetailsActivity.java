@@ -75,7 +75,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
     private void attemptDelete() {
         new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.prompt_delete_person))
+                .setMessage(getString(R.string.prompt_delete_user))
                 .setPositiveButton(getText(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

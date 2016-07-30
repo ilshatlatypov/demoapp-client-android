@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TestApp</string>
-    <string name="action_add_person">Добавить персону</string>
+    <string name="action_add_user">Добавить сотрудника</string>
     <string name="action_create">Создать</string>
     <string name="action_delete">Удалить</string>
     <string name="action_refresh">Обновить</string>
@@ -12,21 +12,20 @@
     <string name="error_server_unavailable">Сервер не отвечает. Попробуйте позже.</string>
     <string name="error_unexpected_response">Неожиданный код ответа от сервера</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
-    <string name="prompt_delete_person">Удалить персону?</string>
+    <string name="prompt_delete_user">Удалить сотрудника?</string>
     <string name="prompt_first_name">Имя</string>
     <string name="prompt_last_name">Фамилия</string>
-    <string name="prompt_no_persons">Список персон пуст</string>
-    <string name="title_person_details">Просмотр персоны</string>
-    <string name="toast_person_created">Персона создана</string>
-    <string name="title_add_person">Добавление персоны</string>
+    <string name="prompt_no_users">Список сотрудников пуст</string>
+    <string name="title_user_details">Данные сотрудника</string>
+    <string name="title_add_user">Добавление сотрудника</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="prompt_deletion">Удаление…</string>
-    <string name="prompt_person_deleted">Персона удалена</string>
-    <string name="prompt_adding_person">Добавление персоны...</string>
-    <string name="prompt_person_added">Персона добавлена</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="prompt_user_deleted">Сотрудик удален</string>
+    <string name="prompt_adding_user">Добавление сотрудника…</string>
+    <string name="prompt_user_added">Сотрудник добавлен</string>
 
     <!-- Strings related to login -->
+    <string name="title_activity_login">Вход</string>
     <string name="prompt_login">Логин</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Войти</string>

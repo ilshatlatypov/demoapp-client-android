@@ -60,7 +60,7 @@ public class DigestAuthRestTemplate extends RestTemplate {
         Map<String, String> authParams = getAuthParams(responseEntity);
         String relativeUrl = getRelativeUrl(url);
 
-        HttpHeaders existingHeaders = new HttpHeaders();
+        HttpHeaders existingHeaders = null;
         Object existingEntity = null;
         if (requestEntity != null) {
             existingHeaders = requestEntity.getHeaders();
@@ -68,9 +68,13 @@ public class DigestAuthRestTemplate extends RestTemplate {
         }
 
         HttpAuthentication auth = new HttpDigestAuthentication(login, password, authParams, method, relativeUrl);
-        existingHeaders.setAuthorization(auth);
+        HttpHeaders headersWithAuth = new HttpHeaders();
+        headersWithAuth.setAuthorization(auth);
+        if (existingHeaders != null) {
+            headersWithAuth.putAll(existingHeaders);
+        }
 
-        HttpEntity<?> entity = new HttpEntity<>(existingEntity, existingHeaders);
+        HttpEntity<?> entity = new HttpEntity<>(existingEntity, headersWithAuth);
         return super.exchange(url, method, entity, responseType, uriVariables);
     }
 

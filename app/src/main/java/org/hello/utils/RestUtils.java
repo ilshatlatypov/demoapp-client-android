@@ -18,12 +18,12 @@ public class RestUtils {
         REST_TEMPLATE = DigestAuthRestTemplate.getInstance();
     }
 
-    private static final String PERSONS_URL = "http://192.168.2.11:8080/users";
+    private static final String USERS_URL = "http://192.168.2.11:8080/users";
 
     private RestUtils() {}
 
     public static ResponseEntity<String> getPersonsList() {
-        return REST_TEMPLATE.exchange(PERSONS_URL, HttpMethod.GET, null, String.class);
+        return REST_TEMPLATE.exchange(USERS_URL, HttpMethod.GET, null, String.class);
     }
 
     public static ResponseEntity<String> getPersonDetails(String personUrl) {
@@ -34,10 +34,10 @@ public class RestUtils {
         return REST_TEMPLATE.exchange(personUrl, HttpMethod.DELETE, null, String.class);
     }
 
-    public static ResponseEntity<String> createPerson(String personJson) {
+    public static ResponseEntity<String> createUser(String userJson) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(personJson, headers);
-        return REST_TEMPLATE.exchange(PERSONS_URL, HttpMethod.POST, entity, String.class);
+        HttpEntity<String> entity = new HttpEntity<>(userJson, headers);
+        return REST_TEMPLATE.exchange(USERS_URL, HttpMethod.POST, entity, String.class);
     }
 }

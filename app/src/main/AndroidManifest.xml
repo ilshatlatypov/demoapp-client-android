@@ -29,10 +29,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.AddPersonActivity"
-            android:label="@string/title_add_person" />
+            android:label="@string/title_add_user" />
         <activity
             android:name=".activity.PersonDetailsActivity"
-            android:label="@string/title_person_details" />
+            android:label="@string/title_user_details" />
     </application>
 
 </manifest>
