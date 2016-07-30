@@ -29,7 +29,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
     private ViewSwitcherNew viewSwitcher;
     private View baseLayout;
-    private String personSelfLink;
+    private String userSelfLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
         baseLayout = findViewById(R.id.base_layout);
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
-        personSelfLink = getIntent().getStringExtra(PersonsListActivity.EXTRA_PERSON_LINK);
+        userSelfLink = getIntent().getStringExtra(UsersListActivity.EXTRA_USER_LINK);
 
         Button buttonRetry = (Button) findViewById(R.id.button_retry);
         buttonRetry.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +102,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
             }
 
             try {
-                String personUrl = PersonDetailsActivity.this.personSelfLink;
+                String personUrl = PersonDetailsActivity.this.userSelfLink;
                 ResponseEntity<String> responseEntity = RestUtils.getPersonDetails(personUrl);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.OK) { // TODO not found
@@ -153,7 +153,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
             }
 
             try {
-                String personUrl = PersonDetailsActivity.this.personSelfLink;
+                String personUrl = PersonDetailsActivity.this.userSelfLink;
                 ResponseEntity<String> responseEntity = RestUtils.deletePerson(personUrl);
                 HttpStatus httpStatus = responseEntity.getStatusCode();
                 if (httpStatus == HttpStatus.NO_CONTENT) {

@@ -4,11 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,12 +16,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.hello.utils.ConnectionUtils;
-import org.hello.entity.User;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
 import org.hello.ViewSwitcherNew;
+import org.hello.entity.User;
+import org.hello.utils.ConnectionUtils;
 import org.hello.utils.JSONUtils;
 import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
@@ -33,12 +29,11 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public class PersonsListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class UsersListActivity extends AppCompatActivity {
 
-    private static final int ADD_PERSON_REQUEST = 1;
-    private static final int PERSON_DETAILS_REQUEST = 2;
-    public static final String EXTRA_PERSON_LINK = "person_link";
+    private static final int ADD_USER_REQUEST = 1;
+    private static final int USER_DETAILS_REQUEST = 2;
+    public static final String EXTRA_USER_LINK = "user_link";
 
     private ViewSwitcherNew viewSwitcher;
     private ListView lvPeople;
@@ -46,7 +41,7 @@ public class PersonsListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_persons_list);
+        setContentView(R.layout.activity_users_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -57,15 +52,7 @@ public class PersonsListActivity extends AppCompatActivity
                 openAddPersonActivity();
             }
         });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
 
@@ -103,23 +90,23 @@ public class PersonsListActivity extends AppCompatActivity
 
     private void openAddPersonActivity() {
         Intent intent = new Intent(this, AddPersonActivity.class);
-        this.startActivityForResult(intent, ADD_PERSON_REQUEST);
+        this.startActivityForResult(intent, ADD_USER_REQUEST);
     }
 
     private void openPersonDetailsActivity(User person) {
         Intent intent = new Intent(this, PersonDetailsActivity.class);
-        intent.putExtra(EXTRA_PERSON_LINK, person.getSelfLink());
-        this.startActivityForResult(intent, PERSON_DETAILS_REQUEST);
+        intent.putExtra(EXTRA_USER_LINK, person.getSelfLink());
+        this.startActivityForResult(intent, USER_DETAILS_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ADD_PERSON_REQUEST) {
+        if (requestCode == ADD_USER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Snackbar.make(lvPeople, R.string.prompt_user_added, Snackbar.LENGTH_SHORT).show();
                 updatePeopleList();
             }
-        } else if (requestCode == PERSON_DETAILS_REQUEST) {
+        } else if (requestCode == USER_DETAILS_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Snackbar.make(lvPeople, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
                 updatePeopleList();
@@ -134,69 +121,26 @@ public class PersonsListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.users_list, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-        } else if (id == R.id.action_refresh) {
+        if (id == R.id.action_refresh) {
             updatePeopleList();
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private class UpdatePersonsListTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(PersonsListActivity.this)) {
+            if (!ConnectionUtils.isConnected(UsersListActivity.this)) {
                 return new TaskResult(TaskResultType.NO_CONNECTION);
             }
 
@@ -244,4 +188,5 @@ public class PersonsListActivity extends AppCompatActivity
             viewSwitcher.showErrorLayout();
         }
     }
+
 }

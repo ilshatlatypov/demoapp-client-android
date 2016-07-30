@@ -1,33 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TestApp</string>
-    <string name="action_add_user">Добавить сотрудника</string>
-    <string name="action_create">Создать</string>
-    <string name="action_delete">Удалить</string>
-    <string name="action_refresh">Обновить</string>
-    <string name="action_retry">Повторить</string>
-    <string name="action_settings">Настройки</string>
-    <string name="error_field_required">Обязательное поле</string>
-    <string name="error_no_connection">Ошибка при получении данных с сервера. Проверьте интернет подключение.</string>
-    <string name="error_server_unavailable">Сервер не отвечает. Попробуйте позже.</string>
-    <string name="error_unexpected_response">Неожиданный код ответа от сервера</string>
-    <string name="navigation_drawer_close">Закрыть панель навигации</string>
-    <string name="prompt_delete_user">Удалить сотрудника?</string>
-    <string name="prompt_first_name">Имя</string>
-    <string name="prompt_last_name">Фамилия</string>
-    <string name="prompt_no_users">Список сотрудников пуст</string>
-    <string name="title_user_details">Данные сотрудника</string>
-    <string name="title_add_user">Добавление сотрудника</string>
-    <string name="navigation_drawer_open">Открыть панель навигации</string>
-    <string name="prompt_deletion">Удаление…</string>
-    <string name="prompt_user_deleted">Сотрудик удален</string>
-    <string name="prompt_adding_user">Добавление сотрудника…</string>
-    <string name="prompt_user_added">Сотрудник добавлен</string>
-
     <!-- Strings related to login -->
     <string name="title_activity_login">Вход</string>
     <string name="prompt_login">Логин</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Войти</string>
     <string name="error_incorrect_password">Неправильный пароль</string>
+    <string name="prompt_users">Сотрудники</string>
+
+    <!-- Main -->
+    <string name="app_name">TestApp</string>
+    <string name="navigation_drawer_close">Закрыть панель навигации</string>
+    <string name="navigation_drawer_open">Открыть панель навигации</string>
+
+    <!-- Users list -->
+    <string name="title_activity_users_list">Сотрудники</string>
+    <string name="prompt_no_users">Список сотрудников пуст</string>
+    <string name="action_add_user">Добавить сотрудника</string>
+
+    <!-- User details -->
+    <string name="title_user_details">Данные сотрудника</string>
+    <string name="prompt_delete_user">Удалить сотрудника?</string>
+    <string name="prompt_deletion">Удаление…</string>
+    <string name="prompt_user_deleted">Сотрудик удален</string>
+
+    <!-- Add user -->
+    <string name="title_add_user">Добавление сотрудника</string>
+    <string name="prompt_first_name">Имя</string>
+    <string name="prompt_last_name">Фамилия</string>
+    <string name="prompt_adding_user">Добавление сотрудника…</string>
+    <string name="prompt_user_added">Сотрудник добавлен</string>
+
+    <!-- Common -->
+    <string name="action_refresh">Обновить</string>
+    <string name="action_retry">Повторить</string>
+    <string name="action_settings">Настройки</string>
+    <string name="error_field_required">Обязательное поле</string>
+    <string name="action_create">Создать</string>
+    <string name="action_delete">Удалить</string>
+
+    <string name="error_no_connection">Ошибка при получении данных с сервера. Проверьте интернет подключение.</string>
+    <string name="error_server_unavailable">Сервер не отвечает. Попробуйте позже.</string>
+    <string name="error_unexpected_response">Неожиданный код ответа от сервера</string>
 </resources>

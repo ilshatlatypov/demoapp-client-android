@@ -24,15 +24,34 @@
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".activity.PersonsListActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activity.UsersListActivity"
+            android:label="@string/title_activity_users_list"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
+        </activity>
+        <activity
             android:name=".activity.AddPersonActivity"
-            android:label="@string/title_add_user" />
+            android:label="@string/title_add_user"
+            android:parentActivityName=".activity.UsersListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.UsersListActivity" />
+        </activity>
         <activity
             android:name=".activity.PersonDetailsActivity"
-            android:label="@string/title_user_details" />
+            android:label="@string/title_user_details"
+            android:parentActivityName=".activity.UsersListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.UsersListActivity" />
+        </activity>
     </application>
 
 </manifest>
