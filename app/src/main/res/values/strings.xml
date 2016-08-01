@@ -5,7 +5,6 @@
     <string name="prompt_login">Логин</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Войти</string>
-    <string name="error_incorrect_password">Неправильный пароль</string>
     <string name="prompt_users">Сотрудники</string>
     <string name="error_incorrect_login_password">Неправильный логин или пароль</string>
 
@@ -40,8 +39,8 @@
     <string name="action_create">Создать</string>
     <string name="action_delete">Удалить</string>
 
-    <string name="error_no_connection">Ошибка при получении данных с сервера. Проверьте интернет подключение.</string>
-    <string name="error_server_unavailable">Сервер не отвечает. Попробуйте позже.</string>
+    <string name="error_no_connection">Отсутствует интернет подключение</string>
+    <string name="error_server_unavailable">Сервер временно недоступен</string>
     <string name="error_unexpected_response">Неожиданный код ответа от сервера</string>
 
 </resources>
