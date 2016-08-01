@@ -20,7 +20,10 @@ import android.widget.TextView;
 
 import org.hello.MyResponseErrorHandler;
 import org.hello.R;
+import org.hello.TaskResult;
+import org.hello.TaskResultType;
 import org.hello.security.DigestAuthRestTemplate;
+import org.hello.utils.ConnectionUtils;
 import org.hello.utils.KeyboardUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -89,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
         // Reset errors.
         ((TextInputLayout) mLoginView.getParent()).setError(null);
         ((TextInputLayout) mPasswordView.getParent()).setError(null);
+        findViewById(R.id.error_text).setVisibility(View.GONE);
 
         // Store values at the time of the login attempt.
         String login = mLoginView.getText().toString();
@@ -165,7 +169,7 @@ public class LoginActivity extends AppCompatActivity {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, TaskResult> {
 
         private final String mLogin;
         private final String mPassword;
@@ -176,30 +180,65 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            String url = "http://192.168.2.11:8080";
-            DigestAuthRestTemplate restTemplate = DigestAuthRestTemplate.getInstance();
-            restTemplate.setCredentials(mLogin, mPassword);
-            restTemplate.setErrorHandler(new MyResponseErrorHandler());
-            restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
-            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-            return responseEntity.getStatusCode() == HttpStatus.OK;
+        protected TaskResult doInBackground(Void... params) {
+            if (!ConnectionUtils.isConnected(LoginActivity.this)) {
+                return new TaskResult(TaskResultType.NO_CONNECTION);
+            }
+
+            try {
+                String url = "http://192.168.2.11:8080";
+                DigestAuthRestTemplate restTemplate = DigestAuthRestTemplate.getInstance();
+                restTemplate.setCredentials(mLogin, mPassword);
+                restTemplate.setErrorHandler(new MyResponseErrorHandler());
+                restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+                ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+                HttpStatus httpStatus = responseEntity.getStatusCode();
+                if (httpStatus == HttpStatus.OK) {
+                    return new TaskResult(httpStatus);
+                } else if (httpStatus == HttpStatus.UNAUTHORIZED) {
+                    return new TaskResult(httpStatus);
+                } else {
+                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
+                }
+            } catch (Exception e) {
+                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
+            }
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(TaskResult taskResult) {
             mAuthTask = null;
 
-            if (success) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                showProgress(false);
-                ((TextInputLayout) mPasswordView.getParent()).setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-                KeyboardUtils.showKeyboard(LoginActivity.this);
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
+                if (taskResult.getResultObject().equals(HttpStatus.OK)) {
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    TextView errorTextView = (TextView) findViewById(R.id.error_text);
+                    errorTextView.setText(R.string.error_incorrect_login_password);
+                    errorTextView.setVisibility(View.VISIBLE);
+                    showProgress(false);
+                }
+                return;
             }
+
+            CharSequence errorMessage = null;
+            switch (taskResult.getResultType()) {
+                case UNEXPECTED_RESPONSE_CODE:
+                    errorMessage = getText(R.string.error_unexpected_response);
+                    break;
+                case SERVER_UNAVAILABLE:
+                    errorMessage = getText(R.string.error_server_unavailable);
+                    break;
+                case NO_CONNECTION:
+                    errorMessage = getText(R.string.error_no_connection);
+                    break;
+            }
+            TextView errorTextView = (TextView) findViewById(R.id.error_text);
+            errorTextView.setText(errorMessage);
+            errorTextView.setVisibility(View.VISIBLE);
+            showProgress(false);
         }
 
         @Override

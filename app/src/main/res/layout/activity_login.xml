@@ -63,6 +63,15 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <TextView
+                android:id="@+id/error_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@android:color/holo_red_dark"
+                android:textAlignment="center"
+                android:visibility="gone"/>
+
             <Button
                 android:id="@+id/sign_in_button"
                 style="?android:textAppearanceSmall"
