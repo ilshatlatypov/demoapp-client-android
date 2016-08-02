@@ -23,6 +23,7 @@
     <string name="prompt_delete_user">Удалить сотрудника?</string>
     <string name="prompt_deletion">Удаление…</string>
     <string name="prompt_user_deleted">Сотрудик удален</string>
+    <string name="error_user_already_deleted">Сотрудник уже удален</string>
 
     <!-- Add user -->
     <string name="title_add_user">Добавление сотрудника</string>

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,22 +15,29 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.hello.entity.User;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
 import org.hello.ViewSwitcherNew;
+import org.hello.entity.User;
 import org.hello.utils.ConnectionUtils;
 import org.hello.utils.JSONUtils;
 import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 
 public class UserDetailsActivity extends AppCompatActivity {
+
+    private GetUserDetailsTask getUserDetailsTask = null;
+    private DeleteUserTask deleteUserTask = null;
 
     private ViewSwitcherNew viewSwitcher;
     private View baseLayout;
     private String userSelfLink;
+
+    private TextView firstnameTextView;
+    private TextView lastnameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +50,9 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
         userSelfLink = getIntent().getStringExtra(UsersListActivity.EXTRA_USER_LINK);
+
+        firstnameTextView = (TextView) findViewById(R.id.firstname);
+        lastnameTextView = (TextView) findViewById(R.id.lastname);
 
         Button buttonRetry = (Button) findViewById(R.id.button_retry);
         buttonRetry.setOnClickListener(new View.OnClickListener() {
@@ -68,8 +79,13 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void attemptGetUserDetails() {
+        if (getUserDetailsTask != null) {
+            return;
+        }
+
         viewSwitcher.showProgressBar();
-        new GetUserDetailsTask().execute();
+        getUserDetailsTask = new GetUserDetailsTask();
+        getUserDetailsTask.execute();
     }
 
 
@@ -80,7 +96,8 @@ public class UserDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_SHORT).show();
-                        new DeleteUserTask().execute();
+                        deleteUserTask = new DeleteUserTask();
+                        deleteUserTask.execute();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -98,50 +115,58 @@ public class UserDetailsActivity extends AppCompatActivity {
         @Override
         protected TaskResult doInBackground(Void... params) {
             if (!ConnectionUtils.isConnected(UserDetailsActivity.this)) {
-                return new TaskResult(TaskResultType.NO_CONNECTION);
+                return TaskResult.noConnection();
             }
 
             try {
                 String url = UserDetailsActivity.this.userSelfLink;
                 ResponseEntity<String> responseEntity = RestUtils.getUserDetails(url);
-                HttpStatus httpStatus = responseEntity.getStatusCode();
-                if (httpStatus == HttpStatus.OK) { // TODO not found
-                    User user = JSONUtils.parseAsUser(responseEntity.getBody());
-                    return new TaskResult(user);
-                } else {
-                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
-                }
-            } catch (Exception e) {
-                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
+                return TaskResult.ok(responseEntity);
+            } catch (ResourceAccessException e) {
+                return TaskResult.serverUnavailable();
             }
         }
 
         @Override
         protected void onPostExecute(TaskResult taskResult) {
-            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                User user = (User) taskResult.getResultObject();
-                ((TextView) findViewById(R.id.firstname)).setText(user.getFirstname());
-                ((TextView) findViewById(R.id.lastname)).setText(user.getLastname());
-                viewSwitcher.showMainLayout();
-                return;
-            }
+            getUserDetailsTask = null;
 
-            String errorMessage = null;
-            switch (taskResult.getResultType()) {
-                case UNEXPECTED_RESPONSE_CODE:
-                    errorMessage = getString(R.string.error_unexpected_response);
-                    break;
-                case SERVER_UNAVAILABLE:
-                    errorMessage = getString(R.string.error_server_unavailable);
-                    break;
-                case NO_CONNECTION:
-                    errorMessage = getString(R.string.error_no_connection);
-                    break;
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
+                ResponseEntity<String> responseEntity = (ResponseEntity<String>) taskResult.getResultObject();
+                if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                    displayUserDetails(responseEntity);
+                } else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    displayError(R.string.error_user_already_deleted);
+                } else {
+                    displayError(R.string.error_unexpected_response);
+                    // TODO send report
+                }
+            } else if (taskResult.getResultType() == TaskResultType.NO_CONNECTION) {
+                displayError(R.string.error_no_connection);
+            } else if (taskResult.getResultType() == TaskResultType.SERVER_UNAVAILABLE) {
+                displayError(R.string.error_server_unavailable);
             }
-            TextView errorTextView = (TextView) findViewById(R.id.error_text);
-            errorTextView.setText(errorMessage);
-            viewSwitcher.showErrorLayout();
         }
+
+        @Override
+        protected void onCancelled() {
+            getUserDetailsTask = null;
+            finish();
+        }
+    }
+
+    private void displayUserDetails(ResponseEntity<String> responseEntity) {
+        User user = JSONUtils.parseAsUser(responseEntity.getBody());
+        firstnameTextView.setText(user.getFirstname());
+        lastnameTextView.setText(user.getLastname());
+        viewSwitcher.showMainLayout();
+    }
+
+    private void displayError(@StringRes int errorMessageResId) {
+        String errorMessage = getString(errorMessageResId);
+        TextView errorTextView = (TextView) findViewById(R.id.error_text);
+        errorTextView.setText(errorMessage);
+        viewSwitcher.showErrorLayout();
     }
 
     private class DeleteUserTask extends AsyncTask<Void, Void, TaskResult> {
@@ -149,50 +174,52 @@ public class UserDetailsActivity extends AppCompatActivity {
         @Override
         protected TaskResult doInBackground(Void... params) {
             if (!ConnectionUtils.isConnected(UserDetailsActivity.this)) {
-                return new TaskResult(TaskResultType.NO_CONNECTION);
+                return TaskResult.noConnection();
             }
 
             try {
                 String url = UserDetailsActivity.this.userSelfLink;
                 ResponseEntity<String> responseEntity = RestUtils.deleteUser(url);
-                HttpStatus httpStatus = responseEntity.getStatusCode();
-                if (httpStatus == HttpStatus.NO_CONTENT) {
-                    return new TaskResult(TaskResultType.SUCCESS);
-                } else {
-                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
-                }
-            } catch (Exception e) {
-                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
+                return TaskResult.ok(responseEntity);
+            } catch (ResourceAccessException e) {
+                return TaskResult.serverUnavailable();
             }
         }
 
         @Override
         protected void onPostExecute(TaskResult taskResult) {
-            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                setResult(Activity.RESULT_OK, new Intent());
-                finish();
-                return;
-            }
+            deleteUserTask = null;
 
-            String errorMessage = null;
-            switch (taskResult.getResultType()) {
-                case UNEXPECTED_RESPONSE_CODE:
-                    errorMessage = getString(R.string.error_unexpected_response);
-                    break;
-                case SERVER_UNAVAILABLE:
-                    errorMessage = getString(R.string.error_server_unavailable);
-                    break;
-                case NO_CONNECTION:
-                    errorMessage = getString(R.string.error_no_connection);
-                    break;
+            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
+                ResponseEntity<String> responseEntity = (ResponseEntity<String>) taskResult.getResultObject();
+                if (responseEntity.getStatusCode() == HttpStatus.NO_CONTENT) {
+                    setResult(Activity.RESULT_OK, new Intent());
+                    finish();
+                } else {
+                    displayErrorSnackbar(R.string.error_unexpected_response);
+                    // TODO send report
+                }
+            } else if (taskResult.getResultType() == TaskResultType.NO_CONNECTION) {
+                displayErrorSnackbar(R.string.error_no_connection);
+            } else if (taskResult.getResultType() == TaskResultType.SERVER_UNAVAILABLE) {
+                displayErrorSnackbar(R.string.error_server_unavailable);
             }
-            Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.action_retry, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            attemptDelete();
-                        }
-                    }).show();
         }
+
+        @Override
+        protected void onCancelled() {
+            deleteUserTask = null;
+        }
+    }
+
+    private void displayErrorSnackbar(@StringRes int errorMessageResId) {
+        String errorMessage = getString(errorMessageResId);
+        Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attemptDelete();
+                    }
+                }).show();
     }
 }
