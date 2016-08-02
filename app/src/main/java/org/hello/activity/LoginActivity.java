@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -18,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.hello.MyResponseErrorHandler;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
@@ -28,9 +28,7 @@ import org.hello.utils.KeyboardUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-
-import java.nio.charset.Charset;
+import org.springframework.web.client.ResourceAccessException;
 
 /**
  * A login screen that offers login via login/password.
@@ -182,26 +180,17 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected TaskResult doInBackground(Void... params) {
             if (!ConnectionUtils.isConnected(LoginActivity.this)) {
-                return new TaskResult(TaskResultType.NO_CONNECTION);
+                return TaskResult.noConnection();
             }
 
             try {
                 String url = "http://192.168.2.11:8080";
                 DigestAuthRestTemplate restTemplate = DigestAuthRestTemplate.getInstance();
                 restTemplate.setCredentials(mLogin, mPassword);
-                restTemplate.setErrorHandler(new MyResponseErrorHandler());
-                restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
                 ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-                HttpStatus httpStatus = responseEntity.getStatusCode();
-                if (httpStatus == HttpStatus.OK) {
-                    return new TaskResult(httpStatus);
-                } else if (httpStatus == HttpStatus.UNAUTHORIZED) {
-                    return new TaskResult(httpStatus);
-                } else {
-                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
-                }
-            } catch (Exception e) {
-                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
+                return TaskResult.ok(responseEntity);
+            } catch (ResourceAccessException e) {
+                return TaskResult.serverUnavailable();
             }
         }
 
@@ -210,35 +199,21 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = null;
 
             if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                if (taskResult.getResultObject().equals(HttpStatus.OK)) {
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                ResponseEntity<String> responseEntity = (ResponseEntity<String>) taskResult.getResultObject();
+                HttpStatus statusCode = responseEntity.getStatusCode();
+                if (statusCode == HttpStatus.OK) {
+                    gotoMainActivity();
+                } else if (statusCode == HttpStatus.UNAUTHORIZED) {
+                    displayIncorrectLoginPasswordError();
                 } else {
-                    TextView errorTextView = (TextView) findViewById(R.id.error_text);
-                    errorTextView.setText(R.string.error_incorrect_login_password);
-                    errorTextView.setVisibility(View.VISIBLE);
-                    showProgress(false);
+                    displayUnexpectedResponseError();
+                    // TODO send report
                 }
-                return;
+            } else if (taskResult.getResultType() == TaskResultType.NO_CONNECTION) {
+                displayNoConnectionError();
+            } else if (taskResult.getResultType() == TaskResultType.SERVER_UNAVAILABLE) {
+                displayServerUnavailableError();
             }
-
-            CharSequence errorMessage = null;
-            switch (taskResult.getResultType()) {
-                case UNEXPECTED_RESPONSE_CODE:
-                    errorMessage = getText(R.string.error_unexpected_response);
-                    break;
-                case SERVER_UNAVAILABLE:
-                    errorMessage = getText(R.string.error_server_unavailable);
-                    break;
-                case NO_CONNECTION:
-                    errorMessage = getText(R.string.error_no_connection);
-                    break;
-            }
-            TextView errorTextView = (TextView) findViewById(R.id.error_text);
-            errorTextView.setText(errorMessage);
-            errorTextView.setVisibility(View.VISIBLE);
-            showProgress(false);
         }
 
         @Override
@@ -248,6 +223,34 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void gotoMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
+    private void displayIncorrectLoginPasswordError() {
+        displayError(R.string.error_incorrect_login_password);
+    }
+
+    private void displayServerUnavailableError() {
+        displayError(R.string.error_server_unavailable);
+    }
+
+    private void displayNoConnectionError() {
+        displayError(R.string.error_no_connection);
+    }
+
+    private void displayUnexpectedResponseError() {
+        displayError(R.string.error_unexpected_response);
+    }
+
+    private void displayError(@StringRes int errorMessageResId) {
+        String errorMessage = getString(errorMessageResId);
+        TextView errorTextView = (TextView) findViewById(R.id.error_text);
+        errorTextView.setText(errorMessage);
+        errorTextView.setVisibility(View.VISIBLE);
+        showProgress(false);
+    }
 }
 

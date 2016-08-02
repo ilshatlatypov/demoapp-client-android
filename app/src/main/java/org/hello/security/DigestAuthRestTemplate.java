@@ -2,6 +2,7 @@ package org.hello.security;
 
 import android.support.annotation.NonNull;
 
+import org.hello.MyResponseErrorHandler;
 import org.springframework.http.HttpAuthentication;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +42,7 @@ public class DigestAuthRestTemplate extends RestTemplate {
         if (instance == null) {
             instance = new DigestAuthRestTemplate();
             instance.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+            instance.setErrorHandler(new MyResponseErrorHandler());
         }
         return instance;
     }

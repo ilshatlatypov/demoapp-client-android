@@ -3,6 +3,7 @@ package org.hello.activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,8 +25,10 @@ import org.hello.entity.User;
 import org.hello.utils.ConnectionUtils;
 import org.hello.utils.JSONUtils;
 import org.hello.utils.RestUtils;
+import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 
@@ -34,6 +37,8 @@ public class UsersListActivity extends AppCompatActivity {
     private static final int ADD_USER_REQUEST = 1;
     private static final int USER_DETAILS_REQUEST = 2;
     public static final String EXTRA_USER_LINK = "user_link";
+
+    private UpdateUsersTask updateUsersTask = null;
 
     private ViewSwitcherNew viewSwitcher;
     private ListView lvPeople;
@@ -73,7 +78,7 @@ public class UsersListActivity extends AppCompatActivity {
         buttonRetry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updatePeopleList();
+                updateUsers();
             }
         });
 
@@ -85,7 +90,7 @@ public class UsersListActivity extends AppCompatActivity {
             }
         });
 
-        updatePeopleList();
+        updateUsers();
     }
 
     private void openAddUserActivity() {
@@ -104,20 +109,25 @@ public class UsersListActivity extends AppCompatActivity {
         if (requestCode == ADD_USER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Snackbar.make(lvPeople, R.string.prompt_user_added, Snackbar.LENGTH_SHORT).show();
-                updatePeopleList();
+                updateUsers();
             }
         } else if (requestCode == USER_DETAILS_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Snackbar.make(lvPeople, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
-                updatePeopleList();
+                updateUsers();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void updatePeopleList() {
+    private void updateUsers() {
+        if (updateUsersTask != null) {
+            return;
+        }
+
         viewSwitcher.showProgressBar();
-        new UpdateUsersListTask().execute();
+        updateUsersTask = new UpdateUsersTask();
+        updateUsersTask.execute();
     }
 
     @Override
@@ -131,62 +141,82 @@ public class UsersListActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            updatePeopleList();
+            updateUsers();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private class UpdateUsersListTask extends AsyncTask<Void, Void, TaskResult> {
+    private class UpdateUsersTask extends AsyncTask<Void, Void, TaskResult> {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
             if (!ConnectionUtils.isConnected(UsersListActivity.this)) {
-                return new TaskResult(TaskResultType.NO_CONNECTION);
+                return TaskResult.noConnection();
             }
 
             try {
-                ResponseEntity<String> responseEntity = RestUtils.getUsersList();
-                HttpStatus httpStatus = responseEntity.getStatusCode();
-                if (httpStatus == HttpStatus.OK) {
-                    List<User> users = JSONUtils.parseAsUsersList(responseEntity.getBody());
-                    return new TaskResult(users);
-                } else {
-                    return new TaskResult(TaskResultType.UNEXPECTED_RESPONSE_CODE);
-                }
-            } catch (Exception e) {
-                return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
+                return TaskResult.ok(RestUtils.getUsersList());
+            } catch (ResourceAccessException e) {
+                return TaskResult.serverUnavailable();
             }
         }
 
         @Override
         protected void onPostExecute(TaskResult taskResult) {
+            updateUsersTask = null;
 
             if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                List<User> users = (List<User>) taskResult.getResultObject();
-                ArrayAdapter<User> usersListAdapter = (ArrayAdapter<User>) lvPeople.getAdapter();
-                usersListAdapter.clear();
-                usersListAdapter.addAll(users);
-                usersListAdapter.notifyDataSetChanged();
-                viewSwitcher.showMainLayout();
-                return;
+                ResponseEntity<String> responseEntity = (ResponseEntity<String>) taskResult.getResultObject();
+                if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                    putDataToList(responseEntity);
+                } else {
+                    displayUnexpectedResponseError();
+                    // TODO send report
+                }
+            } else if (taskResult.getResultType() == TaskResultType.NO_CONNECTION) {
+                displayNoConnectionError();
+            } else if (taskResult.getResultType() == TaskResultType.SERVER_UNAVAILABLE) {
+                displayServerUnavailableError();
             }
+        }
 
-            CharSequence errorMessage = null;
-            switch (taskResult.getResultType()) {
-                case UNEXPECTED_RESPONSE_CODE:
-                    errorMessage = getText(R.string.error_unexpected_response);
-                    break;
-                case SERVER_UNAVAILABLE:
-                    errorMessage = getText(R.string.error_server_unavailable);
-                    break;
-                case NO_CONNECTION:
-                    errorMessage = getText(R.string.error_no_connection);
-                    break;
-            }
-            TextView errorTextView = (TextView) findViewById(R.id.error_text);
-            errorTextView.setText(errorMessage);
-            viewSwitcher.showErrorLayout();
+        @Override
+        protected void onCancelled() {
+            updateUsersTask = null;
+            viewSwitcher.showMainLayout();
         }
     }
 
+    private void putDataToList(ResponseEntity<String> responseEntity) {
+        List<User> users = null;
+        try {
+            users = JSONUtils.parseAsUsersList(responseEntity.getBody());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ArrayAdapter<User> usersListAdapter = (ArrayAdapter<User>) lvPeople.getAdapter();
+        usersListAdapter.clear();
+        usersListAdapter.addAll(users);
+        usersListAdapter.notifyDataSetChanged();
+        viewSwitcher.showMainLayout();
+    }
+
+    private void displayServerUnavailableError() {
+        displayError(R.string.error_server_unavailable);
+    }
+
+    private void displayNoConnectionError() {
+        displayError(R.string.error_no_connection);
+    }
+
+    private void displayUnexpectedResponseError() {
+        displayError(R.string.error_unexpected_response);
+    }
+
+    private void displayError(@StringRes int errorMessageResId) {
+        String errorMessage = getString(errorMessageResId);
+        TextView errorTextView = (TextView) findViewById(R.id.error_text);
+        errorTextView.setText(errorMessage);
+        viewSwitcher.showErrorLayout();
+    }
 }
