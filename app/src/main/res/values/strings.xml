@@ -39,6 +39,7 @@
     <string name="error_field_required">Обязательное поле</string>
     <string name="action_create">Создать</string>
     <string name="action_delete">Удалить</string>
+    <string name="action_edit">Редактировать</string>
 
     <string name="error_no_connection">Отсутствует интернет подключение</string>
     <string name="error_server_unavailable">Сервер временно недоступен</string>
