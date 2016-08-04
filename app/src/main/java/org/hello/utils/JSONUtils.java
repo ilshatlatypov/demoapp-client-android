@@ -50,6 +50,8 @@ public class JSONUtils {
         try {
             json.put("firstname", user.getFirstname());
             json.put("lastname", user.getLastname());
+            json.put("username", user.getUsername());
+            json.put("password", user.getPassword());
         } catch (JSONException e) {
             // TODO handle this
         }

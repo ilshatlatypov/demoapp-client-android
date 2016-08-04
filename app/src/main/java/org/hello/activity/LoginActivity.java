@@ -22,13 +22,13 @@ import android.widget.TextView;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
-import org.hello.security.DigestAuthRestTemplate;
 import org.hello.utils.ConnectionUtils;
 import org.hello.utils.KeyboardUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * A login screen that offers login via login/password.
@@ -51,13 +51,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mLoginView = (EditText) findViewById(R.id.login);
+        mLoginView = (EditText) findViewById(R.id.username);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (id == R.id.username || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -185,8 +185,9 @@ public class LoginActivity extends AppCompatActivity {
 
             try {
                 String url = "http://192.168.2.11:8080";
-                DigestAuthRestTemplate restTemplate = DigestAuthRestTemplate.getInstance();
-                restTemplate.setCredentials(mLogin, mPassword);
+//                DigestAuthRestTemplate restTemplate = DigestAuthRestTemplate.getInstance();
+//                restTemplate.setCredentials(mLogin, mPassword);
+                RestTemplate restTemplate = new RestTemplate();
                 ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
                 return TaskResult.ok(responseEntity);
             } catch (ResourceAccessException e) {

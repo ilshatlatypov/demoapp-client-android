@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Strings related to login -->
+    <!-- Strings related to username -->
     <string name="title_activity_login">Вход</string>
     <string name="prompt_login">Логин</string>
     <string name="prompt_password">Пароль</string>
@@ -29,8 +29,9 @@
     <string name="title_add_user">Добавление сотрудника</string>
     <string name="prompt_first_name">Имя</string>
     <string name="prompt_last_name">Фамилия</string>
-    <string name="prompt_adding_user">Добавление сотрудника…</string>
     <string name="prompt_user_added">Сотрудник добавлен</string>
+    <string name="error_invalid_length">От %1$d до %2$d символов</string>
+    <string name="error_only_latin_letters">Только латинские символы</string>
 
     <!-- Common -->
     <string name="action_refresh">Обновить</string>
@@ -40,6 +41,7 @@
     <string name="action_create">Создать</string>
     <string name="action_delete">Удалить</string>
     <string name="action_edit">Редактировать</string>
+    <string name="prompt_saving">Сохранение…</string>
 
     <string name="error_no_connection">Отсутствует интернет подключение</string>
     <string name="error_server_unavailable">Сервер временно недоступен</string>
