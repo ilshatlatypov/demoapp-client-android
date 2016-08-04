@@ -46,5 +46,6 @@
     <string name="error_no_connection">Отсутствует интернет подключение</string>
     <string name="error_server_unavailable">Сервер временно недоступен</string>
     <string name="error_unexpected_response">Неожиданный код ответа от сервера</string>
+    <string name="prompt_tasks">Задачи</string>
 
 </resources>
