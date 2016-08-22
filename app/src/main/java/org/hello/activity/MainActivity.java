@@ -1,7 +1,8 @@
 package org.hello.activity;
 
-import android.content.Intent;
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -13,11 +14,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import org.hello.R;
+import org.hello.TaskResultType;
+import org.hello.ViewSwitcherNew;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
+
+    private ViewSwitcherNew viewSwitcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
     }
 
     @Override
@@ -84,10 +92,21 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_users) {
-            Intent intent = new Intent(this, UsersListActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_camera) {
-
+            viewSwitcher.showProgressBar();
+            getSupportActionBar().setTitle(R.string.title_users);
+            UsersFragment usersFragment = UsersFragment.newInstance();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, usersFragment)
+                    .commit();
+        } else if (id == R.id.nav_tasks) {
+            viewSwitcher.showProgressBar();
+            getSupportActionBar().setTitle(R.string.title_tasks);
+            TasksFragment tasksFragment = TasksFragment.newInstance();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, tasksFragment)
+                    .commit();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -103,5 +122,33 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onDataLoaded() {
+        viewSwitcher.showMainLayout();
+    }
+
+    @Override
+    public void onError(TaskResultType resultType) {
+        switch (resultType) {
+            case NO_CONNECTION:
+                displayError(R.string.error_no_connection);
+                break;
+            case SERVER_UNAVAILABLE:
+                displayError(R.string.error_server_unavailable);
+                break;
+            case UNEXPECTED_RESPONSE_CODE:
+                displayError(R.string.error_unexpected_response);
+                break;
+            default:
+        }
+    }
+
+    private void displayError(@StringRes int errorMessageResId) {
+        String errorMessage = getString(errorMessageResId);
+        TextView errorTextView = (TextView) findViewById(R.id.error_text);
+        errorTextView.setText(errorMessage);
+        viewSwitcher.showErrorLayout();
     }
 }

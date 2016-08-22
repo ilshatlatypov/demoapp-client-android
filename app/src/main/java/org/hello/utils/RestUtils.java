@@ -25,7 +25,7 @@ public class RestUtils {
 
     }
 
-    private static final String USERS_URL = "http://192.168.2.11:8080/users";
+    private static final String USERS_URL = "http://192.168.0.100:8080/users";
 
     private RestUtils() {}
 

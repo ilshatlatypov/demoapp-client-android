@@ -7,7 +7,7 @@
             android:icon="@drawable/ic_group"
             android:title="@string/prompt_users" />
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_tasks"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/prompt_tasks" />
         <item
