@@ -1,7 +1,9 @@
 package org.hello.activity;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -14,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.hello.R;
@@ -24,6 +27,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
 
     private ViewSwitcherNew viewSwitcher;
+    private Button retryButton;
+
+    private int activeFragmentNavItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,15 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
+        retryButton = (Button) findViewById(R.id.button_retry);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activeFragmentNavItemId != 0) {
+                    loadFragmentDataByNavItemId(activeFragmentNavItemId);
+                }
+            }
+        });
     }
 
     @Override
@@ -91,22 +106,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_users) {
-            viewSwitcher.showProgressBar();
-            getSupportActionBar().setTitle(R.string.title_users);
-            UsersFragment usersFragment = UsersFragment.newInstance();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, usersFragment)
-                    .commit();
-        } else if (id == R.id.nav_tasks) {
-            viewSwitcher.showProgressBar();
-            getSupportActionBar().setTitle(R.string.title_tasks);
-            TasksFragment tasksFragment = TasksFragment.newInstance();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, tasksFragment)
-                    .commit();
+        if (id == R.id.nav_users || id == R.id.nav_tasks) {
+            activeFragmentNavItemId = id;
+            loadFragmentDataByNavItemId(activeFragmentNavItemId);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -122,6 +124,25 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setActiveFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment)
+                .commit();
+    }
+
+    private void loadFragmentDataByNavItemId(@IdRes int itemId) {
+        if (itemId == R.id.nav_users) {
+            viewSwitcher.showProgressBar();
+            getSupportActionBar().setTitle(R.string.title_users);
+            setActiveFragment(UsersFragment.newInstance());
+        } else if (itemId == R.id.nav_tasks) {
+            viewSwitcher.showProgressBar();
+            getSupportActionBar().setTitle(R.string.title_tasks);
+            setActiveFragment(TasksFragment.newInstance());
+        }
     }
 
     @Override
