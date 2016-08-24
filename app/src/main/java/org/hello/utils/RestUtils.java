@@ -25,6 +25,7 @@ public class RestUtils {
     }
 
     private static final String USERS_URL = "http://192.168.0.102:8080/users";
+    private static final String TASKS_URL = "http://192.168.0.102:8080/tasks";
 
     private RestUtils() {}
 
@@ -45,5 +46,9 @@ public class RestUtils {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(userJson, headers);
         return REST_TEMPLATE.exchange(USERS_URL, HttpMethod.POST, entity, String.class);
+    }
+
+    public static ResponseEntity<String> getTasksList() {
+        return REST_TEMPLATE.exchange(TASKS_URL, HttpMethod.GET, null, String.class);
     }
 }

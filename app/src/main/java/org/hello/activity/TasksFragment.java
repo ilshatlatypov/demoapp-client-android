@@ -14,8 +14,14 @@ import android.widget.ListView;
 import org.hello.R;
 import org.hello.entity.Task;
 import org.hello.utils.ConnectionUtils;
+import org.hello.utils.JSONUtils;
+import org.hello.utils.RestUtils;
+import org.json.JSONException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,12 +95,7 @@ public class TasksFragment extends Fragment {
             }
 
             try {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return new TaskResultNew((ResponseEntity<String>) null);
+                return new TaskResultNew(RestUtils.getTasksList());
             } catch (ResourceAccessException e) {
                 return new TaskResultNew(ErrorType.SERVER_UNAVAILABLE);
             }
@@ -110,8 +111,9 @@ public class TasksFragment extends Fragment {
             }
 
             ResponseEntity<String> responseEntity = taskResult.getResponseEntity();
-            if (responseEntity == null) {
-                putDataToList();
+            HttpStatus statusCode = responseEntity.getStatusCode();
+            if (statusCode == HttpStatus.OK) {
+                putDataToList(responseEntity);
                 listener.onDataLoaded();
             } else {
                 listener.onError(ErrorType.UNEXPECTED_RESPONSE);
@@ -119,12 +121,16 @@ public class TasksFragment extends Fragment {
         }
     }
 
-    private void putDataToList() {
+    private void putDataToList(ResponseEntity<String> responseEntity) {
+        List<Task> tasks = null;
+        try {
+            tasks = JSONUtils.parseAsTasksList(responseEntity.getBody());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         ArrayAdapter<Task> adapter = (ArrayAdapter<Task>) tasksListView.getAdapter();
-        adapter.add(new Task("Fix the issue"));
-        adapter.add(new Task("Deploy build"));
-        adapter.add(new Task("Install application"));
+        adapter.clear();
+        adapter.addAll(tasks);
         adapter.notifyDataSetChanged();
     }
-
 }
