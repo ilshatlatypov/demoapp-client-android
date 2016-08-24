@@ -22,10 +22,9 @@ public class RestUtils {
         REST_TEMPLATE = new RestTemplate();
         REST_TEMPLATE.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
         REST_TEMPLATE.setErrorHandler(new NoExceptionsErrorHandler());
-
     }
 
-    private static final String USERS_URL = "http://192.168.0.100:8080/users";
+    private static final String USERS_URL = "http://192.168.0.102:8080/users";
 
     private RestUtils() {}
 

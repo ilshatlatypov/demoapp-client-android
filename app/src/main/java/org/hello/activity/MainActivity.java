@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -20,7 +19,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.hello.R;
-import org.hello.TaskResultType;
 import org.hello.ViewSwitcherNew;
 
 public class MainActivity extends AppCompatActivity
@@ -151,23 +149,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onError(TaskResultType resultType) {
-        switch (resultType) {
+    public void onError(ErrorType errorType) {
+        String errorMessage = null;
+        switch (errorType) {
             case NO_CONNECTION:
-                displayError(R.string.error_no_connection);
+                errorMessage = getString(R.string.error_no_connection);
                 break;
             case SERVER_UNAVAILABLE:
-                displayError(R.string.error_server_unavailable);
+                errorMessage = getString(R.string.error_server_unavailable);
                 break;
-            case UNEXPECTED_RESPONSE_CODE:
-                displayError(R.string.error_unexpected_response);
+            case UNEXPECTED_RESPONSE:
+                errorMessage = getString(R.string.error_unexpected_response);
+                // TODO send report
                 break;
-            default:
         }
-    }
-
-    private void displayError(@StringRes int errorMessageResId) {
-        String errorMessage = getString(errorMessageResId);
         TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
         viewSwitcher.showErrorLayout();

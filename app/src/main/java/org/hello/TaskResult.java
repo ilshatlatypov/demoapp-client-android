@@ -18,17 +18,24 @@ public class TaskResult {
         return new TaskResult(TaskResultType.SERVER_UNAVAILABLE);
     }
 
-    public static TaskResult ok(ResponseEntity<String> responseEntity) {
-        return new TaskResult(responseEntity);
+    public static TaskResult unexpectedResponse(int responseCode) {
+        TaskResult taskResult = new TaskResult();
+        taskResult.resultType = TaskResultType.UNEXPECTED_RESPONSE_CODE;
+        taskResult.resultObject = responseCode;
+        return taskResult;
     }
+
+    public static TaskResult ok(ResponseEntity<String> responseEntity) {
+        TaskResult taskResult = new TaskResult();
+        taskResult.resultType = TaskResultType.SUCCESS;
+        taskResult.resultObject = responseEntity;
+        return taskResult;
+    }
+
+    public TaskResult() {}
 
     public TaskResult(TaskResultType resultType) {
         this.resultType = resultType;
-    }
-
-    public TaskResult(Object resultObject) {
-        this.resultType = TaskResultType.SUCCESS;
-        this.resultObject = resultObject;
     }
 
     public TaskResultType getResultType() {

@@ -12,8 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.hello.R;
-import org.hello.TaskResult;
-import org.hello.TaskResultType;
 import org.hello.entity.User;
 import org.hello.utils.ConnectionUtils;
 import org.hello.utils.JSONUtils;
@@ -88,34 +86,38 @@ public class UsersFragment extends Fragment {
         updateUsersTask.execute();
     }
 
-    private class UpdateUsersTask extends AsyncTask<Void, Void, TaskResult> {
+    private class UpdateUsersTask extends AsyncTask<Void, Void, TaskResultNew> {
 
         @Override
-        protected TaskResult doInBackground(Void... params) {
+        protected TaskResultNew doInBackground(Void... params) {
             if (!ConnectionUtils.isConnected(context)) {
-                return TaskResult.noConnection();
+                return new TaskResultNew(ErrorType.NO_CONNECTION);
             }
 
             try {
-                return TaskResult.ok(RestUtils.getUsersList());
+                return new TaskResultNew(RestUtils.getUsersList());
             } catch (ResourceAccessException e) {
-                return TaskResult.serverUnavailable();
+                return new TaskResultNew(ErrorType.SERVER_UNAVAILABLE);
             }
         }
 
         @Override
-        protected void onPostExecute(TaskResult taskResult) {
+        protected void onPostExecute(TaskResultNew taskResult) {
             updateUsersTask = null;
 
-            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                ResponseEntity<String> responseEntity = (ResponseEntity<String>) taskResult.getResultObject();
-                if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                    putDataToList(responseEntity);
-                    listener.onDataLoaded();
-                    return;
-                }
+            if (taskResult.isError()) {
+                listener.onError(taskResult.getErrorType());
+                return;
             }
-            listener.onError(taskResult.getResultType());
+
+            ResponseEntity<String> responseEntity = taskResult.getResponseEntity();
+            HttpStatus statusCode = responseEntity.getStatusCode();
+            if (statusCode == HttpStatus.OK) {
+                putDataToList(responseEntity);
+                listener.onDataLoaded();
+            } else {
+                listener.onError(ErrorType.UNEXPECTED_RESPONSE);
+            }
         }
     }
 

@@ -12,8 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.hello.R;
-import org.hello.TaskResult;
-import org.hello.TaskResultType;
 import org.hello.entity.Task;
 import org.hello.utils.ConnectionUtils;
 import org.springframework.http.ResponseEntity;
@@ -82,12 +80,12 @@ public class TasksFragment extends Fragment {
         updateTasksTask.execute();
     }
 
-    private class UpdateTasksTask extends AsyncTask<Void, Void, TaskResult> {
+    private class UpdateTasksTask extends AsyncTask<Void, Void, TaskResultNew> {
 
         @Override
-        protected TaskResult doInBackground(Void... params) {
+        protected TaskResultNew doInBackground(Void... params) {
             if (!ConnectionUtils.isConnected(context)) {
-                return TaskResult.noConnection();
+                return new TaskResultNew(ErrorType.NO_CONNECTION);
             }
 
             try {
@@ -96,44 +94,36 @@ public class TasksFragment extends Fragment {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return TaskResult.ok(null);
+                return new TaskResultNew((ResponseEntity<String>) null);
             } catch (ResourceAccessException e) {
-                return TaskResult.serverUnavailable();
+                return new TaskResultNew(ErrorType.SERVER_UNAVAILABLE);
             }
         }
 
         @Override
-        protected void onPostExecute(TaskResult taskResult) {
+        protected void onPostExecute(TaskResultNew taskResult) {
             updateTasksTask = null;
 
-            if (taskResult.getResultType() == TaskResultType.SUCCESS) {
-                putDataToList(null);
-                listener.onDataLoaded();
+            if (taskResult.isError()) {
+                listener.onError(taskResult.getErrorType());
                 return;
-//                ResponseEntity<String> responseEntity = (ResponseEntity<String>) taskResult.getResultObject();
-//                if (responseEntity.getStatusCode() == HttpStatus.OK) {
-//                    putDataToList(responseEntity);
-//                    listener.onDataLoaded();
-//                    return;
-//                }
             }
-            listener.onError(taskResult.getResultType());
+
+            ResponseEntity<String> responseEntity = taskResult.getResponseEntity();
+            if (responseEntity == null) {
+                putDataToList();
+                listener.onDataLoaded();
+            } else {
+                listener.onError(ErrorType.UNEXPECTED_RESPONSE);
+            }
         }
     }
 
-    private void putDataToList(ResponseEntity<String> responseEntity) {
-//        List<User> users = null;
-//        try {
-//            users = JSONUtils.parseAsUsersList(responseEntity.getBody());
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+    private void putDataToList() {
         ArrayAdapter<Task> adapter = (ArrayAdapter<Task>) tasksListView.getAdapter();
         adapter.add(new Task("Fix the issue"));
         adapter.add(new Task("Deploy build"));
         adapter.add(new Task("Install application"));
-        //adapter.clear();
-        //adapter.addAll(users);
         adapter.notifyDataSetChanged();
     }
 
