@@ -37,7 +37,7 @@ public class JSONUtils {
             User user = new User();
 
             String selfLink = userJson.getJSONObject("_links").getJSONObject("self").getString("href");
-            user.setSelfLink(selfLink);
+            user.setSelf(selfLink);
             user.setFirstname(userJson.getString("firstname"));
             user.setLastname(userJson.getString("lastname"));
 

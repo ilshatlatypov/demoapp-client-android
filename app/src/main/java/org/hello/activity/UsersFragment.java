@@ -89,7 +89,7 @@ public class UsersFragment extends Fragment {
 
     private void openDetailsActivity(User user) {
         Intent intent = new Intent(context, UserDetailsActivity.class);
-        intent.putExtra(EXTRA_USER_LINK, user.getSelfLink());
+        intent.putExtra(EXTRA_USER_LINK, user.getSelf());
         this.startActivityForResult(intent, DETAILS_REQUEST);
     }
 

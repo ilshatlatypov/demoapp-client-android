@@ -57,7 +57,7 @@ public class UserDto {
 
     public User toUser() {
         User user = new User(firstname, lastname, username, password);
-        user.setSelfLink(links.getSelf().getHref());
+        user.setSelf(links.getSelf().getHref());
         return user;
     }
 }

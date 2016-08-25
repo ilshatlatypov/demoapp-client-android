@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
 
-    private String selfLink;
+    private String self;
     private String firstname;
     private String lastname;
     private String username;
@@ -22,12 +22,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getSelfLink() {
-        return selfLink;
+    public String getSelf() {
+        return self;
     }
 
-    public void setSelfLink(String selfLink) {
-        this.selfLink = selfLink;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
     public String getFirstname() {
