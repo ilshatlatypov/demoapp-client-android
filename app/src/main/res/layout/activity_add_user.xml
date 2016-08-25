@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/base_layout"
-    tools:context=".activity.AddUserActivity">
+    tools:context=".activity.CreateUserActivity">
 
     <!-- Dummy item to prevent EditText from receiving focus -->
     <View

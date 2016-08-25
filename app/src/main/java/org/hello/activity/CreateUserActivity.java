@@ -25,7 +25,7 @@ import org.hello.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class AddUserActivity extends AppCompatActivity {
+public class CreateUserActivity extends AppCompatActivity {
 
     private static final int MIN_LENGTH = 4;
     private static final int MAX_LENGTH = 20;
@@ -168,7 +168,7 @@ public class AddUserActivity extends AppCompatActivity {
 
         @Override
         protected TaskResult doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(AddUserActivity.this)) {
+            if (!ConnectionUtils.isConnected(CreateUserActivity.this)) {
                 return TaskResult.noConnection();
             }
 

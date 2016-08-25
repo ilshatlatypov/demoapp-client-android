@@ -49,7 +49,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         baseLayout = findViewById(R.id.base_layout);
 
         viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
-        userSelfLink = getIntent().getStringExtra(UsersListActivity.EXTRA_USER_LINK);
+        userSelfLink = getIntent().getStringExtra(UsersFragment.EXTRA_USER_LINK);
 
         firstnameTextView = (TextView) findViewById(R.id.firstname);
         lastnameTextView = (TextView) findViewById(R.id.lastname);
