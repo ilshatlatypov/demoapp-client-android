@@ -140,7 +140,6 @@ public class UsersFragment extends Fragment {
             try {
                 return RestUtils.getUsersListRetrofit();
             } catch (IOException e) {
-                listener.onError(ErrorType.SERVER_UNAVAILABLE);
                 return null;
             }
         }
@@ -151,6 +150,8 @@ public class UsersFragment extends Fragment {
             if (users != null) {
                 putDataToList(users);
                 listener.onDataLoaded();
+            } else {
+                listener.onError(ErrorType.SERVER_UNAVAILABLE);
             }
         }
     }
