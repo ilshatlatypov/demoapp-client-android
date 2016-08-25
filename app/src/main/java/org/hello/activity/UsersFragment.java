@@ -13,14 +13,9 @@ import android.widget.ListView;
 
 import org.hello.R;
 import org.hello.entity.User;
-import org.hello.utils.ConnectionUtils;
-import org.hello.utils.JSONUtils;
 import org.hello.utils.RestUtils;
-import org.json.JSONException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.ResourceAccessException;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -86,48 +81,29 @@ public class UsersFragment extends Fragment {
         updateUsersTask.execute();
     }
 
-    private class UpdateUsersTask extends AsyncTask<Void, Void, TaskResultNew> {
+    private class UpdateUsersTask extends AsyncTask<Void, Void, List<User>> {
 
         @Override
-        protected TaskResultNew doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(context)) {
-                return new TaskResultNew(ErrorType.NO_CONNECTION);
-            }
-
+        protected List<User> doInBackground(Void... params) {
             try {
-                return new TaskResultNew(RestUtils.getUsersList());
-            } catch (ResourceAccessException e) {
-                return new TaskResultNew(ErrorType.SERVER_UNAVAILABLE);
+                return RestUtils.getUsersListRetrofit();
+            } catch (IOException e) {
+                listener.onError(ErrorType.SERVER_UNAVAILABLE);
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(TaskResultNew taskResult) {
+        protected void onPostExecute(List<User> users) {
             updateUsersTask = null;
-
-            if (taskResult.isError()) {
-                listener.onError(taskResult.getErrorType());
-                return;
-            }
-
-            ResponseEntity<String> responseEntity = taskResult.getResponseEntity();
-            HttpStatus statusCode = responseEntity.getStatusCode();
-            if (statusCode == HttpStatus.OK) {
-                putDataToList(responseEntity);
+            if (users != null) {
+                putDataToList(users);
                 listener.onDataLoaded();
-            } else {
-                listener.onError(ErrorType.UNEXPECTED_RESPONSE);
             }
         }
     }
 
-    private void putDataToList(ResponseEntity<String> responseEntity) {
-        List<User> users = null;
-        try {
-            users = JSONUtils.parseAsUsersList(responseEntity.getBody());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void putDataToList(List<User> users) {
         ArrayAdapter<User> adapter = (ArrayAdapter<User>) usersListView.getAdapter();
         adapter.clear();
         adapter.addAll(users);
