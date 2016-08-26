@@ -29,7 +29,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.CreateUserActivity"
-            android:label="@string/title_add_user">
+            android:label="@string/title_new_user">
         </activity>
         <activity
             android:name=".activity.UserDetailsActivity"

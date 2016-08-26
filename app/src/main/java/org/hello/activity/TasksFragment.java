@@ -106,7 +106,7 @@ public class TasksFragment extends Fragment {
             updateTasksTask = null;
 
             if (taskResult.isError()) {
-                listener.onError(taskResult.getErrorType());
+                listener.onError("error");
                 return;
             }
 
@@ -116,7 +116,7 @@ public class TasksFragment extends Fragment {
                 putDataToList(responseEntity);
                 listener.onDataLoaded();
             } else {
-                listener.onError(ErrorType.UNEXPECTED_RESPONSE);
+                listener.onError("unexpected response");
             }
         }
     }

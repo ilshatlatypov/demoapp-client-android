@@ -15,7 +15,7 @@ import retrofit2.http.Path;
 public interface MyService {
 
     @GET("users")
-    Call<UsersPageDto> listUsers();
+    Call<UsersPageDto> getUsers();
 
     @POST("users")
     Call<Void> createUser(@Body UserDto user);

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,12 +15,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.hello.MyService;
 import org.hello.R;
 import org.hello.entity.User;
+import org.hello.entity.dto.UsersPageDto;
 import org.hello.utils.RestUtils;
 
-import java.io.IOException;
+import java.net.ConnectException;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +34,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class UsersFragment extends Fragment {
+
+    private MyService service = RestUtils.getService();
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
@@ -38,7 +45,6 @@ public class UsersFragment extends Fragment {
     private ListView usersListView;
 
     private FragmentDataLoadingListener listener;
-    private UpdateUsersTask updateUsersTask;
 
     public UsersFragment() {
         // Required empty public constructor
@@ -126,34 +132,22 @@ public class UsersFragment extends Fragment {
     }
 
     private void updateUsers() {
-        if (updateUsersTask != null) {
-            return;
-        }
-        updateUsersTask = new UpdateUsersTask();
-        updateUsersTask.execute();
-    }
-
-    private class UpdateUsersTask extends AsyncTask<Void, Void, List<User>> {
-
-        @Override
-        protected List<User> doInBackground(Void... params) {
-            try {
-                return RestUtils.getUsersListRetrofit();
-            } catch (IOException e) {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<User> users) {
-            updateUsersTask = null;
-            if (users != null) {
-                putDataToList(users);
+        Call<UsersPageDto> usersPageDtoCall = service.getUsers();
+        usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
+            @Override
+            public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
+                putDataToList(response.body().getUsers());
                 listener.onDataLoaded();
-            } else {
-                listener.onError(ErrorType.SERVER_UNAVAILABLE);
             }
-        }
+
+            @Override
+            public void onFailure(Call<UsersPageDto> call, Throwable t) {
+                String message = (t instanceof ConnectException) ?
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
+                listener.onError(message);
+            }
+        });
     }
 
     private void putDataToList(List<User> users) {

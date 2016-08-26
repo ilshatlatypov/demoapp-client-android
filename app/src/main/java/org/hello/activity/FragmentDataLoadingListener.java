@@ -5,5 +5,5 @@ package org.hello.activity;
  */
 public interface FragmentDataLoadingListener {
     void onDataLoaded();
-    void onError(ErrorType errorType);
+    void onError(String errorMessage);
 }

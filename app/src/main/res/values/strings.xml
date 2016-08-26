@@ -26,7 +26,7 @@
     <string name="error_user_already_deleted">Сотрудник уже удален</string>
 
     <!-- Add user -->
-    <string name="title_add_user">Добавление сотрудника</string>
+    <string name="title_new_user">Новый сотрудник</string>
     <string name="prompt_first_name">Имя</string>
     <string name="prompt_last_name">Фамилия</string>
     <string name="prompt_user_added">Сотрудник добавлен</string>

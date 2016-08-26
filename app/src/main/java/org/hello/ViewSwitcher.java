@@ -7,65 +7,70 @@ import android.app.Activity;
 import android.os.Build;
 import android.support.annotation.IdRes;
 import android.view.View;
-import android.widget.ProgressBar;
 
 /**
- * Created by ilshat on 22.07.16.
+ * Created by ilshat on 23.07.16.
  */
 public class ViewSwitcher {
 
     private Activity activity;
-    private int firstViewResId;
-    private int secondViewResId;
+    private int progressBarResId;
+    private int mainLayoutResId;
+    private int errorLayoutResId;
 
-    public ViewSwitcher(Activity activity, @IdRes int firstViewResId, @IdRes int secondViewResId) {
+    public ViewSwitcher(Activity activity, @IdRes int progressBarResId, @IdRes int mainLayoutResId, @IdRes int errorLayoutResId) {
         this.activity = activity;
-        this.firstViewResId = firstViewResId;
-        this.secondViewResId = secondViewResId;
+        this.progressBarResId = progressBarResId;
+        this.mainLayoutResId = mainLayoutResId;
+        this.errorLayoutResId = errorLayoutResId;
     }
 
-    public void showFirst() {
-        showFirst(true);
+    public void showProgressBar() {
+        show(progressBarResId);
     }
 
-    public void showSecond() {
-        showFirst(false);
+    public void showMainLayout() {
+        show(mainLayoutResId);
+    }
+
+    public void showErrorLayout() {
+        show(errorLayoutResId);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showFirst(final boolean first) {
+    private void show(int resId) {
+        View progressBar = activity.findViewById(progressBarResId);
+        View mainLayout = activity.findViewById(mainLayoutResId);
+        View errorLayout = activity.findViewById(errorLayoutResId);
 
-        final View view1 = activity.findViewById(firstViewResId);
-        final View view2 = activity.findViewById(secondViewResId);
+        boolean showProgressBar = (progressBar.getId() == resId);
+        boolean showMainLayout = (mainLayout.getId() == resId);
+        boolean showErrorLayout = (errorLayout.getId() == resId);
 
+        showView(progressBar, showProgressBar);
+        showView(mainLayout, showMainLayout);
+        showView(errorLayout, showErrorLayout);
+    }
+
+    private void showView(final View view, final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = activity.getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            view2.setVisibility(first ? View.GONE : View.VISIBLE);
-            view2.animate().setDuration(shortAnimTime).alpha(
-                    first ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            view.setVisibility(show ? View.VISIBLE : View.GONE);
+            view.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    view2.setVisibility(first ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            view1.setVisibility(first ? View.VISIBLE : View.GONE);
-            view1.animate().setDuration(shortAnimTime).alpha(
-                    first ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    view1.setVisibility(first ? View.VISIBLE : View.GONE);
+                    view.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            view1.setVisibility(first ? View.VISIBLE : View.GONE);
-            view2.setVisibility(first ? View.GONE : View.VISIBLE);
+            view.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 }

@@ -18,7 +18,7 @@ import android.widget.TextView;
 import org.hello.R;
 import org.hello.TaskResult;
 import org.hello.TaskResultType;
-import org.hello.ViewSwitcherNew;
+import org.hello.ViewSwitcher;
 import org.hello.entity.User;
 import org.hello.utils.ConnectionUtils;
 import org.hello.utils.JSONUtils;
@@ -32,7 +32,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     private GetUserDetailsTask getUserDetailsTask = null;
     private DeleteUserTask deleteUserTask = null;
 
-    private ViewSwitcherNew viewSwitcher;
+    private ViewSwitcher viewSwitcher;
     private View baseLayout;
     private String userSelfLink;
 
@@ -48,7 +48,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         baseLayout = findViewById(R.id.base_layout);
 
-        viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
+        viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
         userSelfLink = getIntent().getStringExtra(UsersFragment.EXTRA_USER_LINK);
 
         firstnameTextView = (TextView) findViewById(R.id.firstname);

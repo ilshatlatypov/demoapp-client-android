@@ -17,12 +17,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.hello.R;
-import org.hello.ViewSwitcherNew;
+import org.hello.ViewSwitcher;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
 
-    private ViewSwitcherNew viewSwitcher;
+    private ViewSwitcher viewSwitcher;
     private Button retryButton;
 
     private int activeFragmentNavItemId;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        viewSwitcher = new ViewSwitcherNew(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
+        viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
         retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,20 +138,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onError(ErrorType errorType) {
-        String errorMessage = null;
-        switch (errorType) {
-            case NO_CONNECTION:
-                errorMessage = getString(R.string.error_no_connection);
-                break;
-            case SERVER_UNAVAILABLE:
-                errorMessage = getString(R.string.error_server_unavailable);
-                break;
-            case UNEXPECTED_RESPONSE:
-                errorMessage = getString(R.string.error_unexpected_response);
-                // TODO send report
-                break;
-        }
+    public void onError(String errorMessage) {
         TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
         viewSwitcher.showErrorLayout();

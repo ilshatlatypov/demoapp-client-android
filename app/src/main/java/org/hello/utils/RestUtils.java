@@ -2,20 +2,13 @@ package org.hello.utils;
 
 import org.hello.MyService;
 import org.hello.NoExceptionsErrorHandler;
-import org.hello.entity.User;
-import org.hello.entity.dto.UserDto;
-import org.hello.entity.dto.UsersPageDto;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -45,16 +38,6 @@ public class RestUtils {
 
     public static MyService getService() {
         return service;
-    }
-
-    public static List<User> getUsersListRetrofit() throws IOException {
-        Response<UsersPageDto> response = service.listUsers().execute();
-        List<UserDto> userDtos = response.body().getUsers();
-        List<User> users = new ArrayList<>(userDtos.size());
-        for (UserDto userDto : userDtos) {
-            users.add(userDto.toUser());
-        }
-        return users;
     }
 
     public static ResponseEntity<String> getUserDetails(String url) {
