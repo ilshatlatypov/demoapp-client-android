@@ -5,10 +5,7 @@ import org.hello.NoExceptionsErrorHandler;
 import org.hello.entity.User;
 import org.hello.entity.dto.UserDto;
 import org.hello.entity.dto.UsersPageDto;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -31,7 +28,7 @@ public class RestUtils {
     private static final MyService service;
     static {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.0.101:8080/")
+                .baseUrl("http://192.168.0.102:8080/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(MyService.class);
@@ -42,20 +39,12 @@ public class RestUtils {
         REST_TEMPLATE.setErrorHandler(new NoExceptionsErrorHandler());
     }
 
-    private static final String USERS_URL = "http://192.168.0.101:8080/users";
-    private static final String TASKS_URL = "http://192.168.0.101:8080/tasks";
+    private static final String TASKS_URL = "http://192.168.0.102:8080/tasks";
 
     private RestUtils() {}
 
-    public static User getUserRetrofit() {
-        Response<User> response = null;
-        try {
-            response = service.getUser(1).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-            // TODO handle this
-        }
-        return response.body();
+    public static MyService getService() {
+        return service;
     }
 
     public static List<User> getUsersListRetrofit() throws IOException {
@@ -68,23 +57,12 @@ public class RestUtils {
         return users;
     }
 
-    public static ResponseEntity<String> getUsersList() {
-        return REST_TEMPLATE.exchange(USERS_URL, HttpMethod.GET, null, String.class);
-    }
-
     public static ResponseEntity<String> getUserDetails(String url) {
         return REST_TEMPLATE.exchange(url, HttpMethod.GET, null, String.class);
     }
 
     public static ResponseEntity<String> deleteUser(String url) {
         return REST_TEMPLATE.exchange(url, HttpMethod.DELETE, null, String.class);
-    }
-
-    public static ResponseEntity<String> createUser(String userJson) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(userJson, headers);
-        return REST_TEMPLATE.exchange(USERS_URL, HttpMethod.POST, entity, String.class);
     }
 
     public static ResponseEntity<String> getTasksList() {

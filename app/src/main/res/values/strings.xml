@@ -48,9 +48,7 @@
     <string name="error_no_connection">Отсутствует интернет подключение</string>
     <string name="error_server_unavailable">Сервер временно недоступен</string>
     <string name="error_unexpected_response">Неожиданный ответ от сервера</string>
+    <string name="error_unknown">Неизвестная ошибка: %s</string>
     <string name="prompt_tasks">Задачи</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -15,6 +15,13 @@ public class UserDto {
     @SerializedName("_links")
     private Links links;
 
+    public UserDto(User user) {
+        this.firstname = user.getFirstname();
+        this.lastname = user.getLastname();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+    }
+
     public String getFirstname() {
         return firstname;
     }
