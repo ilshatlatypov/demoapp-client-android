@@ -69,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/holo_red_dark"
-                android:textAlignment="center"
                 android:visibility="gone"/>
 
             <Button
