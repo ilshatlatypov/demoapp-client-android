@@ -3,23 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/base_layout"
     tools:context=".activity.CreateUserActivity">
-
-    <!-- Dummy item to prevent EditText from receiving focus -->
-    <View
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:layout_width="0px"
-        android:layout_height="0px"/>
-
-    <ProgressBar
-        android:id="@+id/progress_add_user"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
 
     <ScrollView
         android:id="@+id/add_user_form"
@@ -38,7 +24,8 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/firstname_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorTextAppearance="@style/error_appearance">
                 <EditText
                     android:id="@+id/firstname_text"
                     android:hint="@string/prompt_first_name"
@@ -50,7 +37,8 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/lastname_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorTextAppearance="@style/error_appearance">
                 <EditText
                     android:id="@+id/lastname_text"
                     android:hint="@string/prompt_last_name"
@@ -62,7 +50,8 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/username_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorTextAppearance="@style/error_appearance">
                 <EditText
                     android:id="@+id/username_text"
                     android:hint="@string/prompt_login"
@@ -74,32 +63,16 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/password_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorTextAppearance="@style/error_appearance">
                 <EditText
                     android:id="@+id/password_text"
                     android:hint="@string/prompt_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"/>
+                    android:singleLine="true"
+                    android:imeOptions="actionDone"/>
             </android.support.design.widget.TextInputLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-
-                <Button
-                    android:id="@+id/b_create"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_create" />
-
-            </LinearLayout>
 
         </LinearLayout>
 

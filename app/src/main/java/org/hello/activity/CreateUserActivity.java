@@ -6,10 +6,13 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.hello.MyService;
 import org.hello.R;
@@ -27,26 +30,40 @@ import retrofit2.Response;
 public class CreateUserActivity extends AppCompatActivity {
 
     private MyService service = RestUtils.getService();
-
-    private Button createButton;
     private View baseLayout;
+
+    private EditText firstnameText;
+    private EditText lastnameText;
+    private EditText usernameText;
+    private EditText passwordText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_user);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         baseLayout = findViewById(R.id.base_layout);
 
-        createButton = (Button) findViewById(R.id.b_create);
-        createButton.setOnClickListener(new View.OnClickListener() {
+        firstnameText = (EditText) findViewById(R.id.firstname_text);
+        lastnameText = (EditText) findViewById(R.id.lastname_text);
+        usernameText = (EditText) findViewById(R.id.username_text);
+        passwordText = (EditText) findViewById(R.id.password_text);
+        passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View v) {
-                attemptCreateUser();
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    attemptCreateUser();
+                    return true;
+                }
+                return false;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.create_user, menu);
+        return true;
     }
 
     @Override
@@ -54,7 +71,8 @@ public class CreateUserActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             finish();
-            return true;
+        } else if (id == R.id.action_save) {
+            attemptCreateUser();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -69,10 +87,6 @@ public class CreateUserActivity extends AppCompatActivity {
         usernameLayout.setError(null);
         passwordLayout.setError(null);
 
-        EditText firstnameText = (EditText) findViewById(R.id.firstname_text);
-        EditText lastnameText = (EditText) findViewById(R.id.lastname_text);
-        EditText usernameText = (EditText) findViewById(R.id.username_text);
-        EditText passwordText = (EditText) findViewById(R.id.password_text);
         String firstname = firstnameText.getText().toString();
         String lastname = lastnameText.getText().toString();
         String username = usernameText.getText().toString();
