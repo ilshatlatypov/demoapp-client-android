@@ -50,5 +50,6 @@
     <string name="error_unexpected_response">Неожиданный ответ от сервера</string>
     <string name="error_unknown">Неизвестная ошибка: %s</string>
     <string name="prompt_tasks">Задачи</string>
+    <string name="error_user_not_found">Сотрудник не найден</string>
 
 </resources>

@@ -131,8 +131,8 @@ public class CreateUserActivity extends AppCompatActivity {
     private void sendCreateUserRequest(User user) {
         Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
-        Call<Void> userDtoCall = service.createUser(new UserDto(user));
-        userDtoCall.enqueue(new Callback<Void>() {
+        Call<Void> createUserCall = service.createUser(new UserDto(user));
+        createUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

@@ -39,7 +39,7 @@ public class UsersFragment extends Fragment {
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
-    public static final String EXTRA_USER_LINK = "user_link";
+    public static final String EXTRA_USER_ID = "user_id";
 
     private Context context;
     private ListView usersListView;
@@ -95,7 +95,7 @@ public class UsersFragment extends Fragment {
 
     private void openDetailsActivity(User user) {
         Intent intent = new Intent(context, UserDetailsActivity.class);
-        intent.putExtra(EXTRA_USER_LINK, user.getSelf());
+        intent.putExtra(EXTRA_USER_ID, user.getId());
         this.startActivityForResult(intent, DETAILS_REQUEST);
     }
 
@@ -107,8 +107,10 @@ public class UsersFragment extends Fragment {
                 updateUsers();
             }
         } else if (requestCode == DETAILS_REQUEST) {
-            if (resultCode == Activity.RESULT_OK) {
+            if (resultCode == UserDetailsActivity.RESULT_DELETED) {
                 Snackbar.make(usersListView, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
+                updateUsers();
+            } else if (resultCode == UserDetailsActivity.RESULT_NEED_REFRESH) {
                 updateUsers();
             }
         }

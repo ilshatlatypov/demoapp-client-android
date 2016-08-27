@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
 
-    private String self;
+    private int id;
     private String firstname;
     private String lastname;
     private String username;
@@ -22,12 +22,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getSelf() {
-        return self;
+    public int getId() {
+        return id;
     }
 
-    public void setSelf(String self) {
-        this.self = self;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstname() {

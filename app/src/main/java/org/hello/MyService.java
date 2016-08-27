@@ -5,6 +5,7 @@ import org.hello.entity.dto.UsersPageDto;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -22,4 +23,7 @@ public interface MyService {
 
     @GET("users/{id}")
     Call<UserDto> getUser(@Path("id") int id);
+
+    @DELETE("users/{id}")
+    Call<Void> deleteUser(@Path("id") int id);
 }
