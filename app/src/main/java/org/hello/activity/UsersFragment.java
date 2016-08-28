@@ -22,6 +22,7 @@ import org.hello.entity.dto.UsersPageDto;
 import org.hello.utils.RestUtils;
 
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -149,7 +150,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
 
             @Override
             public void onFailure(Call<UsersPageDto> call, Throwable t) {
-                String message = (t instanceof ConnectException) ?
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
                         getString(R.string.error_server_unavailable) :
                         getString(R.string.error_unknown, t.getMessage());
                 listener.onError(message);

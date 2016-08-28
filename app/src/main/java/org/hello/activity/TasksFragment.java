@@ -3,7 +3,6 @@ package org.hello.activity;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,17 +10,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.hello.MyService;
 import org.hello.R;
 import org.hello.entity.Task;
-import org.hello.utils.ConnectionUtils;
-import org.hello.utils.JSONUtils;
+import org.hello.entity.dto.TasksPageDto;
 import org.hello.utils.RestUtils;
-import org.json.JSONException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.ResourceAccessException;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,11 +31,12 @@ import java.util.List;
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
+    private MyService service = RestUtils.getService();
+
     private Context context;
     private ListView tasksListView;
 
     private FragmentDataLoadingListener listener;
-    private UpdateTasksTask updateTasksTask;
 
     public TasksFragment() {
         // Required empty public constructor
@@ -42,23 +44,6 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
 
     public static TasksFragment newInstance() {
         return new TasksFragment();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentDataLoadingListener) {
-            listener = (FragmentDataLoadingListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement FragmentDataLoadingListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 
     @Override
@@ -79,60 +64,47 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentDataLoadingListener) {
+            listener = (FragmentDataLoadingListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement FragmentDataLoadingListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    @Override
     public void refreshFragmentData() {
         updateTasks();
     }
 
     private void updateTasks() {
-        if (updateTasksTask != null) {
-            return;
-        }
-        updateTasksTask = new UpdateTasksTask();
-        updateTasksTask.execute();
-    }
-
-    private class UpdateTasksTask extends AsyncTask<Void, Void, TaskResultNew> {
-
-        @Override
-        protected TaskResultNew doInBackground(Void... params) {
-            if (!ConnectionUtils.isConnected(context)) {
-                return new TaskResultNew(ErrorType.NO_CONNECTION);
-            }
-
-            try {
-                return new TaskResultNew(RestUtils.getTasksList());
-            } catch (ResourceAccessException e) {
-                return new TaskResultNew(ErrorType.SERVER_UNAVAILABLE);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(TaskResultNew taskResult) {
-            updateTasksTask = null;
-
-            if (taskResult.isError()) {
-                listener.onError("error");
-                return;
-            }
-
-            ResponseEntity<String> responseEntity = taskResult.getResponseEntity();
-            HttpStatus statusCode = responseEntity.getStatusCode();
-            if (statusCode == HttpStatus.OK) {
-                putDataToList(responseEntity);
+        Call<TasksPageDto> tasksPageDtoCall = service.getTasks();
+        tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
+            @Override
+            public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
+                putDataToList(response.body().getTasks());
                 listener.onDataLoaded();
-            } else {
-                listener.onError("unexpected response");
             }
-        }
+
+            @Override
+            public void onFailure(Call<TasksPageDto> call, Throwable t) {
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
+                listener.onError(message);
+            }
+        });
     }
 
-    private void putDataToList(ResponseEntity<String> responseEntity) {
-        List<Task> tasks = null;
-        try {
-            tasks = JSONUtils.parseAsTasksList(responseEntity.getBody());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void putDataToList(List<Task> tasks) {
         ArrayAdapter<Task> adapter = (ArrayAdapter<Task>) tasksListView.getAdapter();
         adapter.clear();
         adapter.addAll(tasks);

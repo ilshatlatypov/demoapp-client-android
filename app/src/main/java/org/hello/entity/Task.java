@@ -5,7 +5,7 @@ package org.hello.entity;
  */
 public class Task {
 
-    private String self;
+    private int id;
     private String title;
 
     public Task() {
@@ -15,12 +15,12 @@ public class Task {
         this.title = title;
     }
 
-    public String getSelf() {
-        return self;
+    public int getId() {
+        return id;
     }
 
-    public void setSelf(String self) {
-        this.self = self;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {

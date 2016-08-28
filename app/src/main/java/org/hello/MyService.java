@@ -1,5 +1,6 @@
 package org.hello;
 
+import org.hello.entity.dto.TasksPageDto;
 import org.hello.entity.dto.UserDto;
 import org.hello.entity.dto.UsersPageDto;
 
@@ -26,4 +27,7 @@ public interface MyService {
 
     @DELETE("users/{id}")
     Call<Void> deleteUser(@Path("id") int id);
+
+    @GET("tasks")
+    Call<TasksPageDto> getTasks();
 }
