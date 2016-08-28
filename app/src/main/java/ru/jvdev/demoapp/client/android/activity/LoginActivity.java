@@ -19,15 +19,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import ru.jvdev.demoapp.client.android.TaskResult;
-import ru.jvdev.demoapp.client.android.TaskResultType;
-import ru.jvdev.demoapp.client.android.utils.ConnectionUtils;
-import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
+import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.TaskResult;
+import ru.jvdev.demoapp.client.android.TaskResultType;
+import ru.jvdev.demoapp.client.android.utils.ConnectionUtils;
+import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
 /**
  * A login screen that offers login via login/password.
@@ -48,15 +50,15 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(ru.jvdev.R.layout.activity_login);
+        setContentView(R.layout.activity_login);
         // Set up the login form.
-        mLoginView = (EditText) findViewById(ru.jvdev.R.id.username);
+        mLoginView = (EditText) findViewById(R.id.username);
 
-        mPasswordView = (EditText) findViewById(ru.jvdev.R.id.password);
+        mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == ru.jvdev.R.id.username || id == EditorInfo.IME_NULL) {
+                if (id == R.id.username || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -64,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button signInButton = (Button) findViewById(ru.jvdev.R.id.sign_in_button);
+        Button signInButton = (Button) findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,8 +74,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        mLoginFormView = findViewById(ru.jvdev.R.id.login_form);
-        mProgressView = findViewById(ru.jvdev.R.id.login_progress);
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
     }
 
     /**
@@ -89,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
         // Reset errors.
         ((TextInputLayout) mLoginView.getParent()).setError(null);
         ((TextInputLayout) mPasswordView.getParent()).setError(null);
-        findViewById(ru.jvdev.R.id.error_text).setVisibility(View.GONE);
+        findViewById(R.id.error_text).setVisibility(View.GONE);
 
         // Store values at the time of the login attempt.
         String login = mLoginView.getText().toString();
@@ -100,14 +102,14 @@ public class LoginActivity extends AppCompatActivity {
 
         // Check for a valid password.
         if (TextUtils.isEmpty(password)) {
-            ((TextInputLayout) mPasswordView.getParent()).setError(getString(ru.jvdev.R.string.error_field_required));
+            ((TextInputLayout) mPasswordView.getParent()).setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid login.
         if (TextUtils.isEmpty(login)) {
-            ((TextInputLayout) mLoginView.getParent()).setError(getString(ru.jvdev.R.string.error_field_required));
+            ((TextInputLayout) mLoginView.getParent()).setError(getString(R.string.error_field_required));
             focusView = mLoginView;
             cancel = true;
         }
@@ -230,24 +232,24 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void displayIncorrectLoginPasswordError() {
-        displayError(ru.jvdev.R.string.error_incorrect_login_password);
+        displayError(R.string.error_incorrect_login_password);
     }
 
     private void displayServerUnavailableError() {
-        displayError(ru.jvdev.R.string.error_server_unavailable);
+        displayError(R.string.error_server_unavailable);
     }
 
     private void displayNoConnectionError() {
-        displayError(ru.jvdev.R.string.error_no_connection);
+        displayError(R.string.error_no_connection);
     }
 
     private void displayUnexpectedResponseError() {
-        displayError(ru.jvdev.R.string.error_unexpected_response);
+        displayError(R.string.error_unexpected_response);
     }
 
     private void displayError(@StringRes int errorMessageResId) {
         String errorMessage = getString(errorMessageResId);
-        TextView errorTextView = (TextView) findViewById(ru.jvdev.R.id.error_text);
+        TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
         errorTextView.setVisibility(View.VISIBLE);
         showProgress(false);

@@ -10,12 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.R;
-import ru.jvdev.demoapp.client.android.entity.Task;
-import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
-import ru.jvdev.demoapp.client.android.utils.RestProvider;
-
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.List;
@@ -23,6 +17,11 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.entity.Task;
+import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
+import ru.jvdev.demoapp.client.android.utils.RestProvider;
 
 /**
  * A simple {@link Fragment} subclass.

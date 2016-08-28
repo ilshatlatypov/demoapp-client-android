@@ -23,6 +23,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
@@ -43,14 +44,14 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(ru.jvdev.R.layout.activity_create_or_update_user);
+        setContentView(R.layout.activity_create_or_update_user);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        baseLayout = (LinearLayout) findViewById(ru.jvdev.R.id.base_layout);
+        baseLayout = (LinearLayout) findViewById(R.id.base_layout);
 
-        firstnameText = (EditText) findViewById(ru.jvdev.R.id.firstname_text);
-        lastnameText = (EditText) findViewById(ru.jvdev.R.id.lastname_text);
-        usernameText = (EditText) findViewById(ru.jvdev.R.id.username_text);
-        passwordText = (EditText) findViewById(ru.jvdev.R.id.password_text);
+        firstnameText = (EditText) findViewById(R.id.firstname_text);
+        lastnameText = (EditText) findViewById(R.id.lastname_text);
+        usernameText = (EditText) findViewById(R.id.username_text);
+        passwordText = (EditText) findViewById(R.id.password_text);
         passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -66,9 +67,9 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         if (user != null) {
             userId = user.getId();
             fillFieldsWithData(user);
-            getSupportActionBar().setTitle(ru.jvdev.R.string.title_edit_user);
+            getSupportActionBar().setTitle(R.string.title_edit_user);
         } else {
-            getSupportActionBar().setTitle(ru.jvdev.R.string.title_new_user);
+            getSupportActionBar().setTitle(R.string.title_new_user);
         }
     }
 
@@ -81,7 +82,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(ru.jvdev.R.menu.create_user, menu);
+        getMenuInflater().inflate(R.menu.create_user, menu);
         return true;
     }
 
@@ -90,7 +91,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             finish();
-        } else if (id == ru.jvdev.R.id.action_save) {
+        } else if (id == R.id.action_save) {
             if (userId == 0) {
                 attemptCreateUser();
             } else {
@@ -115,7 +116,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     }
 
     private void sendCreateUserRequest(User user) {
-        Snackbar.make(baseLayout, ru.jvdev.R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
         Call<Void> createUserCall = usersApi.createUser(new UserDto(user));
         createUserCall.enqueue(new Callback<Void>() {
@@ -130,8 +131,8 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 String message = (t instanceof ConnectException) ?
-                    getString(ru.jvdev.R.string.error_server_unavailable) :
-                    getString(ru.jvdev.R.string.error_unknown, t.getMessage());
+                    getString(R.string.error_server_unavailable) :
+                    getString(R.string.error_unknown, t.getMessage());
                 showRequestError(message);
             }
         });
@@ -152,7 +153,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     }
 
     private void sendUpdateUserRequest(int userId, User user) {
-        Snackbar.make(baseLayout, ru.jvdev.R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
         Call<Void> updateUserCall = usersApi.updateUser(userId, new UserDto(user));
         updateUserCall.enqueue(new Callback<Void>() {
@@ -168,8 +169,8 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 String message = (t instanceof ConnectException) ?
-                        getString(ru.jvdev.R.string.error_server_unavailable) :
-                        getString(ru.jvdev.R.string.error_unknown, t.getMessage());
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
                 showRequestError(message);
             }
         });
@@ -195,22 +196,22 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         Map<Integer, String> errors = new LinkedHashMap<>();
 
         if (TextUtils.isEmpty(user.getFirstname())) {
-            errors.put(ru.jvdev.R.id.firstname_layout, getString(ru.jvdev.R.string.error_field_required));
+            errors.put(R.id.firstname_layout, getString(R.string.error_field_required));
         }
 
         if (TextUtils.isEmpty(user.getLastname())) {
-            errors.put(ru.jvdev.R.id.lastname_layout, getString(ru.jvdev.R.string.error_field_required));
+            errors.put(R.id.lastname_layout, getString(R.string.error_field_required));
         }
 
         if (!StringUtils.containsOnlyLatinLetters(user.getUsername())) {
-            errors.put(ru.jvdev.R.id.username_layout, getString(ru.jvdev.R.string.error_only_latin_letters));
+            errors.put(R.id.username_layout, getString(R.string.error_only_latin_letters));
         }
         if (TextUtils.isEmpty(user.getUsername())) {
-            errors.put(ru.jvdev.R.id.username_layout, getString(ru.jvdev.R.string.error_field_required));
+            errors.put(R.id.username_layout, getString(R.string.error_field_required));
         }
 
         if (TextUtils.isEmpty(user.getPassword())) {
-            errors.put(ru.jvdev.R.id.password_layout, getString(ru.jvdev.R.string.error_field_required));
+            errors.put(R.id.password_layout, getString(R.string.error_field_required));
         }
         return errors;
     }
@@ -230,7 +231,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
     private void showRequestError(String errorMessage) {
         Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
-                .setAction(ru.jvdev.R.string.action_retry, new View.OnClickListener() {
+                .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         attemptCreateUser();

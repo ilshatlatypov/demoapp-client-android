@@ -15,11 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.demoapp.client.android.entity.User;
-import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
-import ru.jvdev.demoapp.client.android.utils.RestProvider;
-
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.List;
@@ -27,6 +22,11 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.entity.User;
+import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
+import ru.jvdev.demoapp.client.android.utils.RestProvider;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,10 +58,10 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(ru.jvdev.R.layout.fragment_users, container, false);
+        View view = inflater.inflate(R.layout.fragment_users, container, false);
         context = view.getContext();
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(ru.jvdev.R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,7 +70,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
         });
 
         if (usersListView == null) {
-            usersListView = (ListView) view.findViewById(ru.jvdev.R.id.users_list_view);
+            usersListView = (ListView) view.findViewById(R.id.users_list_view);
 
             ArrayAdapter<User> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
             usersListView.setAdapter(adapter);
@@ -103,12 +103,12 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CREATE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(usersListView, ru.jvdev.R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(usersListView, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
                 updateUsers();
             }
         } else if (requestCode == DETAILS_REQUEST) {
             if (resultCode == UserDetailsActivity.RESULT_DELETED) {
-                Snackbar.make(usersListView, ru.jvdev.R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(usersListView, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
                 updateUsers();
             } else if (resultCode == UserDetailsActivity.RESULT_NEED_REFRESH) {
                 updateUsers();
@@ -150,8 +150,8 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
             @Override
             public void onFailure(Call<UsersPageDto> call, Throwable t) {
                 String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(ru.jvdev.R.string.error_server_unavailable) :
-                        getString(ru.jvdev.R.string.error_unknown, t.getMessage());
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
                 listener.onError(message);
             }
         });
