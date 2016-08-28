@@ -14,7 +14,7 @@ import org.hello.Api;
 import org.hello.R;
 import org.hello.entity.Task;
 import org.hello.entity.dto.TasksPageDto;
-import org.hello.utils.RestUtils;
+import org.hello.utils.RestProvider;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -31,7 +31,7 @@ import retrofit2.Response;
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
-    private Api.Tasks tasksApi = RestUtils.getTasksApi();
+    private Api.Tasks tasksApi = RestProvider.getTasksApi();
 
     private Context context;
     private ListView tasksListView;

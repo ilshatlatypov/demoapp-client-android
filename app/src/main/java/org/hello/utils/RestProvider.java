@@ -8,12 +8,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by ilshat on 25.07.16.
  */
-public class RestUtils {
+public class RestProvider {
 
-    private static final Api.Users usersApi;
-    private static final Api.Tasks tasksApi;
+    private static Api.Users usersApi;
+    private static Api.Tasks tasksApi;
 
-    static {
+    private RestProvider() {}
+
+    public static void init() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.0.102:8080/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -21,8 +23,6 @@ public class RestUtils {
         usersApi = retrofit.create(Api.Users.class);
         tasksApi = retrofit.create(Api.Tasks.class);
     }
-
-    private RestUtils() {}
 
     public static Api.Users getUsersApi() {
         return usersApi;

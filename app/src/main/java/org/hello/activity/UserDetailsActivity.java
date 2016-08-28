@@ -18,7 +18,7 @@ import org.hello.R;
 import org.hello.ViewSwitcher;
 import org.hello.entity.User;
 import org.hello.entity.dto.UserDto;
-import org.hello.utils.RestUtils;
+import org.hello.utils.RestProvider;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -35,7 +35,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "user";
     private static final int EDIT_REQUEST = 1;
 
-    private Api.Users usersApi = RestUtils.getUsersApi();
+    private Api.Users usersApi = RestProvider.getUsersApi();
 
     private ViewSwitcher viewSwitcher;
     private View baseLayout;

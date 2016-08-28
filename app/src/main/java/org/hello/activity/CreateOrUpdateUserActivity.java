@@ -20,7 +20,7 @@ import org.hello.R;
 import org.hello.entity.User;
 import org.hello.entity.dto.UserDto;
 import org.hello.utils.KeyboardUtils;
-import org.hello.utils.RestUtils;
+import org.hello.utils.RestProvider;
 import org.hello.utils.StringUtils;
 
 import java.net.ConnectException;
@@ -33,7 +33,7 @@ import retrofit2.Response;
 
 public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
-    private Api.Users usersApi = RestUtils.getUsersApi();
+    private Api.Users usersApi = RestProvider.getUsersApi();
     private LinearLayout baseLayout;
 
     private int userId;

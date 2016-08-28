@@ -19,7 +19,7 @@ import org.hello.Api;
 import org.hello.R;
 import org.hello.entity.User;
 import org.hello.entity.dto.UsersPageDto;
-import org.hello.utils.RestUtils;
+import org.hello.utils.RestProvider;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -36,7 +36,7 @@ import retrofit2.Response;
  */
 public class UsersFragment extends Fragment implements RefreshableFragment {
 
-    private Api.Users usersApi = RestUtils.getUsersApi();
+    private Api.Users usersApi = RestProvider.getUsersApi();
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
