@@ -11,4 +11,8 @@ public class StringUtils {
         String[] pieces = url.split(StringConstants.SLASH);
         return Integer.parseInt(pieces[pieces.length - 1]);
     }
+
+    public static boolean containsOnlyLatinLetters(String s) {
+        return s.matches("[A-Za-z]+");
+    }
 }

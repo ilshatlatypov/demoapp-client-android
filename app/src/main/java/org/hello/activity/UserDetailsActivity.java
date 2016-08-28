@@ -1,5 +1,6 @@
 package org.hello.activity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ public class UserDetailsActivity extends AppCompatActivity {
     public static final int RESULT_DELETED = 100;
     public static final int RESULT_NEED_REFRESH = 101;
     public static final int HTTP_NOT_FOUND = 404;
+    public static final String EXTRA_USER = "user";
+    private static final int EDIT_REQUEST = 1;
 
     private MyService service = RestUtils.getService();
 
@@ -38,6 +41,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     private View baseLayout;
 
     private int userId;
+    private User user;
     private TextView firstnameTextView;
     private TextView lastnameTextView;
 
@@ -95,6 +99,10 @@ public class UserDetailsActivity extends AppCompatActivity {
             }
             finish();
             return true;
+        } else if (id == R.id.action_edit) {
+            if (!deletionInProgress) {
+                openUpdateUserActivity();
+            }
         } else if (id == R.id.action_delete) {
             if (!deletionInProgress) {
                 attemptDelete();
@@ -102,6 +110,12 @@ public class UserDetailsActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openUpdateUserActivity() {
+        Intent intent = new Intent(this, CreateOrUpdateUserActivity.class);
+        intent.putExtra(EXTRA_USER, user);
+        startActivityForResult(intent, EDIT_REQUEST);
     }
 
     private void sendGetUserDetailsRequest() {
@@ -112,7 +126,7 @@ public class UserDetailsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserDto> call, Response<UserDto> response) {
                 if (response.isSuccessful()) {
-                    User user = response.body().toUser();
+                    user = response.body().toUser();
                     displayUserDetails(user);
                     setActionsOnUserVisible(true);
                 } else if (response.code() == HTTP_NOT_FOUND) {
@@ -131,6 +145,17 @@ public class UserDetailsActivity extends AppCompatActivity {
                 setActionsOnUserVisible(false);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                Snackbar.make(baseLayout, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
+                sendGetUserDetailsRequest();
+                needParentRefresh = true;
+            }
+        }
     }
 
     private void setActionsOnUserVisible(boolean actionsVisible) {

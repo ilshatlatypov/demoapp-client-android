@@ -90,7 +90,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     }
 
     private void openCreateUserActivity() {
-        Intent intent = new Intent(context, CreateUserActivity.class);
+        Intent intent = new Intent(context, CreateOrUpdateUserActivity.class);
         this.startActivityForResult(intent, CREATE_REQUEST);
     }
 
@@ -104,7 +104,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CREATE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(usersListView, R.string.prompt_user_added, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(usersListView, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
                 updateUsers();
             }
         } else if (requestCode == DETAILS_REQUEST) {

@@ -9,6 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 /**
@@ -21,6 +22,9 @@ public interface MyService {
 
     @POST("users")
     Call<Void> createUser(@Body UserDto user);
+
+    @PUT("users/{id}")
+    Call<Void> updateUser(@Path("id") int id, @Body UserDto user);
 
     @GET("users/{id}")
     Call<UserDto> getUser(@Path("id") int id);
