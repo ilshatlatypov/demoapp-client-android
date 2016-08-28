@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:id="@+id/base_layout"
-    tools:context=".activity.UserDetailsActivity">
+    tools:context="ru.jvdev.demoapp.client.android.activity.UserDetailsActivity">
 
     <ProgressBar
         android:id="@+id/progress_bar"

@@ -11,9 +11,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".GlobalsInitializer">
+        android:name="ru.jvdev.demoapp.client.android.GlobalsInitializer">
         <activity
-            android:name=".activity.SplashActivity"
+            android:name="ru.jvdev.demoapp.client.android.activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,18 +22,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.LoginActivity"
+            android:name="ru.jvdev.demoapp.client.android.activity.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".activity.MainActivity"
+            android:name="ru.jvdev.demoapp.client.android.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.CreateOrUpdateUserActivity"
+            android:name="ru.jvdev.demoapp.client.android.activity.CreateOrUpdateUserActivity"
             android:label="@string/title_new_user">
         </activity>
         <activity
-            android:name=".activity.UserDetailsActivity"
+            android:name="ru.jvdev.demoapp.client.android.activity.UserDetailsActivity"
             android:label="@string/title_user_details">
         </activity>
     </application>

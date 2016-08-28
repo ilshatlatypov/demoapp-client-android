@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.MainActivity">
+    tools:context="ru.jvdev.demoapp.client.android.activity.MainActivity">
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".activity.MainActivity">
+        tools:context="ru.jvdev.demoapp.client.android.activity.MainActivity">
 
     </FrameLayout>
 

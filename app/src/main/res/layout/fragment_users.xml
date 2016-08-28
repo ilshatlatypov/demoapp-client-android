@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.hello.activity.UsersFragment">
+    tools:context="ru.jvdev.demoapp.client.android.activity.UsersFragment">
 
     <ListView
         android:id="@+id/users_list_view"
