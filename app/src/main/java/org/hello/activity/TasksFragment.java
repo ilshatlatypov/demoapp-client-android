@@ -28,7 +28,7 @@ import java.util.List;
  * Use the {@link TasksFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TasksFragment extends Fragment {
+public class TasksFragment extends Fragment implements RefreshableFragment {
 
     private Context context;
     private ListView tasksListView;
@@ -76,6 +76,11 @@ public class TasksFragment extends Fragment {
         updateTasks();
 
         return view;
+    }
+
+    @Override
+    public void refreshFragmentData() {
+        updateTasks();
     }
 
     private void updateTasks() {

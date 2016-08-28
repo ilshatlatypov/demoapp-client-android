@@ -23,9 +23,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
 
     private ViewSwitcher viewSwitcher;
-    private Button retryButton;
-
-    private int activeFragmentNavItemId;
+    private Fragment activeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +42,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
-        retryButton = (Button) findViewById(R.id.button_retry);
+        Button retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (activeFragmentNavItemId != 0) {
-                    loadFragmentDataByNavItemId(activeFragmentNavItemId);
-                }
+                refreshActiveFragment();
             }
         });
     }
@@ -67,21 +63,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
+        if (id == R.id.action_refresh) {
+            refreshActiveFragment();
         }
 
         return super.onOptionsItemSelected(item);
@@ -90,12 +82,10 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_users || id == R.id.nav_tasks) {
-            activeFragmentNavItemId = id;
-            loadFragmentDataByNavItemId(activeFragmentNavItemId);
+            displayFragmentByNavItemId(id);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -113,22 +103,29 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setActiveFragment(Fragment fragment) {
+    private void setActiveFragment(android.app.Fragment fragment) {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)
                 .commit();
+        activeFragment = fragment;
     }
 
-    private void loadFragmentDataByNavItemId(@IdRes int itemId) {
+    private void displayFragmentByNavItemId(@IdRes int itemId) {
+        viewSwitcher.showProgressBar();
         if (itemId == R.id.nav_users) {
-            viewSwitcher.showProgressBar();
             getSupportActionBar().setTitle(R.string.title_users);
             setActiveFragment(UsersFragment.newInstance());
         } else if (itemId == R.id.nav_tasks) {
-            viewSwitcher.showProgressBar();
             getSupportActionBar().setTitle(R.string.title_tasks);
             setActiveFragment(TasksFragment.newInstance());
+        }
+    }
+
+    private void refreshActiveFragment() {
+        if (activeFragment != null && activeFragment instanceof RefreshableFragment) {
+            viewSwitcher.showProgressBar();
+            ((RefreshableFragment) activeFragment).refreshFragmentData();
         }
     }
 

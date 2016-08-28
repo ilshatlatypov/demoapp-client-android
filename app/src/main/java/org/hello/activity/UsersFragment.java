@@ -33,7 +33,7 @@ import retrofit2.Response;
  * Use the {@link UsersFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UsersFragment extends Fragment {
+public class UsersFragment extends Fragment implements RefreshableFragment {
 
     private MyService service = RestUtils.getService();
 
@@ -131,6 +131,11 @@ public class UsersFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+    }
+
+    @Override
+    public void refreshFragmentData() {
+        updateUsers();
     }
 
     private void updateUsers() {
