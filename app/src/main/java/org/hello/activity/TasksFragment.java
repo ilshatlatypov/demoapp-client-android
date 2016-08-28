@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.hello.MyService;
+import org.hello.Api;
 import org.hello.R;
 import org.hello.entity.Task;
 import org.hello.entity.dto.TasksPageDto;
@@ -31,7 +31,7 @@ import retrofit2.Response;
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
-    private MyService service = RestUtils.getService();
+    private Api.Tasks tasksApi = RestUtils.getTasksApi();
 
     private Context context;
     private ListView tasksListView;
@@ -86,7 +86,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateTasks() {
-        Call<TasksPageDto> tasksPageDtoCall = service.getTasks();
+        Call<TasksPageDto> tasksPageDtoCall = tasksApi.getTasks();
         tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {

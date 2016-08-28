@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.hello.MyService;
+import org.hello.Api;
 import org.hello.R;
 import org.hello.entity.User;
 import org.hello.entity.dto.UsersPageDto;
@@ -36,7 +36,7 @@ import retrofit2.Response;
  */
 public class UsersFragment extends Fragment implements RefreshableFragment {
 
-    private MyService service = RestUtils.getService();
+    private Api.Users usersApi = RestUtils.getUsersApi();
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
@@ -140,7 +140,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateUsers() {
-        Call<UsersPageDto> usersPageDtoCall = service.getUsers();
+        Call<UsersPageDto> usersPageDtoCall = usersApi.getUsers();
         usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
             @Override
             public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {

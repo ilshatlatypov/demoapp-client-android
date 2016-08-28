@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.hello.MyService;
+import org.hello.Api;
 import org.hello.R;
 import org.hello.entity.User;
 import org.hello.entity.dto.UserDto;
@@ -33,7 +33,7 @@ import retrofit2.Response;
 
 public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
-    private MyService service = RestUtils.getService();
+    private Api.Users usersApi = RestUtils.getUsersApi();
     private LinearLayout baseLayout;
 
     private int userId;
@@ -119,7 +119,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     private void sendCreateUserRequest(User user) {
         Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
-        Call<Void> createUserCall = service.createUser(new UserDto(user));
+        Call<Void> createUserCall = usersApi.createUser(new UserDto(user));
         createUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -156,7 +156,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     private void sendUpdateUserRequest(int userId, User user) {
         Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
-        Call<Void> updateUserCall = service.updateUser(userId, new UserDto(user));
+        Call<Void> updateUserCall = usersApi.updateUser(userId, new UserDto(user));
         updateUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {

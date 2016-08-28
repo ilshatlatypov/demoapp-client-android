@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.hello.MyService;
+import org.hello.Api;
 import org.hello.R;
 import org.hello.ViewSwitcher;
 import org.hello.entity.User;
@@ -35,7 +35,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "user";
     private static final int EDIT_REQUEST = 1;
 
-    private MyService service = RestUtils.getService();
+    private Api.Users usersApi = RestUtils.getUsersApi();
 
     private ViewSwitcher viewSwitcher;
     private View baseLayout;
@@ -121,7 +121,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     private void sendGetUserDetailsRequest() {
         viewSwitcher.showProgressBar();
 
-        Call<UserDto> getUserCall = service.getUser(userId);
+        Call<UserDto> getUserCall = usersApi.getUser(userId);
         getUserCall.enqueue(new Callback<UserDto>() {
             @Override
             public void onResponse(Call<UserDto> call, Response<UserDto> response) {
@@ -180,7 +180,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
 
         deletionInProgress = true;
-        Call<Void> deleteUserCall = service.deleteUser(userId);
+        Call<Void> deleteUserCall = usersApi.deleteUser(userId);
         deleteUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
