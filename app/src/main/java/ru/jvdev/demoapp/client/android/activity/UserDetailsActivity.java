@@ -24,13 +24,13 @@ import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
+import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 import ru.jvdev.demoapp.client.android.utils.RestProvider;
 
 public class UserDetailsActivity extends AppCompatActivity {
 
     public static final int RESULT_DELETED = 100;
     public static final int RESULT_NEED_REFRESH = 101;
-    public static final int HTTP_NOT_FOUND = 404;
     public static final String EXTRA_USER = "user";
     private static final int EDIT_REQUEST = 1;
 
@@ -128,7 +128,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                     user = response.body().toUser();
                     displayUserDetails(user);
                     setActionsOnUserVisible(true);
-                } else if (response.code() == HTTP_NOT_FOUND) {
+                } else if (response.code() == HttpCodes.NOT_FOUND) {
                     showUserNotFoundError();
                     setActionsOnUserVisible(false);
                     needParentRefresh = true;
@@ -183,7 +183,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         deleteUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful() || response.code() == HTTP_NOT_FOUND) {
+                if (response.isSuccessful() || response.code() == HttpCodes.NOT_FOUND) {
                     setResult(RESULT_DELETED, new Intent());
                     finish();
                 }

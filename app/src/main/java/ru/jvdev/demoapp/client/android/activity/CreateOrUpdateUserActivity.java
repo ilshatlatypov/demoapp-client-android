@@ -33,6 +33,7 @@ import ru.jvdev.demoapp.client.android.utils.StringUtils;
 public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
     private Api.Users usersApi = RestProvider.getUsersApi();
+
     private LinearLayout baseLayout;
 
     private int userId;
@@ -163,7 +164,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
                     setResult(RESULT_OK, new Intent());
                     finish();
                 }
-                // TODO user not found
+                // FIXME: 29.08.16 PUT to non-existing ID creates new instance instead of NOT FOUND
             }
 
             @Override
