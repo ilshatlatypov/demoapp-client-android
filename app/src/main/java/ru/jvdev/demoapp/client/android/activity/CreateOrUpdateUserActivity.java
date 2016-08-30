@@ -11,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.net.ConnectException;
@@ -23,7 +25,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
+import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
@@ -72,6 +77,13 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         } else {
             getSupportActionBar().setTitle(R.string.title_new_user);
         }
+
+        final Spinner spinner = (Spinner) findViewById(R.id.position_spinner);
+        final ArrayAdapter<Role> spinnerAdapter =
+                new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item, Role.values());
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
     }
 
     private void fillFieldsWithData(User user) {
