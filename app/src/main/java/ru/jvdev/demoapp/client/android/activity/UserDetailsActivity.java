@@ -41,8 +41,10 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     private int userId;
     private User user;
-    private TextView firstnameTextView;
-    private TextView lastnameTextView;
+    private TextView fullnameTextView;
+    private TextView usernameTextView;
+    private TextView passwordTextView;
+    private TextView positionTextView;
 
     private Button retryButton;
 
@@ -63,8 +65,11 @@ public class UserDetailsActivity extends AppCompatActivity {
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
         userId = getIntent().getIntExtra(UsersFragment.EXTRA_USER_ID, 0);
 
-        firstnameTextView = (TextView) findViewById(R.id.firstname);
-        lastnameTextView = (TextView) findViewById(R.id.lastname);
+        fullnameTextView = (TextView) findViewById(R.id.fullname);
+        usernameTextView = (TextView) findViewById(R.id.username);
+        passwordTextView = (TextView) findViewById(R.id.password);
+        positionTextView = (TextView) findViewById(R.id.position);
+
 
         retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setOnClickListener(new View.OnClickListener() {
@@ -202,8 +207,10 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void displayUserDetails(User user) {
-        firstnameTextView.setText(user.getFirstname());
-        lastnameTextView.setText(user.getLastname());
+        fullnameTextView.setText(user.getFullname());
+        usernameTextView.setText(user.getUsername());
+        passwordTextView.setText(user.getPassword());
+        positionTextView.setText(user.getRole().toString());
         viewSwitcher.showMainLayout();
     }
 

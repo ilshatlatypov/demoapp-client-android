@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import ru.jvdev.demoapp.client.android.R;
+
 /**
  * Created by ilshat on 30.08.16.
  */
@@ -22,7 +24,7 @@ public class SpinnerWithChooseItemListener implements AdapterView.OnItemSelected
         // If user change the default selection
         // First item is disable and it is used for hint
         if (position > 0) {
-            int color = ContextCompat.getColor(context, android.R.color.primary_text_light);
+            int color = ContextCompat.getColor(context, R.color.text_primary);
             ((TextView) view).setTextColor(color);
         }
     }

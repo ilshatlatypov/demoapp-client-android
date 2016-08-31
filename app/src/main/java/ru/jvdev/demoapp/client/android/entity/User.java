@@ -48,6 +48,10 @@ public class User implements Serializable {
         this.lastname = lastname;
     }
 
+    public String getFullname() {
+        return firstname + " " + lastname;
+    }
+
     public String getUsername() {
         return username;
     }
