@@ -25,12 +25,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter;
 import ru.jvdev.demoapp.client.android.R;
-import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
+import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter;
+import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import ru.jvdev.demoapp.client.android.utils.RestProvider;
 import ru.jvdev.demoapp.client.android.utils.StringUtils;
@@ -46,6 +46,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     private EditText lastnameText;
     private EditText usernameText;
     private EditText passwordText;
+    private Spinner positionSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,13 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
             }
         });
 
+        positionSpinner = (Spinner) findViewById(R.id.position_spinner);
+        ArrayAdapter<Role> spinnerAdapter =
+                new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item, Role.values());
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        positionSpinner.setAdapter(spinnerAdapter);
+        positionSpinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
+
         User user = (User) getIntent().getSerializableExtra(UserDetailsActivity.EXTRA_USER);
         if (user != null) {
             userId = user.getId();
@@ -77,13 +85,6 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         } else {
             getSupportActionBar().setTitle(R.string.title_new_user);
         }
-
-        final Spinner spinner = (Spinner) findViewById(R.id.position_spinner);
-        final ArrayAdapter<Role> spinnerAdapter =
-                new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item, Role.values());
-        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-        spinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
     }
 
     private void fillFieldsWithData(User user) {
@@ -91,6 +92,8 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         lastnameText.setText(user.getLastname());
         usernameText.setText(user.getUsername());
         passwordText.setText(user.getPassword());
+        int pos = ((ArrayAdapter<Role>) positionSpinner.getAdapter()).getPosition(user.getRole());
+        positionSpinner.setSelection(pos);
     }
 
     @Override
@@ -202,7 +205,8 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         String lastname = lastnameText.getText().toString();
         String username = usernameText.getText().toString();
         String password = passwordText.getText().toString();
-        return new User(firstname, lastname, username, password);
+        Role role = (Role) positionSpinner.getSelectedItem();
+        return new User(firstname, lastname, username, password, role);
     }
 
     private Map<Integer, String> validate(User user) {

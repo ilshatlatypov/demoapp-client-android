@@ -4,17 +4,15 @@ package ru.jvdev.demoapp.client.android.entity;
  * Created by ilshat on 30.08.16.
  */
 public enum Role {
-    NO_ROLE(0, "Должность"),
-    ADMIN(1, "Администратор"),
-    DIRECTOR(2, "Директор"),
-    MANAGER(3, "Менеджер"),
-    EMPLOYEE(4, "Рабочий");
+    NO_ROLE("Должность"),
+    ADMIN("Администратор"),
+    DIRECTOR("Директор"),
+    MANAGER("Менеджер"),
+    EMPLOYEE("Рабочий");
 
-    private int id;
     private String title;
 
-    Role(int id, String title) {
-        this.id = id;
+    Role(String title) {
         this.title = title;
     }
 
