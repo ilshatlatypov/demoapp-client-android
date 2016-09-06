@@ -5,4 +5,5 @@ package ru.jvdev.demoapp.client.android.utils;
  */
 public interface HttpCodes {
     int NOT_FOUND = 404;
+    int UNAUTHORIZED = 401;
 }

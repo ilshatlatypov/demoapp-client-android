@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -184,7 +185,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                String message = (t instanceof ConnectException) ?
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
                         getString(R.string.error_server_unavailable) :
                         getString(R.string.error_unknown, t.getMessage());
                 showRequestError(message);

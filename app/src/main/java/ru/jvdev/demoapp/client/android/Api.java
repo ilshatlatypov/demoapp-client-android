@@ -17,6 +17,11 @@ import retrofit2.http.Path;
  */
 public class Api {
 
+    public interface Root {
+        @GET("/")
+        Call<Void> getRoot();
+    }
+
     public interface Users {
         @GET("users")
         Call<UsersPageDto> getUsers();
