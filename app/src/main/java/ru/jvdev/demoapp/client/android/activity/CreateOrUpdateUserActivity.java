@@ -38,8 +38,7 @@ import ru.jvdev.demoapp.client.android.utils.StringUtils;
 
 public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
-    private DemoApp app = (DemoApp) getApplicationContext();
-    private Api.Users usersApi = app.getRestProvider().getUsersApi();
+    private Api.Users usersApi;
 
     private LinearLayout baseLayout;
 
@@ -87,6 +86,9 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
         } else {
             getSupportActionBar().setTitle(R.string.title_new_user);
         }
+
+        DemoApp app = (DemoApp) getApplicationContext();
+        usersApi = app.getRestProvider().getUsersApi();
     }
 
     private void fillFieldsWithData(User user) {

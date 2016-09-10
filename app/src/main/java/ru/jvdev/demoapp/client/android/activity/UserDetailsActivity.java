@@ -34,8 +34,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "user";
     private static final int EDIT_REQUEST = 1;
 
-    private DemoApp app = (DemoApp) getApplicationContext();
-    private Api.Users usersApi = app.getRestProvider().getUsersApi();
+    private Api.Users usersApi;
 
     private ViewSwitcher viewSwitcher;
     private View baseLayout;
@@ -71,7 +70,6 @@ public class UserDetailsActivity extends AppCompatActivity {
         passwordTextView = (TextView) findViewById(R.id.password);
         positionTextView = (TextView) findViewById(R.id.position);
 
-
         retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,6 +77,9 @@ public class UserDetailsActivity extends AppCompatActivity {
                 sendGetUserDetailsRequest();
             }
         });
+
+        DemoApp app = (DemoApp) getApplicationContext();
+        usersApi = app.getRestProvider().getUsersApi();
 
         sendGetUserDetailsRequest();
     }
