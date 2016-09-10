@@ -16,8 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
+import ru.jvdev.demoapp.client.android.entity.User;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
@@ -40,6 +42,10 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View header = navigationView.getHeaderView(0);
+        User activeUser = ((DemoApp) getApplicationContext()).getActiveUser();
+        ((TextView) header.findViewById(R.id.username)).setText(activeUser.getFullname());
 
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
         Button retryButton = (Button) findViewById(R.id.button_retry);

@@ -20,12 +20,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
-import ru.jvdev.demoapp.client.android.utils.RestProvider;
 
 public class UserDetailsActivity extends AppCompatActivity {
 
@@ -34,7 +34,8 @@ public class UserDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "user";
     private static final int EDIT_REQUEST = 1;
 
-    private Api.Users usersApi = RestProvider.getUsersApi();
+    private DemoApp app = (DemoApp) getApplicationContext();
+    private Api.Users usersApi = app.getRestProvider().getUsersApi();
 
     private ViewSwitcher viewSwitcher;
     private View baseLayout;

@@ -24,8 +24,10 @@ import java.net.SocketTimeoutException;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.entity.User;
+import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import ru.jvdev.demoapp.client.android.utils.RestProvider;
@@ -34,8 +36,6 @@ import ru.jvdev.demoapp.client.android.utils.RestProvider;
  * A login screen that offers login via login/password.
  */
 public class LoginActivity extends AppCompatActivity {
-
-    private Api.Root rootApi;
 
     private EditText usernameView;
     private EditText passwordView;
@@ -107,16 +107,17 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void sendLoginRequest(String username, String password) {
+    private void sendLoginRequest(final String username, String password) {
         showProgress(true);
 
-        RestProvider.initWithCredentials(username, password);
-
-        Call<Void> createUserCall = RestProvider.getRootApi().getRoot();
-        createUserCall.enqueue(new Callback<Void>() {
+        RestProvider restProvider = new RestProvider(username, password);
+        Call<UserDto> getUserByUsernameCall = restProvider.getUsersApi().getUserByUsername(username);
+        getUserByUsernameCall.enqueue(new Callback<UserDto>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<UserDto> call, Response<UserDto> response) {
                 if (response.isSuccessful()) {
+                    User user = response.body().toUser();
+                    ((DemoApp) getApplicationContext()).setActiveUser(user);
                     gotoMainActivity();
                 } else if (response.code() == HttpCodes.UNAUTHORIZED) {
                     displayIncorrectLoginPasswordError();
@@ -124,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<UserDto> call, Throwable t) {
                 String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
                         getString(R.string.error_server_unavailable) :
                         getString(R.string.error_unknown, t.getMessage());

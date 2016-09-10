@@ -23,10 +23,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
-import ru.jvdev.demoapp.client.android.utils.RestProvider;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,8 +34,6 @@ import ru.jvdev.demoapp.client.android.utils.RestProvider;
  * create an instance of this fragment.
  */
 public class UsersFragment extends Fragment implements RefreshableFragment {
-
-    private Api.Users usersApi = RestProvider.getUsersApi();
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
@@ -139,6 +137,9 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateUsers() {
+        DemoApp app = (DemoApp) getActivity().getApplicationContext();
+        Api.Users usersApi = app.getRestProvider().getUsersApi();
+
         Call<UsersPageDto> usersPageDtoCall = usersApi.getUsers();
         usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
             @Override

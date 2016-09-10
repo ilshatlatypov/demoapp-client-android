@@ -1,5 +1,6 @@
 package ru.jvdev.demoapp.client.android;
 
+import retrofit2.http.Query;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
@@ -17,11 +18,6 @@ import retrofit2.http.Path;
  */
 public class Api {
 
-    public interface Root {
-        @GET("/")
-        Call<Void> getRoot();
-    }
-
     public interface Users {
         @GET("users")
         Call<UsersPageDto> getUsers();
@@ -34,6 +30,9 @@ public class Api {
 
         @GET("users/{id}")
         Call<UserDto> getUser(@Path("id") int id);
+
+        @GET("users/search/findByUsername")
+        Call<UserDto> getUserByUsername(@Query("username") String username);
 
         @DELETE("users/{id}")
         Call<Void> deleteUser(@Path("id") int id);

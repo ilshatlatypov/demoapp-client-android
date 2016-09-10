@@ -26,6 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
@@ -33,12 +34,12 @@ import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter;
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
-import ru.jvdev.demoapp.client.android.utils.RestProvider;
 import ru.jvdev.demoapp.client.android.utils.StringUtils;
 
 public class CreateOrUpdateUserActivity extends AppCompatActivity {
 
-    private Api.Users usersApi = RestProvider.getUsersApi();
+    private DemoApp app = (DemoApp) getApplicationContext();
+    private Api.Users usersApi = app.getRestProvider().getUsersApi();
 
     private LinearLayout baseLayout;
 

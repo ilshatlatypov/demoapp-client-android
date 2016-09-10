@@ -18,10 +18,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
-import ru.jvdev.demoapp.client.android.utils.RestProvider;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,8 +29,6 @@ import ru.jvdev.demoapp.client.android.utils.RestProvider;
  * create an instance of this fragment.
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
-
-    private Api.Tasks tasksApi = RestProvider.getTasksApi();
 
     private Context context;
     private ListView tasksListView;
@@ -85,6 +83,9 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateTasks() {
+        DemoApp app = (DemoApp) getActivity().getApplicationContext();
+        Api.Tasks tasksApi = app.getRestProvider().getTasksApi();
+
         Call<TasksPageDto> tasksPageDtoCall = tasksApi.getTasks();
         tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
             @Override
