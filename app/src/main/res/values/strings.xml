@@ -52,5 +52,6 @@
     <string name="prompt_tasks">Задачи</string>
     <string name="error_user_not_found">Сотрудник не найден</string>
     <string name="title_edit_user">Изменить сотрудника</string>
+    <string name="prompt_logout">Выйти</string>
 
 </resources>
