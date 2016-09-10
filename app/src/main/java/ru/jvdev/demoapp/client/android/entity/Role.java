@@ -5,8 +5,6 @@ package ru.jvdev.demoapp.client.android.entity;
  */
 public enum Role {
     NO_ROLE("Должность"),
-    ADMIN("Администратор"),
-    DIRECTOR("Директор"),
     MANAGER("Менеджер"),
     EMPLOYEE("Рабочий");
 
