@@ -15,18 +15,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
+import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
+import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
 
     private ViewSwitcher viewSwitcher;
     private Fragment activeFragment;
+
+    private ListView tasksListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +69,42 @@ public class MainActivity extends AppCompatActivity
                 refreshActiveFragment();
             }
         });
+
+        tasksListView = (ListView) findViewById(R.id.tasks_list_view);
+        TasksWithSubheadersAdapter adapter = new TasksWithSubheadersAdapter(this);
+        tasksListView.setAdapter(adapter);
+
+        updateTasks();
+    }
+
+    private void updateTasks() {
+        DemoApp app = (DemoApp) getApplicationContext();
+        Api.Tasks tasksApi = app.getRestProvider().getTasksApi();
+
+        Call<TasksPageDto> tasksPageDtoCall = tasksApi.getTasks();
+        tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
+            @Override
+            public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
+                List<Task> tasks = response.body().getTasks();
+                tasks.add(0, new Task(0, "Сегодня"));
+                putDataToList(tasks);
+                MainActivity.this.onDataLoaded();
+            }
+
+            @Override
+            public void onFailure(Call<TasksPageDto> call, Throwable t) {
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
+                MainActivity.this.onError(message);
+            }
+        });
+    }
+
+    private void putDataToList(List<Task> tasks) {
+        TasksWithSubheadersAdapter adapter = (TasksWithSubheadersAdapter) tasksListView.getAdapter();
+        adapter.setTasks(tasks);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

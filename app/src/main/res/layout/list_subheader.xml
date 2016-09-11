@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/subheader"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:textSize="@dimen/list_subheader_text_size"
+    android:textStyle="bold"
+    android:gravity="center_vertical"
+    android:textColor="@color/text_secondary"
+    android:paddingStart="@dimen/list_subheader_padding"
+    android:paddingEnd="@dimen/list_subheader_padding"
+    android:paddingLeft="@dimen/list_subheader_padding"
+    android:paddingRight="@dimen/list_subheader_padding"
+    android:minHeight="@dimen/list_subheader_min_height"/>
