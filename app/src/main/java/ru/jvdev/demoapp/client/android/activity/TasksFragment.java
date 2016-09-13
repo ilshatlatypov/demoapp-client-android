@@ -3,10 +3,13 @@ package ru.jvdev.demoapp.client.android.activity;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.net.ConnectException;
@@ -31,6 +34,10 @@ import ru.jvdev.demoapp.client.android.utils.DateUtils;
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
+    private static final int CREATE_REQUEST = 1;
+    private static final int DETAILS_REQUEST = 2;
+    public static final String EXTRA_TASK_ID = "task_id";
+
     private ListView tasksListView;
     private FragmentDataLoadingListener listener;
 
@@ -48,14 +55,41 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tasks, container, false);
 
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCreateTaskActivity();
+            }
+        });
+
         if (tasksListView == null) {
             tasksListView = (ListView) view.findViewById(R.id.tasks_list_view);
             TasksWithSubheadersAdapter adapter = new TasksWithSubheadersAdapter(getActivity());
             tasksListView.setAdapter(adapter);
+
+            tasksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Task task = (Task) parent.getItemAtPosition(position);
+                    openDetailsActivity(task);
+                }
+            });
         }
         updateTasks();
 
         return view;
+    }
+
+    private void openCreateTaskActivity() {
+        Intent intent = new Intent(getActivity(), CreateOrUpdateUserActivity.class);
+        this.startActivityForResult(intent, CREATE_REQUEST);
+    }
+
+    private void openDetailsActivity(Task task) {
+        Intent intent = new Intent(getActivity(), UserDetailsActivity.class);
+        intent.putExtra(EXTRA_TASK_ID, task.getId());
+        this.startActivityForResult(intent, DETAILS_REQUEST);
     }
 
     @Override

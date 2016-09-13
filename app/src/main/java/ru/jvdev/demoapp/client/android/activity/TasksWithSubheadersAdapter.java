@@ -43,7 +43,7 @@ public class TasksWithSubheadersAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return tasks.get(position);
     }
 
     @Override
