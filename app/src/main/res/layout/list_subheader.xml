@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/subheader"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:textSize="@dimen/list_subheader_text_size"
-    android:textStyle="bold"
-    android:gravity="center_vertical"
-    android:textColor="@color/text_secondary"
-    android:paddingStart="@dimen/list_subheader_padding"
-    android:paddingEnd="@dimen/list_subheader_padding"
-    android:paddingLeft="@dimen/list_subheader_padding"
-    android:paddingRight="@dimen/list_subheader_padding"
-    android:minHeight="@dimen/list_subheader_min_height"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="wrap_content">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/list_subheader_padding"
+        android:paddingEnd="@dimen/list_subheader_padding"
+        android:paddingLeft="@dimen/list_subheader_padding"
+        android:paddingRight="@dimen/list_subheader_padding"
+        android:minHeight="@dimen/list_subheader_min_height"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/subheader"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_subheader_text_size"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_gravity="bottom"
+        android:foregroundGravity="bottom"/>
+
+</FrameLayout>

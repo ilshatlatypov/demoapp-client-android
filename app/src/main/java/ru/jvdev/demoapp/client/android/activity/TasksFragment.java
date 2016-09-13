@@ -7,11 +7,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -22,6 +22,7 @@ import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
+import ru.jvdev.demoapp.client.android.utils.DateUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,9 +31,7 @@ import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
-    private Context context;
     private ListView tasksListView;
-
     private FragmentDataLoadingListener listener;
 
     public TasksFragment() {
@@ -48,11 +47,10 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tasks, container, false);
-        context = view.getContext();
 
         if (tasksListView == null) {
             tasksListView = (ListView) view.findViewById(R.id.tasks_list_view);
-            ArrayAdapter<Task> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
+            TasksWithSubheadersAdapter adapter = new TasksWithSubheadersAdapter(getActivity());
             tasksListView.setAdapter(adapter);
         }
         updateTasks();
@@ -86,12 +84,33 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         DemoApp app = (DemoApp) getActivity().getApplicationContext();
         Api.Tasks tasksApi = app.getRestProvider().getTasksApi();
 
-        Call<TasksPageDto> tasksPageDtoCall = tasksApi.getTasks();
+        Call<TasksPageDto> tasksPageDtoCall = tasksApi.getTasks("date");
         tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
-                putDataToList(response.body().getTasks());
+                List<Task> tasks = response.body().getTasks();
+                addSubheaderObjects(tasks);
+                putDataToList(tasks);
                 listener.onDataLoaded();
+            }
+
+            private void addSubheaderObjects(List<Task> tasks) {
+                int tasksTotal = tasks.size();
+                for (int i = tasksTotal - 1; i >= 0; i--) {
+                    boolean insertSubheader;
+                    Date taskDate = tasks.get(i).getDate();
+                    if (i > 0) {
+                        Date prevTaskDate = tasks.get(i - 1).getDate();
+                        insertSubheader = !taskDate.equals(prevTaskDate);
+                    } else {
+                        insertSubheader = true;
+                    }
+
+                    if (insertSubheader) {
+                        String dateAsStr = DateUtils.dateToString(getActivity(), taskDate);
+                        tasks.add(i, new Task(0, dateAsStr));
+                    }
+                }
             }
 
             @Override
@@ -105,9 +124,8 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     private void putDataToList(List<Task> tasks) {
-        ArrayAdapter<Task> adapter = (ArrayAdapter<Task>) tasksListView.getAdapter();
-        adapter.clear();
-        adapter.addAll(tasks);
+        TasksWithSubheadersAdapter adapter = (TasksWithSubheadersAdapter) tasksListView.getAdapter();
+        adapter.setTasks(tasks);
         adapter.notifyDataSetChanged();
     }
 }

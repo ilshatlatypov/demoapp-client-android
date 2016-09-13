@@ -8,4 +8,6 @@
 
     <color name="text_secondary">#737373</color> <!-- black 54% -->
     <color name="text_primary">#202020</color> <!-- black 87% -->
+
+    <color name="divider">#E0E0E0</color> <!-- black 12% -->
 </resources>

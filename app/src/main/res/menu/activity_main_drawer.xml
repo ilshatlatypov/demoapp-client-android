@@ -3,13 +3,14 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:checked="true"
+            android:id="@+id/nav_tasks"
+            android:icon="@drawable/ic_content_paste"
+            android:title="@string/prompt_tasks" />
+        <item
             android:id="@+id/nav_users"
             android:icon="@drawable/ic_group"
             android:title="@string/prompt_users" />
-        <item
-            android:id="@+id/nav_tasks"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/prompt_tasks" />
     </group>
 
     <group android:id="@+id/settings">

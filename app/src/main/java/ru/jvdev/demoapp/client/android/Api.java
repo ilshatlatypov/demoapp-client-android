@@ -40,6 +40,6 @@ public class Api {
 
     public interface Tasks {
         @GET("tasks")
-        Call<TasksPageDto> getTasks();
+        Call<TasksPageDto> getTasks(@Query("sort") String sort);
     }
 }

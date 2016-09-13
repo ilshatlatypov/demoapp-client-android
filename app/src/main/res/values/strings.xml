@@ -54,4 +54,8 @@
     <string name="title_edit_user">Изменить сотрудника</string>
     <string name="prompt_logout">Выйти</string>
 
+    <string name="prompt_today">Сегодня</string>
+    <string name="prompt_tomorrow">Завтра</string>
+    <string name="prompt_day_after_tomorrow">Послезавтра</string>
+
 </resources>

@@ -44,7 +44,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_login"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:text="smorozova"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -64,7 +65,8 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:text="smorozova"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -83,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
         </LinearLayout>
     </ScrollView>
