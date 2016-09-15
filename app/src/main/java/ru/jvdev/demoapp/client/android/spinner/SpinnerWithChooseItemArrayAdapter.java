@@ -14,6 +14,10 @@ import ru.jvdev.demoapp.client.android.R;
  */
 public class SpinnerWithChooseItemArrayAdapter<T> extends ArrayAdapter<T> {
 
+    public SpinnerWithChooseItemArrayAdapter(Context context, int resource) {
+        super(context, resource);
+    }
+
     public SpinnerWithChooseItemArrayAdapter(Context context, int resource, T[] objects) {
         super(context, resource, objects);
     }

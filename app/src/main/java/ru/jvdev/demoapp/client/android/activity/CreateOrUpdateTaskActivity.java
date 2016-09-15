@@ -10,15 +10,19 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -27,8 +31,13 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
+import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TaskDto;
+import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
+import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter;
+import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
 public class CreateOrUpdateTaskActivity extends AppCompatActivity {
@@ -36,12 +45,14 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
     private static DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
 
     private Api.Tasks tasksApi;
+    private Api.Users usersApi;
+
     private LinearLayout baseLayout;
 
     private int taskId;
     private EditText titleText;
     private EditText dateText;
-//    private Spinner userSpinner;
+    private Spinner userSpinner;
 
     private Date date;
 
@@ -77,16 +88,17 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
             }
         });
 
-//        userSpinner = (Spinner) findViewById(R.id.user_spinner);
-//        userSpinner = (Spinner) findViewById(R.id.user_spinner);
-//        ArrayAdapter<String> spinnerAdapter = new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item);
-//        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-//        userSpinner.setAdapter(spinnerAdapter);
+        userSpinner = (Spinner) findViewById(R.id.user_spinner);
+        ArrayAdapter<String> spinnerAdapter = new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        userSpinner.setAdapter(spinnerAdapter);
+        userSpinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
 
         DemoApp app = (DemoApp) getApplicationContext();
         tasksApi = app.getRestProvider().getTasksApi();
+        usersApi = app.getRestProvider().getUsersApi();
 
-        // updateUsers();
+        updateUsersInSpinner();
     }
 
     private void showDatePicker() {
@@ -111,35 +123,32 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
         datePicker.show();
     }
 
-//    private void updateUsers() {
-//        DemoApp app = (DemoApp) getApplicationContext();
-//        Api.Users usersApi = app.getRestProvider().getUsersApi();
-//
-//        Call<UsersPageDto> usersPageDtoCall = usersApi.getUsers();
-//        usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
-//            @Override
-//            public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
-//                putDataToList(response.body().getUsers());
-//                //listener.onDataLoaded();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<UsersPageDto> call, Throwable t) {
-//                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-//                        getString(R.string.error_server_unavailable) :
-//                        getString(R.string.error_unknown, t.getMessage());
-//                //listener.onError(message);
-//            }
-//        });
-//    }
-//
-//    private void putDataToList(List<User> users) {
-//        ArrayAdapter<User> adapter = (ArrayAdapter<User>) userSpinner.getAdapter();
-//        adapter.clear();
-//        adapter.add(new User("Сотрудник", "", "", "", Role.NO_ROLE));
-//        adapter.addAll(users);
-//        adapter.notifyDataSetChanged();
-//    }
+    private void updateUsersInSpinner() {
+        Call<UsersPageDto> usersPageDtoCall = usersApi.getUsers();
+        usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
+            @Override
+            public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
+                putDataToSpinner(response.body().getUsers());
+                //listener.onDataLoaded();
+            }
+
+            @Override
+            public void onFailure(Call<UsersPageDto> call, Throwable t) {
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
+                //listener.onError(message);
+            }
+        });
+    }
+
+    private void putDataToSpinner(List<User> users) {
+        ArrayAdapter<User> adapter = (ArrayAdapter<User>) userSpinner.getAdapter();
+        adapter.clear();
+        adapter.add(new User("Сотрудник", "", "", "", Role.NO_ROLE));
+        adapter.addAll(users);
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -19,7 +19,7 @@ import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
 public class Api {
 
     public interface Users {
-        @GET("users")
+        @GET("users?sort=firstname&sort=lastname")
         Call<UsersPageDto> getUsers();
 
         @POST("users")

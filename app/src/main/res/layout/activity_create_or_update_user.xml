@@ -81,8 +81,8 @@
                 android:id="@+id/position_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
+                android:paddingTop="@dimen/spinner_padding_top"
+                android:paddingBottom="@dimen/spinner_padding_bottom"
                 style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
         </LinearLayout>
