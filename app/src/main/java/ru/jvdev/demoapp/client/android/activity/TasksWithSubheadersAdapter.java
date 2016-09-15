@@ -12,6 +12,7 @@ import java.util.List;
 
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.Task;
+import ru.jvdev.demoapp.client.android.entity.User;
 
 /**
  * Created by ilshat on 11.09.16.
@@ -90,7 +91,12 @@ public class TasksWithSubheadersAdapter extends BaseAdapter {
             subheaderView.setText(task.getTitle());
         } else {
             TextView taskTitleView = (TextView) view.findViewById(R.id.task_title);
+            TextView executorView = (TextView) view.findViewById(R.id.executor_name);
             taskTitleView.setText(task.getTitle());
+
+            User user = task.getUser();
+            String executorText = user != null ? user.getFullname() : "не назначен";
+            executorView.setText("Исполнитель: " + executorText);
         }
 
         return view;

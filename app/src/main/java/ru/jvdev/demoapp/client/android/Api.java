@@ -40,7 +40,7 @@ public class Api {
     }
 
     public interface Tasks {
-        @GET("tasks?sort=date")
+        @GET("tasks?sort=date&projection=withUser")
         Call<TasksPageDto> list();
 
         @POST("tasks")

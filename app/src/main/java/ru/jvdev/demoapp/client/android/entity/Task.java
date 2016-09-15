@@ -10,6 +10,7 @@ public class Task {
     private int id;
     private String title;
     private Date date;
+    private User user;
 
     public Task() {
     }
@@ -46,6 +47,14 @@ public class Task {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String toString() {

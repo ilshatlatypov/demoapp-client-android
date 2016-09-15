@@ -256,7 +256,12 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
 
     private Task initTask() {
         String title = titleText.getText().toString();
-        return new Task(title, date);
+        Task task = new Task(title, date);
+        User user = (User) userSpinner.getSelectedItem();
+        if (user.getId() > 0) {
+            task.setUser(user);
+        }
+        return task;
     }
 
     private Map<Integer, String> validate(Task task) {

@@ -29,4 +29,8 @@ public class UserDto {
         user.setId(id);
         return user;
     }
+
+    public int getId() {
+        return id;
+    }
 }

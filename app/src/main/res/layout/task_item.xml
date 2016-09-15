@@ -24,9 +24,9 @@
             android:maxLines="1"/>
 
         <TextView
+            android:id="@+id/executor_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Исполнитель: Вася Пупкин"
             android:textSize="14sp"
             android:textColor="@color/text_secondary"/>
 

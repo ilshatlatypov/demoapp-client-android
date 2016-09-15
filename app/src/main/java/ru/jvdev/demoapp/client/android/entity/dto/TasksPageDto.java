@@ -2,10 +2,10 @@ package ru.jvdev.demoapp.client.android.entity.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-import ru.jvdev.demoapp.client.android.entity.Task;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import ru.jvdev.demoapp.client.android.entity.Task;
 
 /**
  * Created by ilshat on 28.08.16.
