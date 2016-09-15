@@ -1,11 +1,13 @@
 package ru.jvdev.demoapp.client.android.activity;
 
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +84,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     private void openCreateTaskActivity() {
-        Intent intent = new Intent(getActivity(), CreateOrUpdateUserActivity.class);
+        Intent intent = new Intent(getActivity(), CreateOrUpdateTaskActivity.class);
         this.startActivityForResult(intent, CREATE_REQUEST);
     }
 
@@ -90,6 +92,15 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         Intent intent = new Intent(getActivity(), UserDetailsActivity.class);
         intent.putExtra(EXTRA_TASK_ID, task.getId());
         this.startActivityForResult(intent, DETAILS_REQUEST);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CREATE_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                Snackbar.make(tasksListView, R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                updateTasks();
+            }
+        }
     }
 
     @Override
@@ -118,7 +129,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         DemoApp app = (DemoApp) getActivity().getApplicationContext();
         Api.Tasks tasksApi = app.getRestProvider().getTasksApi();
 
-        Call<TasksPageDto> tasksPageDtoCall = tasksApi.getTasks("date");
+        Call<TasksPageDto> tasksPageDtoCall = tasksApi.list();
         tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {

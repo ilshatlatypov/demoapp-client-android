@@ -8,6 +8,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import ru.jvdev.demoapp.client.android.entity.dto.TaskDto;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
@@ -39,7 +40,16 @@ public class Api {
     }
 
     public interface Tasks {
-        @GET("tasks")
-        Call<TasksPageDto> getTasks(@Query("sort") String sort);
+        @GET("tasks?sort=date")
+        Call<TasksPageDto> list();
+
+        @POST("tasks")
+        Call<Void> create(@Body TaskDto task);
+
+        @PUT("tasks/{id}")
+        Call<Void> update(@Path("id") int id, @Body TaskDto task);
+
+        @GET("tasks/{id}")
+        Call<TaskDto> get(@Path("id") int id);
     }
 }

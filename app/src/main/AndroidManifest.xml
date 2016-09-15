@@ -6,14 +6,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".DemoApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".DemoApp">
+        android:theme="@style/AppTheme">
         <activity
-            android:name="ru.jvdev.demoapp.client.android.activity.SplashActivity"
+            android:name=".activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,20 +22,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ru.jvdev.demoapp.client.android.activity.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name="ru.jvdev.demoapp.client.android.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="ru.jvdev.demoapp.client.android.activity.CreateOrUpdateUserActivity"
-            android:label="@string/title_new_user">
-        </activity>
+            android:name=".activity.CreateOrUpdateUserActivity"
+            android:label="@string/title_new_user"></activity>
         <activity
-            android:name="ru.jvdev.demoapp.client.android.activity.UserDetailsActivity"
-            android:label="@string/title_user_details">
-        </activity>
+            android:name=".activity.UserDetailsActivity"
+            android:label="@string/title_user_details"></activity>
+        <activity android:name=".activity.CreateOrUpdateTaskActivity"></activity>
     </application>
 
 </manifest>

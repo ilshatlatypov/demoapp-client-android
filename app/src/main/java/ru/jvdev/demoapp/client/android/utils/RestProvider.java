@@ -2,6 +2,9 @@ package ru.jvdev.demoapp.client.android.utils;
 
 import android.util.Base64;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
@@ -22,9 +25,13 @@ public class RestProvider {
     private Api.Users usersApi;
     private Api.Tasks tasksApi;
 
+    private static Gson gson = new GsonBuilder()
+            .setDateFormat("yyyy-MM-dd")
+            .create();
+
     private static Retrofit.Builder builder = new Retrofit.Builder()
             .baseUrl("http://192.168.0.102:8080/")
-            .addConverterFactory(GsonConverterFactory.create());
+            .addConverterFactory(GsonConverterFactory.create(gson));
 
     public RestProvider() {
         this(null, null);

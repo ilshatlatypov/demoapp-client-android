@@ -7,7 +7,6 @@
     tools:context="ru.jvdev.demoapp.client.android.activity.CreateOrUpdateUserActivity">
 
     <ScrollView
-        android:id="@+id/add_user_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 

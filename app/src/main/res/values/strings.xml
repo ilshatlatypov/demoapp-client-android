@@ -58,4 +58,10 @@
     <string name="prompt_tomorrow">Завтра</string>
     <string name="prompt_day_after_tomorrow">Послезавтра</string>
 
+    <string name="title_new_task">Новая задача</string>
+    <string name="title_edit_task">Изменить задачу</string>
+    <string name="prompt_title">Название</string>
+    <string name="prompt_date">Дата</string>
+    <string name="prompt_task_saved">Задача сохранена</string>
+
 </resources>
