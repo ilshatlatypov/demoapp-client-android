@@ -45,14 +45,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:inputType="date" />
-                <!--<Button-->
-                    <!--android:id="@+id/date_text"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:textAllCaps="false"-->
-                    <!--android:textSize="16sp"-->
-                    <!--style="@style/Widget.AppCompat.Button.Borderless"/>-->
+                    android:inputType="date"
+                    android:cursorVisible="false"/>
             </android.support.design.widget.TextInputLayout>
 
             <!--<Spinner-->

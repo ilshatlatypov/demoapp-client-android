@@ -51,6 +51,9 @@ public class DateUtils {
     }
 
     public static String dateToString(Context context, Date taskDate) {
+        if (context == null) {
+            return null;
+        }
         String dateAsStr;
         if (DateUtils.isToday(taskDate)) {
             dateAsStr = context.getString(R.string.prompt_today);

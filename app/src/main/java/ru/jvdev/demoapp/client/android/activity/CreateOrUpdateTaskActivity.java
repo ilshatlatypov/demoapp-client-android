@@ -31,7 +31,7 @@ import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.dto.TaskDto;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
-public class CreateOrUpdateTaskActivity extends AppCompatActivity/* implements DatePickerDialog.OnDateSetListener*/ {
+public class CreateOrUpdateTaskActivity extends AppCompatActivity {
 
     private static DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
 
@@ -53,7 +53,6 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity/* implements D
         baseLayout = (LinearLayout) findViewById(R.id.base_layout);
 
         titleText = (EditText) findViewById(R.id.title_text);
-//        userSpinner = (Spinner) findViewById(R.id.user_spinner);
 
         Task task = (Task) getIntent().getSerializableExtra(UserDetailsActivity.EXTRA_USER);
         if (task != null) {
@@ -67,32 +66,18 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity/* implements D
         date = Calendar.getInstance().getTime();
         dateText = (EditText) findViewById(R.id.date_text);
         dateText.setText(df.format(date));
+        dateText.setKeyListener(null); // do not show keyboard on focus
         dateText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
-                    final Calendar c = Calendar.getInstance();
-                    int year = c.get(Calendar.YEAR);
-                    int month = c.get(Calendar.MONTH);
-                    int day = c.get(Calendar.DAY_OF_MONTH);
-
-                    DatePickerDialog mTimePicker = new DatePickerDialog(CreateOrUpdateTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int month, int day) {
-                            Calendar c = Calendar.getInstance();
-                            c.set(Calendar.YEAR, year);
-                            c.set(Calendar.MONTH, month);
-                            c.set(Calendar.DAY_OF_MONTH, day);
-
-                            date = c.getTime();
-                            dateText.setText(df.format(date));
-                        }
-                    }, year, month, day);
-                    mTimePicker.show();
+                    KeyboardUtils.hideKeyboard(CreateOrUpdateTaskActivity.this);
+                    showDatePicker();
                 }
             }
         });
 
+//        userSpinner = (Spinner) findViewById(R.id.user_spinner);
 //        userSpinner = (Spinner) findViewById(R.id.user_spinner);
 //        ArrayAdapter<String> spinnerAdapter = new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item);
 //        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
@@ -104,32 +89,27 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity/* implements D
         // updateUsers();
     }
 
-//    public void showDatePickerDialog(View v) {
-//        DialogFragment newFragment = new DatePickerFragment();
-//        newFragment.show(getFragmentManager(), "datePicker");
-//    }
+    private void showDatePicker() {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
 
-//    public static class DatePickerFragment extends DialogFragment {
-//
-//        @Override
-//        public Dialog onCreateDialog(Bundle savedInstanceState) {
-//            final Calendar c = Calendar.getInstance();
-//            int year = c.get(Calendar.YEAR);
-//            int month = c.get(Calendar.MONTH);
-//            int day = c.get(Calendar.DAY_OF_MONTH);
-//            return new DatePickerDialog(getActivity(), (CreateOrUpdateTaskActivity) getActivity(), year, month, day);
-//        }
-//    }
+        DatePickerDialog datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.YEAR, year);
+                c.set(Calendar.MONTH, month);
+                c.set(Calendar.DAY_OF_MONTH, day);
 
-//    public void onDateSet(DatePicker view, int year, int month, int day) {
-//        Calendar c = Calendar.getInstance();
-//        c.set(Calendar.YEAR, year);
-//        c.set(Calendar.MONTH, month);
-//        c.set(Calendar.DAY_OF_MONTH, day);
-//
-//        date = c.getTime();
-//        dateText.setText(df.format(c.getTime()));
-//    }
+                date = c.getTime();
+                dateText.setText(df.format(date));
+            }
+        }, year, month, day);
+        datePicker.getDatePicker().setMinDate(c.getTimeInMillis());
+        datePicker.show();
+    }
 
 //    private void updateUsers() {
 //        DemoApp app = (DemoApp) getApplicationContext();
@@ -276,6 +256,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity/* implements D
         if (TextUtils.isEmpty(task.getTitle())) {
             errors.put(R.id.title_layout, getString(R.string.error_field_required));
         }
+
         return errors;
     }
 
