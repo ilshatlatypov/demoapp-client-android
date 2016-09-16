@@ -25,8 +25,11 @@ import ru.jvdev.demoapp.client.android.entity.User;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
 
+    private static final String STATE_ACTIVE_NAV_ITEM = "activeNavItemId";
+
     private ViewSwitcher viewSwitcher;
     private Fragment activeFragment;
+    private int activeNavItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +60,18 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        displayFragmentByNavItemId(R.id.nav_tasks);
+        if (savedInstanceState == null) {
+            activeNavItemId = R.id.nav_tasks;
+        } else {
+            activeNavItemId = savedInstanceState.getInt(STATE_ACTIVE_NAV_ITEM);
+        }
+        displayFragmentByNavItemId(activeNavItemId);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_ACTIVE_NAV_ITEM, activeNavItemId);
     }
 
     @Override
@@ -111,22 +125,34 @@ public class MainActivity extends AppCompatActivity
         finish();
     }
 
-    private void setActiveFragment(android.app.Fragment fragment) {
+    private void setActiveFragment(Fragment fragment, String tag) {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment)
+                .replace(R.id.content_frame, fragment, tag)
                 .commit();
         activeFragment = fragment;
     }
 
     private void displayFragmentByNavItemId(@IdRes int itemId) {
         viewSwitcher.showProgressBar();
-        if (itemId == R.id.nav_users) {
-            getSupportActionBar().setTitle(R.string.title_users);
-            setActiveFragment(UsersFragment.newInstance());
-        } else if (itemId == R.id.nav_tasks) {
+        if (itemId == R.id.nav_tasks) {
+            String tag = "tasks_fragment";
             getSupportActionBar().setTitle(R.string.title_tasks);
-            setActiveFragment(TasksFragment.newInstance());
+            Fragment fragment = getFragmentManager().findFragmentByTag(tag);
+            if (fragment == null) {
+                fragment = TasksFragment.newInstance();
+            }
+            setActiveFragment(fragment, tag);
+            activeNavItemId = itemId;
+        } else if (itemId == R.id.nav_users) {
+            String tag = "users_fragment";
+            getSupportActionBar().setTitle(R.string.title_users);
+            Fragment fragment = getFragmentManager().findFragmentByTag(tag);
+            if (fragment == null) {
+                fragment = UsersFragment.newInstance();
+            }
+            setActiveFragment(fragment, tag);
+            activeNavItemId = itemId;
         }
     }
 
