@@ -67,20 +67,18 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
             }
         });
 
-        if (usersListView == null) {
-            usersListView = (ListView) view.findViewById(R.id.users_list_view);
 
-            ArrayAdapter<User> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-            usersListView.setAdapter(adapter);
+        usersListView = (ListView) view.findViewById(R.id.users_list_view);
+        ArrayAdapter<User> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
+        usersListView.setAdapter(adapter);
+        usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = (User) parent.getItemAtPosition(position);
+                openDetailsActivity(user);
+            }
+        });
 
-            usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    User user = (User) parent.getItemAtPosition(position);
-                    openDetailsActivity(user);
-                }
-            });
-        }
         updateUsers();
 
         return view;

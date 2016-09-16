@@ -65,19 +65,17 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
             }
         });
 
-        if (tasksListView == null) {
-            tasksListView = (ListView) view.findViewById(R.id.tasks_list_view);
-            TasksWithSubheadersAdapter adapter = new TasksWithSubheadersAdapter(getActivity());
-            tasksListView.setAdapter(adapter);
+        tasksListView = (ListView) view.findViewById(R.id.tasks_list_view);
+        TasksWithSubheadersAdapter adapter = new TasksWithSubheadersAdapter(getActivity());
+        tasksListView.setAdapter(adapter);
+        tasksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Task task = (Task) parent.getItemAtPosition(position);
+                openDetailsActivity(task);
+            }
+        });
 
-            tasksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Task task = (Task) parent.getItemAtPosition(position);
-                    openDetailsActivity(task);
-                }
-            });
-        }
         updateTasks();
 
         return view;
