@@ -102,6 +102,17 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof FragmentDataLoadingListener) {
+            listener = (FragmentDataLoadingListener) activity;
+        } else {
+            throw new RuntimeException(activity.toString()
+                    + " must implement FragmentDataLoadingListener");
+        }
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof FragmentDataLoadingListener) {
