@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -120,7 +119,8 @@ public class LoginActivity extends AppCompatActivity {
                     ((DemoApp) getApplicationContext()).setActiveUser(user);
                     gotoMainActivity();
                 } else if (response.code() == HttpCodes.UNAUTHORIZED) {
-                    displayIncorrectLoginPasswordError();
+                    String message = getString(R.string.error_incorrect_login_password);
+                    showRequestError(message);
                 }
             }
 
@@ -176,21 +176,10 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void displayIncorrectLoginPasswordError() {
-        displayError(R.string.error_incorrect_login_password);
-    }
-
-    private void displayError(@StringRes int errorMessageResId) {
-        String errorMessage = getString(errorMessageResId);
-        TextView errorTextView = (TextView) findViewById(R.id.error_text);
-        errorTextView.setText(errorMessage);
-        errorTextView.setVisibility(View.VISIBLE);
-        showProgress(false);
-    }
-
     private void showRequestError(String errorMessage) {
         TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
+        errorTextView.setVisibility(View.VISIBLE);
         showProgress(false);
     }
 }
