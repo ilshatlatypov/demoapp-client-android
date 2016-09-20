@@ -30,7 +30,7 @@ public class RestProvider {
             .create();
 
     private static Retrofit.Builder builder = new Retrofit.Builder()
-            .baseUrl("http://192.168.0.102:8080/")
+            .baseUrl("http://192.168.0.101:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson));
 
     public RestProvider() {

@@ -43,6 +43,9 @@ public class Api {
         @GET("tasks?sort=date&projection=withUser")
         Call<TasksPageDto> list();
 
+        @GET("tasks/search/findByUserUsername?sort=date&projection=withUser")
+        Call<TasksPageDto> listByUser(@Query("username") String username);
+
         @POST("tasks")
         Call<Void> create(@Body TaskDto task);
 

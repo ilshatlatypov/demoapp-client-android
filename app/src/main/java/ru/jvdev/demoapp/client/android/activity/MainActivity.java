@@ -20,6 +20,7 @@ import android.widget.TextView;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
+import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
 
 public class MainActivity extends AppCompatActivity
@@ -50,6 +51,10 @@ public class MainActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         User activeUser = ((DemoApp) getApplicationContext()).getActiveUser();
         ((TextView) header.findViewById(R.id.username)).setText(activeUser.getFullname());
+
+        if (activeUser.getRole() == Role.EMPLOYEE) {
+            navigationView.getMenu().findItem(R.id.nav_users).setVisible(false);
+        }
 
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.content_frame, R.id.error_layout);
         Button retryButton = (Button) findViewById(R.id.button_retry);

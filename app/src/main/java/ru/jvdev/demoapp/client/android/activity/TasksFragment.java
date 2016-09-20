@@ -25,7 +25,9 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
+import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 import ru.jvdev.demoapp.client.android.utils.DateUtils;
 
@@ -42,6 +44,8 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
 
     private ListView tasksListView;
     private FragmentDataLoadingListener listener;
+
+    private User activeUser;
 
     public TasksFragment() {
         // Required empty public constructor
@@ -75,6 +79,11 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
                 openDetailsActivity(task);
             }
         });
+
+        activeUser = ((DemoApp) getActivity().getApplicationContext()).getActiveUser();
+        if (activeUser.getRole() == Role.EMPLOYEE) {
+            fab.setVisibility(View.GONE);
+        }
 
         updateTasks();
 
@@ -138,10 +147,12 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         DemoApp app = (DemoApp) getActivity().getApplicationContext();
         Api.Tasks tasksApi = app.getRestProvider().getTasksApi();
 
-        Call<TasksPageDto> tasksPageDtoCall = tasksApi.list();
+        Call<TasksPageDto> tasksPageDtoCall = activeUser.getRole() == Role.MANAGER ?
+                tasksApi.list() : tasksApi.listByUser(activeUser.getUsername());
         tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
+                // TODO no tasks
                 List<Task> tasks = response.body().getTasks();
                 addSubheaderObjects(tasks);
                 putDataToList(tasks);

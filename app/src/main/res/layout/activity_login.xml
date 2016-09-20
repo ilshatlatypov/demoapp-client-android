@@ -44,8 +44,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_login"
                     android:maxLines="1"
-                    android:singleLine="true"
-                    android:text="smorozova"/>
+                    android:text="man"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -65,8 +64,7 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true"
-                    android:text="smorozova"/>
+                    android:text="man"/>
 
             </android.support.design.widget.TextInputLayout>
 
