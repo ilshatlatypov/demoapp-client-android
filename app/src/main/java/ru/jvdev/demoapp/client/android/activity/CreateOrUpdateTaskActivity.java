@@ -65,15 +65,6 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
 
         titleText = (EditText) findViewById(R.id.title_text);
 
-        Task task = (Task) getIntent().getSerializableExtra(TaskDetailsActivity.EXTRA_TASK);
-        if (task != null) {
-            taskId = task.getId();
-            // fillFieldsWithData(task);
-            getSupportActionBar().setTitle(R.string.title_edit_task);
-        } else {
-            getSupportActionBar().setTitle(R.string.title_new_task);
-        }
-
         date = Calendar.getInstance().getTime();
         dateText = (EditText) findViewById(R.id.date_text);
         dateText.setText(df.format(date));
@@ -89,7 +80,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
         });
 
         userSpinner = (Spinner) findViewById(R.id.user_spinner);
-        ArrayAdapter<String> spinnerAdapter = new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item);
+        ArrayAdapter<User> spinnerAdapter = new SpinnerWithChooseItemArrayAdapter<>(this, R.layout.spinner_item);
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         userSpinner.setAdapter(spinnerAdapter);
         userSpinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
@@ -98,7 +89,21 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
         tasksApi = app.getRestProvider().getTasksApi();
         usersApi = app.getRestProvider().getUsersApi();
 
-        updateUsersInSpinner();
+        Task task = (Task) getIntent().getSerializableExtra(TaskDetailsActivity.EXTRA_TASK);
+        if (task != null) {
+            getSupportActionBar().setTitle(R.string.title_edit_task);
+            taskId = task.getId();
+            fillFieldsWithData(task);
+            updateUsersInSpinner(task.getUser());
+        } else {
+            getSupportActionBar().setTitle(R.string.title_new_task);
+            updateUsersInSpinner(null);
+        }
+    }
+
+    private void fillFieldsWithData(Task task) {
+        titleText.setText(task.getTitle());
+        dateText.setText(df.format(task.getDate()));
     }
 
     private void showDatePicker() {
@@ -123,13 +128,26 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
         datePicker.show();
     }
 
-    private void updateUsersInSpinner() {
+    private void updateUsersInSpinner(final User selectedUser) {
         Call<UsersPageDto> usersPageDtoCall = usersApi.getUsers();
         usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
             @Override
             public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
                 putDataToSpinner(response.body().getUsers());
+                if (selectedUser != null) {
+                    int userPosition = getPosition(userSpinner, selectedUser.getId());
+                    userSpinner.setSelection(userPosition);
+                }
                 //listener.onDataLoaded();
+            }
+
+            private int getPosition(Spinner spinner, int userId) {
+                for (int i = 0; i < spinner.getCount(); i++) {
+                    if (((User) spinner.getItemAtPosition(i)).getId() == userId) {
+                        return i;
+                    }
+                }
+                return -1;
             }
 
             @Override
@@ -165,7 +183,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
             if (taskId == 0) {
                 attemptCreateTask();
             } else {
-                // attemptUpdateTask();
+                attemptUpdateTask();
             }
         }
         return super.onOptionsItemSelected(item);
@@ -208,43 +226,43 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
         });
     }
 
-//    private void attemptUpdateTask() {
-//        clearFieldErrorsIfAny();
-//
-//        Task task = initTask();
-//        Map<Integer, String> errors = validate(task);
-//
-//        if (errors.isEmpty()) {
-//            KeyboardUtils.hideKeyboard(this);
-//            sendUpdateTaskRequest(taskId, task);
-//        } else {
-//            displayFieldErrors(errors);
-//        }
-//    }
-//
-//    private void sendUpdateUserRequest(int taskId, Task task) {
-//        Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
-//
-//        Call<Void> updateTaskCall = tasksApi.update(taskId, new TaskDto(task));
-//        updateTaskCall.enqueue(new Callback<Void>() {
-//            @Override
-//            public void onResponse(Call<Void> call, Response<Void> response) {
-//                if (response.isSuccessful()) {
-//                    setResult(RESULT_OK, new Intent());
-//                    finish();
-//                }
-//                // FIXME: 29.08.16 PUT to non-existing ID creates new instance instead of NOT FOUND
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Void> call, Throwable t) {
-//                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-//                        getString(R.string.error_server_unavailable) :
-//                        getString(R.string.error_unknown, t.getMessage());
-//                showRequestError(message);
-//            }
-//        });
-//    }
+    private void attemptUpdateTask() {
+        clearFieldErrorsIfAny();
+
+        Task task = initTask();
+        Map<Integer, String> errors = validate(task);
+
+        if (errors.isEmpty()) {
+            KeyboardUtils.hideKeyboard(this);
+            sendUpdateTaskRequest(taskId, task);
+        } else {
+            displayFieldErrors(errors);
+        }
+    }
+
+    private void sendUpdateTaskRequest(int taskId, Task task) {
+        Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+
+        Call<Void> updateTaskCall = tasksApi.update(taskId, new TaskDto(task));
+        updateTaskCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    setResult(RESULT_OK, new Intent());
+                    finish();
+                }
+                // FIXME: 29.08.16 PUT to non-existing ID creates new instance instead of NOT FOUND
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
+                showRequestError(message);
+            }
+        });
+    }
 
     private void clearFieldErrorsIfAny() {
         for(int i = 0; i < baseLayout.getChildCount(); i++ ) {
