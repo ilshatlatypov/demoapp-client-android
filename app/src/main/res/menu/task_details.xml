@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <group android:id="@+id/group_user_actions">
+    <group android:id="@+id/group_task_actions">
         <item
             android:id="@+id/action_edit"
             android:icon="@drawable/ic_create"

@@ -6,4 +6,5 @@ package ru.jvdev.demoapp.client.android.utils;
 
 public interface IntentExtra {
     String ID = "id";
+    String OBJECT = "object";
 }

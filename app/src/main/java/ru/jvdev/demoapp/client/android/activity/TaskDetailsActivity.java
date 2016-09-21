@@ -13,40 +13,32 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.dto.TaskDto;
 import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
+import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
 import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.EDIT;
+import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
 
 public class TaskDetailsActivity extends AppCompatActivity {
 
-    public static final String EXTRA_TASK = "task";
-
     private Api.Tasks tasksApi;
-
-    private ViewSwitcher viewSwitcher;
-    private View baseLayout;
-
     private int taskId;
     private Task task;
 
-    private TextView titleView;
-    private TextView dateView;
-    private TextView userView;
-
+    private ViewSwitcher viewSwitcher;
     private Button retryButton;
 
     private boolean actionsVisible = false;
@@ -59,27 +51,19 @@ public class TaskDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        baseLayout = findViewById(R.id.activity_task_details);
-
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
-        taskId = getIntent().getIntExtra(ID, 0);
-
-        titleView = (TextView) findViewById(R.id.title);
-        dateView = (TextView) findViewById(R.id.date);
-        userView = (TextView) findViewById(R.id.user);
-
         retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendGetTaskDetailsRequest();
+                sendGetDetailsRequest();
             }
         });
 
-        DemoApp app = (DemoApp) getApplicationContext();
-        tasksApi = app.getRestProvider().getTasksApi();
+        taskId = getIntent().getIntExtra(ID, 0);
+        tasksApi = rest(this).getTasksApi();
 
-        sendGetTaskDetailsRequest();
+        sendGetDetailsRequest();
     }
 
     @Override
@@ -89,24 +73,19 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.setGroupVisible(R.id.group_user_actions, actionsVisible);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (needParentRefresh) {
-                setResult(ActivityResultCode.NEED_PARENT_REFRESH, new Intent());
+                setResult(NEED_PARENT_REFRESH, new Intent());
             }
             finish();
             return true;
         } else if (id == R.id.action_edit) {
             if (!deletionInProgress) {
-                openUpdateTaskActivity();
+                openEditActivity();
             }
+            return true;
         } else if (id == R.id.action_delete) {
             if (!deletionInProgress) {
                 attemptDelete();
@@ -116,12 +95,18 @@ public class TaskDetailsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void openUpdateTaskActivity() {
-        Intent intent = new Intent(this, TaskEditActivity.class);
-        intent.putExtra(EXTRA_TASK, task);
-        startActivityForResult(intent, EDIT);
+    private void setActionsOnTaskVisible(boolean actionsVisible) {
+        this.actionsVisible = actionsVisible;
+        invalidateOptionsMenu();
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.setGroupVisible(R.id.group_task_actions, actionsVisible);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    //region Deletion
     private void attemptDelete() {
         new AlertDialog.Builder(this)
                 .setMessage(getString(R.string.prompt_delete_task))
@@ -136,7 +121,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     private void sendDeleteTaskRequest(int taskId) {
-        Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
+        Snackbar.make(content(), R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
 
         deletionInProgress = true;
         Call<Void> deleteUserCall = tasksApi.delete(taskId);
@@ -152,20 +137,20 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
-                showErrorOnTaskDelete(message);
+                String message = requestFailureMessage(TaskDetailsActivity.this, t);
+                showErrorAsSnackbarWithRetry(message);
                 deletionInProgress = false;
             }
         });
     }
+    //endregion
 
-    private void sendGetTaskDetailsRequest() {
+    //region Details
+    private void sendGetDetailsRequest() {
         viewSwitcher.showProgressBar();
 
-        Call<TaskDto> getTaskCall = tasksApi.get(taskId);
-        getTaskCall.enqueue(new Callback<TaskDto>() {
+        Call<TaskDto> call = tasksApi.get(taskId);
+        call.enqueue(new Callback<TaskDto>() {
             @Override
             public void onResponse(Call<TaskDto> call, Response<TaskDto> response) {
                 if (response.isSuccessful()) {
@@ -173,7 +158,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                     displayTaskDetails(task);
                     setActionsOnTaskVisible(true);
                 } else if (response.code() == HttpCodes.NOT_FOUND) {
-                    showTaskNotFoundError();
+                    showErrorLayout(getString(R.string.error_task_not_found), false);
                     setActionsOnTaskVisible(false);
                     needParentRefresh = true;
                 }
@@ -181,60 +166,58 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<TaskDto> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
-                showErrorOnGettingTaskDetails(message);
+                String message = requestFailureMessage(TaskDetailsActivity.this, t);
+                showErrorLayout(message, true);
                 setActionsOnTaskVisible(false);
             }
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(baseLayout, R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
-                sendGetTaskDetailsRequest();
-                needParentRefresh = true;
-            }
-        }
-    }
-
-    private void setActionsOnTaskVisible(boolean actionsVisible) {
-        this.actionsVisible = actionsVisible;
-        invalidateOptionsMenu();
-    }
-
     private void displayTaskDetails(Task task) {
-        titleView.setText(task.getTitle());
-        dateView.setText(task.getDate().toString());
-        userView.setText(task.getUser() != null ? task.getUser().toString() : "не назначен");
+        ((TextView) findViewById(R.id.title)).setText(task.getTitle());
+        ((TextView) findViewById(R.id.date)).setText(DateUtils.dateToString(this, task.getDate()));
+        ((TextView) findViewById(R.id.user)).setText(task.getUser() != null ? task.getUser().toString() : "не назначен");
         viewSwitcher.showMainLayout();
     }
+    //endregion
 
-    private void showTaskNotFoundError() {
-        showErrorLayout(getString(R.string.error_user_not_found), View.GONE);
-    }
-
-    private void showErrorOnGettingTaskDetails(String errorMessage) {
-        showErrorLayout(errorMessage, View.VISIBLE);
-    }
-
-    private void showErrorLayout(String errorMessage, int retryButtonVisibility) {
-        retryButton.setVisibility(retryButtonVisibility);
+    private void showErrorLayout(String errorMessage, boolean retryButtonVisible) {
+        retryButton.setVisibility(retryButtonVisible ? View.VISIBLE : View.GONE);
         TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
         viewSwitcher.showErrorLayout();
     }
 
-    private void showErrorOnTaskDelete(String errorMessage) {
-        Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+    private void showErrorAsSnackbarWithRetry(String errorMessage) {
+        Snackbar.make(content(), errorMessage, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         attemptDelete();
                     }
                 }).show();
+    }
+
+    //region Related Activities
+    private void openEditActivity() {
+        Intent intent = new Intent(this, TaskEditActivity.class);
+        intent.putExtra(OBJECT, task);
+        startActivityForResult(intent, EDIT);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                Snackbar.make(content(), R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                sendGetDetailsRequest();
+                needParentRefresh = true;
+            }
+        }
+    }
+    //endregion
+
+    private View content() {
+        return findViewById(android.R.id.content);
     }
 }

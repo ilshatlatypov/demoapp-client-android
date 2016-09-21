@@ -36,6 +36,8 @@ import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import ru.jvdev.demoapp.client.android.utils.StringUtils;
 
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
+
 public class UserEditActivity extends AppCompatActivity {
 
     private Api.Users usersApi;
@@ -78,7 +80,7 @@ public class UserEditActivity extends AppCompatActivity {
         positionSpinner.setAdapter(spinnerAdapter);
         positionSpinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
 
-        User user = (User) getIntent().getSerializableExtra(UserDetailsActivity.EXTRA_USER);
+        User user = (User) getIntent().getSerializableExtra(OBJECT);
         if (user != null) {
             userId = user.getId();
             fillFieldsWithData(user);

@@ -40,6 +40,8 @@ import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
+
 public class TaskEditActivity extends AppCompatActivity {
 
     private static DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
@@ -86,7 +88,7 @@ public class TaskEditActivity extends AppCompatActivity {
         tasksApi = app.getRestProvider().getTasksApi();
         usersApi = app.getRestProvider().getUsersApi();
 
-        Task task = (Task) getIntent().getSerializableExtra(TaskDetailsActivity.EXTRA_TASK);
+        Task task = (Task) getIntent().getSerializableExtra(OBJECT);
         if (task != null) {
             getSupportActionBar().setTitle(R.string.title_edit_task);
             taskId = task.getId();

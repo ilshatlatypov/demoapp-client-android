@@ -13,14 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.entity.User;
@@ -29,30 +25,23 @@ import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
 import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.EDIT;
+import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
 
 public class UserDetailsActivity extends AppCompatActivity {
 
-    public static final String EXTRA_USER = "user";
-
     private Api.Users usersApi;
-
-    private ViewSwitcher viewSwitcher;
-    private View baseLayout;
-
     private int userId;
     private User user;
-    private TextView fullnameTextView;
-    private TextView usernameTextView;
-    private TextView passwordTextView;
-    private TextView positionTextView;
 
+    private ViewSwitcher viewSwitcher;
     private Button retryButton;
 
     private boolean actionsVisible = false;
-
     private boolean needParentRefresh = false;
-
     private boolean deletionInProgress = false;
 
     @Override
@@ -61,28 +50,19 @@ public class UserDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        baseLayout = findViewById(R.id.base_layout);
-
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
-        userId = getIntent().getIntExtra(ID, 0);
-
-        fullnameTextView = (TextView) findViewById(R.id.fullname);
-        usernameTextView = (TextView) findViewById(R.id.username);
-        passwordTextView = (TextView) findViewById(R.id.password);
-        positionTextView = (TextView) findViewById(R.id.position);
-
         retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendGetUserDetailsRequest();
+                sendGetDetailsRequest();
             }
         });
 
-        DemoApp app = (DemoApp) getApplicationContext();
-        usersApi = app.getRestProvider().getUsersApi();
+        userId = getIntent().getIntExtra(ID, 0);
+        usersApi = rest(this).getUsersApi();
 
-        sendGetUserDetailsRequest();
+        sendGetDetailsRequest();
     }
 
     @Override
@@ -92,24 +72,19 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.setGroupVisible(R.id.group_user_actions, actionsVisible);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (needParentRefresh) {
-                setResult(ActivityResultCode.NEED_PARENT_REFRESH, new Intent());
+                setResult(NEED_PARENT_REFRESH, new Intent());
             }
             finish();
             return true;
         } else if (id == R.id.action_edit) {
             if (!deletionInProgress) {
-                openUpdateUserActivity();
+                openEditActivity();
             }
+            return true;
         } else if (id == R.id.action_delete) {
             if (!deletionInProgress) {
                 attemptDelete();
@@ -119,57 +94,18 @@ public class UserDetailsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void openUpdateUserActivity() {
-        Intent intent = new Intent(this, UserEditActivity.class);
-        intent.putExtra(EXTRA_USER, user);
-        startActivityForResult(intent, EDIT);
-    }
-
-    private void sendGetUserDetailsRequest() {
-        viewSwitcher.showProgressBar();
-
-        Call<UserDto> getUserCall = usersApi.getUser(userId);
-        getUserCall.enqueue(new Callback<UserDto>() {
-            @Override
-            public void onResponse(Call<UserDto> call, Response<UserDto> response) {
-                if (response.isSuccessful()) {
-                    user = response.body().toUser();
-                    displayUserDetails(user);
-                    setActionsOnUserVisible(true);
-                } else if (response.code() == HttpCodes.NOT_FOUND) {
-                    showUserNotFoundError();
-                    setActionsOnUserVisible(false);
-                    needParentRefresh = true;
-                }
-            }
-
-            @Override
-            public void onFailure(Call<UserDto> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
-                showErrorOnGettingUserDetails(message);
-                setActionsOnUserVisible(false);
-            }
-        });
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(baseLayout, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
-                sendGetUserDetailsRequest();
-                needParentRefresh = true;
-            }
-        }
-    }
-
     private void setActionsOnUserVisible(boolean actionsVisible) {
         this.actionsVisible = actionsVisible;
         invalidateOptionsMenu();
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.setGroupVisible(R.id.group_user_actions, actionsVisible);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    //region Deletion
     private void attemptDelete() {
         new AlertDialog.Builder(this)
                 .setMessage(getString(R.string.prompt_delete_user))
@@ -184,7 +120,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void sendDeleteUserRequest(int userId) {
-        Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
+        Snackbar.make(content(), R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
 
         deletionInProgress = true;
         Call<Void> deleteUserCall = usersApi.deleteUser(userId);
@@ -200,45 +136,93 @@ public class UserDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
-                showErrorOnUserDelete(message);
+                String message = requestFailureMessage(UserDetailsActivity.this, t);
+                showErrorAsSnackbarWithRetry(message);
                 deletionInProgress = false;
+            }
+        });
+    }
+    //endregion
+
+    //region Details
+    private void sendGetDetailsRequest() {
+        viewSwitcher.showProgressBar();
+
+        Call<UserDto> getUserCall = usersApi.getUser(userId);
+        getUserCall.enqueue(new Callback<UserDto>() {
+            @Override
+            public void onResponse(Call<UserDto> call, Response<UserDto> response) {
+                if (response.isSuccessful()) {
+                    user = response.body().toUser();
+                    displayUserDetails(user);
+                    setActionsOnUserVisible(true);
+                } else if (response.code() == HttpCodes.NOT_FOUND) {
+                    showErrorLayout(getString(R.string.error_user_not_found), false);
+                    setActionsOnUserVisible(false);
+                    needParentRefresh = true;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDto> call, Throwable t) {
+                String message = requestFailureMessage(UserDetailsActivity.this, t);
+                showErrorLayout(message, true);
+                setActionsOnUserVisible(false);
             }
         });
     }
 
     private void displayUserDetails(User user) {
-        fullnameTextView.setText(user.getFullname());
-        usernameTextView.setText(user.getUsername());
-        passwordTextView.setText(user.getPassword());
-        positionTextView.setText(user.getRole().toString());
+        TextView fullnameView = (TextView) findViewById(R.id.fullname);
+        TextView usernameView = (TextView) findViewById(R.id.username);
+        TextView passwordView = (TextView) findViewById(R.id.password);
+        TextView positionView = (TextView) findViewById(R.id.position);
+
+        fullnameView.setText(user.getFullname());
+        usernameView.setText(user.getUsername());
+        passwordView.setText(user.getPassword());
+        positionView.setText(user.getRole().toString());
         viewSwitcher.showMainLayout();
     }
+    //endregion
 
-    private void showUserNotFoundError() {
-        showErrorLayout(getString(R.string.error_user_not_found), View.GONE);
-    }
-
-    private void showErrorOnGettingUserDetails(String errorMessage) {
-        showErrorLayout(errorMessage, View.VISIBLE);
-    }
-
-    private void showErrorLayout(String errorMessage, int retryButtonVisibility) {
-        retryButton.setVisibility(retryButtonVisibility);
+    private void showErrorLayout(String errorMessage, boolean retryButtonVisible) {
+        retryButton.setVisibility(retryButtonVisible ? View.VISIBLE : View.GONE);
         TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
         viewSwitcher.showErrorLayout();
     }
 
-    private void showErrorOnUserDelete(String errorMessage) {
-        Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+    private void showErrorAsSnackbarWithRetry(String errorMessage) {
+        Snackbar.make(content(), errorMessage, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         attemptDelete();
                     }
                 }).show();
+    }
+
+    //region Related Activities
+    private void openEditActivity() {
+        Intent intent = new Intent(this, UserEditActivity.class);
+        intent.putExtra(OBJECT, user);
+        startActivityForResult(intent, EDIT);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                Snackbar.make(content(), R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
+                sendGetDetailsRequest();
+                needParentRefresh = true;
+            }
+        }
+    }
+    //endregion
+
+    private View content() {
+        return findViewById(android.R.id.content);
     }
 }
