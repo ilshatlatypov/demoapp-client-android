@@ -135,7 +135,29 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     private void sendDeleteTaskRequest(int taskId) {
-        Snackbar.make(baseLayout, "Sending delete request...", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(baseLayout, R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
+
+        deletionInProgress = true;
+        Call<Void> deleteUserCall = tasksApi.delete(taskId);
+        deleteUserCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful() || response.code() == HttpCodes.NOT_FOUND) {
+                    setResult(ActivityResult.DELETED, new Intent());
+                    finish();
+                }
+                deletionInProgress = false;
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
+                        getString(R.string.error_server_unavailable) :
+                        getString(R.string.error_unknown, t.getMessage());
+                showErrorOnTaskDelete(message);
+                deletionInProgress = false;
+            }
+        });
     }
 
     private void sendGetTaskDetailsRequest() {
@@ -192,5 +214,15 @@ public class TaskDetailsActivity extends AppCompatActivity {
         TextView errorTextView = (TextView) findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
         viewSwitcher.showErrorLayout();
+    }
+
+    private void showErrorOnTaskDelete(String errorMessage) {
+        Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attemptDelete();
+                    }
+                }).show();
     }
 }

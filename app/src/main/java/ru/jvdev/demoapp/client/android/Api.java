@@ -54,5 +54,8 @@ public class Api {
 
         @GET("tasks/{id}?projection=withUser")
         Call<TaskDto> get(@Path("id") int id);
+
+        @DELETE("tasks/{id}")
+        Call<Void> delete(@Path("id") int id);
     }
 }

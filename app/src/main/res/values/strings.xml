@@ -66,5 +66,6 @@
     <string name="prompt_no_tasks">Список задач пуст</string>
     <string name="title_task_details">Детали по задаче</string>
     <string name="prompt_delete_task">Удалить задачу?</string>
+    <string name="prompt_task_deleted">Задача удалена</string>
 
 </resources>

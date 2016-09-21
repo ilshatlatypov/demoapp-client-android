@@ -5,5 +5,7 @@ package ru.jvdev.demoapp.client.android.utils;
  */
 
 public interface ActivityRequestCode {
+    int CREATE = 0;
     int EDIT = 1;
+    int DETAILS = 2;
 }

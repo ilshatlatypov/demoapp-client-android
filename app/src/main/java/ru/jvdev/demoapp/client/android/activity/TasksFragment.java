@@ -30,9 +30,12 @@ import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
+import ru.jvdev.demoapp.client.android.utils.ActivityResult;
 import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
+import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.CREATE;
+import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.DETAILS;
 import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
 
 /**
@@ -41,9 +44,6 @@ import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
  * create an instance of this fragment.
  */
 public class TasksFragment extends Fragment implements RefreshableFragment {
-
-    private static final int CREATE_REQUEST = 1;
-    private static final int DETAILS_REQUEST = 2;
 
     private ListView tasksListView;
     private FragmentDataLoadingListener listener;
@@ -96,19 +96,26 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
 
     private void openCreateTaskActivity() {
         Intent intent = new Intent(getActivity(), CreateOrUpdateTaskActivity.class);
-        this.startActivityForResult(intent, CREATE_REQUEST);
+        this.startActivityForResult(intent, CREATE);
     }
 
     private void openDetailsActivity(Task task) {
         Intent intent = new Intent(getActivity(), TaskDetailsActivity.class);
         intent.putExtra(ID, task.getId());
-        this.startActivityForResult(intent, DETAILS_REQUEST);
+        this.startActivityForResult(intent, DETAILS);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CREATE_REQUEST) {
+        if (requestCode == CREATE) {
             if (resultCode == Activity.RESULT_OK) {
                 Snackbar.make(tasksListView, R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                updateTasks();
+            }
+        } else if (requestCode == DETAILS) {
+            if (resultCode == ActivityResult.DELETED) {
+                Snackbar.make(tasksListView, R.string.prompt_task_deleted, Snackbar.LENGTH_SHORT).show();
+                updateTasks();
+            } else if (resultCode == ActivityResult.NEED_PARENT_REFRESH) {
                 updateTasks();
             }
         }
