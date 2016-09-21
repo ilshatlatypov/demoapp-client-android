@@ -28,10 +28,12 @@ import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
 import ru.jvdev.demoapp.client.android.utils.ActivityResult;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
+import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.EDIT;
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
+
 public class UserDetailsActivity extends AppCompatActivity {
 
     public static final String EXTRA_USER = "user";
-    private static final int EDIT_REQUEST = 1;
 
     private Api.Users usersApi;
 
@@ -62,7 +64,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         baseLayout = findViewById(R.id.base_layout);
 
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
-        userId = getIntent().getIntExtra(UsersFragment.EXTRA_USER_ID, 0);
+        userId = getIntent().getIntExtra(ID, 0);
 
         fullnameTextView = (TextView) findViewById(R.id.fullname);
         usernameTextView = (TextView) findViewById(R.id.username);
@@ -120,7 +122,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     private void openUpdateUserActivity() {
         Intent intent = new Intent(this, CreateOrUpdateUserActivity.class);
         intent.putExtra(EXTRA_USER, user);
-        startActivityForResult(intent, EDIT_REQUEST);
+        startActivityForResult(intent, EDIT);
     }
 
     private void sendGetUserDetailsRequest() {
@@ -154,7 +156,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT_REQUEST) {
+        if (requestCode == EDIT) {
             if (resultCode == Activity.RESULT_OK) {
                 Snackbar.make(baseLayout, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
                 sendGetUserDetailsRequest();

@@ -1,11 +1,12 @@
 package ru.jvdev.demoapp.client.android.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by ilshat on 04.08.16.
  */
-public class Task {
+public class Task implements Serializable {
 
     private int id;
     private String title;

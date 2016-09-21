@@ -29,6 +29,8 @@ import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
 import ru.jvdev.demoapp.client.android.utils.ActivityResult;
 
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link UsersFragment#newInstance} factory method to
@@ -38,7 +40,6 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
-    public static final String EXTRA_USER_ID = "user_id";
 
     private Context context;
     private ListView usersListView;
@@ -93,7 +94,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
 
     private void openDetailsActivity(User user) {
         Intent intent = new Intent(context, UserDetailsActivity.class);
-        intent.putExtra(EXTRA_USER_ID, user.getId());
+        intent.putExtra(ID, user.getId());
         this.startActivityForResult(intent, DETAILS_REQUEST);
     }
 

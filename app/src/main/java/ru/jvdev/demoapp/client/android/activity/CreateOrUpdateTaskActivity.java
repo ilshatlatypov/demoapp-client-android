@@ -65,7 +65,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
 
         titleText = (EditText) findViewById(R.id.title_text);
 
-        Task task = (Task) getIntent().getSerializableExtra(UserDetailsActivity.EXTRA_USER);
+        Task task = (Task) getIntent().getSerializableExtra(TaskDetailsActivity.EXTRA_TASK);
         if (task != null) {
             taskId = task.getId();
             // fillFieldsWithData(task);

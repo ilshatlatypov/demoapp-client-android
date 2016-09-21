@@ -33,6 +33,8 @@ import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
+import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link TasksFragment#newInstance} factory method to
@@ -42,7 +44,6 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
 
     private static final int CREATE_REQUEST = 1;
     private static final int DETAILS_REQUEST = 2;
-    public static final String EXTRA_TASK_ID = "task_id";
 
     private ListView tasksListView;
     private FragmentDataLoadingListener listener;
@@ -100,7 +101,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
 
     private void openDetailsActivity(Task task) {
         Intent intent = new Intent(getActivity(), TaskDetailsActivity.class);
-        intent.putExtra(EXTRA_TASK_ID, task.getId());
+        intent.putExtra(ID, task.getId());
         this.startActivityForResult(intent, DETAILS_REQUEST);
     }
 
