@@ -65,5 +65,6 @@
     <string name="prompt_task_saved">Задача сохранена</string>
 
     <string name="prompt_no_tasks">Список задач пуст</string>
+    <string name="title_task_details">Детали по задаче</string>
 
 </resources>

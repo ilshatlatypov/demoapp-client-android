@@ -99,7 +99,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     private void openDetailsActivity(Task task) {
-        Intent intent = new Intent(getActivity(), UserDetailsActivity.class);
+        Intent intent = new Intent(getActivity(), TaskDetailsActivity.class);
         intent.putExtra(EXTRA_TASK_ID, task.getId());
         this.startActivityForResult(intent, DETAILS_REQUEST);
     }
