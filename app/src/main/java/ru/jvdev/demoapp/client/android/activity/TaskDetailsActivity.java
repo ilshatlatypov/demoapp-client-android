@@ -117,7 +117,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     private void openUpdateTaskActivity() {
-        Intent intent = new Intent(this, CreateOrUpdateTaskActivity.class);
+        Intent intent = new Intent(this, TaskEditActivity.class);
         intent.putExtra(EXTRA_TASK, task);
         startActivityForResult(intent, EDIT);
     }

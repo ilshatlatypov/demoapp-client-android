@@ -29,12 +29,12 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.CreateOrUpdateUserActivity"
+            android:name=".activity.UserEditActivity"
             android:label="@string/title_new_user" />
         <activity
             android:name=".activity.UserDetailsActivity"
             android:label="@string/title_user_details" />
-        <activity android:name=".activity.CreateOrUpdateTaskActivity"
+        <activity android:name=".activity.TaskEditActivity"
             android:label="@string/title_new_task" />
         <activity android:name=".activity.TaskDetailsActivity"
             android:label="@string/title_task_details" />

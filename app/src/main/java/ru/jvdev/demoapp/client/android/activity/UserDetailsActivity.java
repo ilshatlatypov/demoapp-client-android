@@ -120,7 +120,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void openUpdateUserActivity() {
-        Intent intent = new Intent(this, CreateOrUpdateUserActivity.class);
+        Intent intent = new Intent(this, UserEditActivity.class);
         intent.putExtra(EXTRA_USER, user);
         startActivityForResult(intent, EDIT);
     }

@@ -40,7 +40,7 @@ import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
-public class CreateOrUpdateTaskActivity extends AppCompatActivity {
+public class TaskEditActivity extends AppCompatActivity {
 
     private static DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
 
@@ -58,7 +58,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_or_update_task);
+        setContentView(R.layout.activity_edit_task);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         baseLayout = (LinearLayout) findViewById(R.id.base_layout);
 
@@ -70,7 +70,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
-                    KeyboardUtils.hideKeyboard(CreateOrUpdateTaskActivity.this);
+                    KeyboardUtils.hideKeyboard(TaskEditActivity.this);
                     showDatePicker();
                 }
             }

@@ -36,7 +36,7 @@ import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import ru.jvdev.demoapp.client.android.utils.StringUtils;
 
-public class CreateOrUpdateUserActivity extends AppCompatActivity {
+public class UserEditActivity extends AppCompatActivity {
 
     private Api.Users usersApi;
 
@@ -52,7 +52,7 @@ public class CreateOrUpdateUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_or_update_user);
+        setContentView(R.layout.activity_edit_user);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         baseLayout = (LinearLayout) findViewById(R.id.base_layout);
 

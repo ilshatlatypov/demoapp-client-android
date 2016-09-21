@@ -24,7 +24,7 @@ import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FragmentDataLoadingListener {
+        implements NavigationView.OnNavigationItemSelectedListener, DataLoadingListener {
 
     private static final String STATE_ACTIVE_NAV_ITEM = "activeNavItemId";
 

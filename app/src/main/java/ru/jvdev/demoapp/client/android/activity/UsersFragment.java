@@ -15,36 +15,32 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
-import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
 
+import static android.app.Activity.RESULT_OK;
+import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.CREATE;
+import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.DETAILS;
+import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.DELETED;
+import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.tryCastAsDataLoadingListener;
 import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UsersFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UsersFragment extends Fragment implements RefreshableFragment {
 
-    private static final int CREATE_REQUEST = 1;
-    private static final int DETAILS_REQUEST = 2;
+    private Api.Users usersApi;
 
-    private Context context;
     private ListView usersListView;
-
-    private FragmentDataLoadingListener listener;
+    private DataLoadingListener listener;
 
     public UsersFragment() {
         // Required empty public constructor
@@ -57,21 +53,18 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_users, container, false);
-        context = view.getContext();
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openCreateUserActivity();
+                openCreateActivity();
             }
         });
 
-
         usersListView = (ListView) view.findViewById(R.id.users_list_view);
-        ArrayAdapter<User> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
+        ArrayAdapter<User> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
         usersListView.setAdapter(adapter);
         usersListView.setEmptyView(view.findViewById(android.R.id.empty));
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -82,66 +75,39 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
             }
         });
 
+        usersApi = rest(getActivity()).getUsersApi();
+
         updateUsers();
 
         return view;
     }
 
-    private void openCreateUserActivity() {
-        Intent intent = new Intent(context, CreateOrUpdateUserActivity.class);
-        this.startActivityForResult(intent, CREATE_REQUEST);
+    private void openCreateActivity() {
+        Intent intent = new Intent(getActivity(), UserEditActivity.class);
+        this.startActivityForResult(intent, CREATE);
     }
 
     private void openDetailsActivity(User user) {
-        Intent intent = new Intent(context, UserDetailsActivity.class);
+        Intent intent = new Intent(getActivity(), UserDetailsActivity.class);
         intent.putExtra(ID, user.getId());
-        this.startActivityForResult(intent, DETAILS_REQUEST);
+        this.startActivityForResult(intent, DETAILS);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CREATE_REQUEST) {
-            if (resultCode == Activity.RESULT_OK) {
+        if (requestCode == CREATE) {
+            if (resultCode == RESULT_OK) {
                 Snackbar.make(usersListView, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
                 updateUsers();
             }
-        } else if (requestCode == DETAILS_REQUEST) {
-            if (resultCode == ActivityResultCode.DELETED) {
+        } else if (requestCode == DETAILS) {
+            if (resultCode == DELETED) {
                 Snackbar.make(usersListView, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
                 updateUsers();
-            } else if (resultCode == ActivityResultCode.NEED_PARENT_REFRESH) {
+            } else if (resultCode == NEED_PARENT_REFRESH) {
                 updateUsers();
             }
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof FragmentDataLoadingListener) {
-            listener = (FragmentDataLoadingListener) activity;
-        } else {
-            throw new RuntimeException(activity.toString()
-                    + " must implement FragmentDataLoadingListener");
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentDataLoadingListener) {
-            listener = (FragmentDataLoadingListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement FragmentDataLoadingListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 
     @Override
@@ -150,11 +116,8 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateUsers() {
-        DemoApp app = (DemoApp) getActivity().getApplicationContext();
-        Api.Users usersApi = app.getRestProvider().getUsersApi();
-
-        Call<UsersPageDto> usersPageDtoCall = usersApi.getUsers();
-        usersPageDtoCall.enqueue(new Callback<UsersPageDto>() {
+        Call<UsersPageDto> pageCall = usersApi.getUsers();
+        pageCall.enqueue(new Callback<UsersPageDto>() {
             @Override
             public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
                 putDataToList(response.body().getUsers());
@@ -163,9 +126,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
 
             @Override
             public void onFailure(Call<UsersPageDto> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
+                String message = requestFailureMessage(getActivity(), t);
                 listener.onError(message);
             }
         });
@@ -177,4 +138,25 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
         adapter.addAll(users);
         adapter.notifyDataSetChanged();
     }
+
+    //region Fragment-Activity attach-detach
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        listener = tryCastAsDataLoadingListener(activity);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        listener = tryCastAsDataLoadingListener(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+    //endregion
 }

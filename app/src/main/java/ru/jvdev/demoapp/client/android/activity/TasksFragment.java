@@ -14,10 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -30,23 +27,24 @@ import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
-import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
-import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
+import ru.jvdev.demoapp.client.android.utils.TaskUtils;
 
 import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.CREATE;
 import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.DETAILS;
+import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.DELETED;
+import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.tryCastAsDataLoadingListener;
 import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TasksFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
+    private Api.Tasks tasksApi;
+
     private ListView tasksListView;
-    private FragmentDataLoadingListener listener;
+    private DataLoadingListener listener;
 
     private User activeUser;
 
@@ -61,14 +59,13 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tasks, container, false);
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openCreateTaskActivity();
+                openCreateActivity();
             }
         });
 
@@ -89,13 +86,15 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
             fab.setVisibility(View.GONE);
         }
 
+        tasksApi = rest(getActivity()).getTasksApi();
+
         updateTasks();
 
         return view;
     }
 
-    private void openCreateTaskActivity() {
-        Intent intent = new Intent(getActivity(), CreateOrUpdateTaskActivity.class);
+    private void openCreateActivity() {
+        Intent intent = new Intent(getActivity(), TaskEditActivity.class);
         this.startActivityForResult(intent, CREATE);
     }
 
@@ -112,42 +111,13 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
                 updateTasks();
             }
         } else if (requestCode == DETAILS) {
-            if (resultCode == ActivityResultCode.DELETED) {
+            if (resultCode == DELETED) {
                 Snackbar.make(tasksListView, R.string.prompt_task_deleted, Snackbar.LENGTH_SHORT).show();
                 updateTasks();
-            } else if (resultCode == ActivityResultCode.NEED_PARENT_REFRESH) {
+            } else if (resultCode == NEED_PARENT_REFRESH) {
                 updateTasks();
             }
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof FragmentDataLoadingListener) {
-            listener = (FragmentDataLoadingListener) activity;
-        } else {
-            throw new RuntimeException(activity.toString()
-                    + " must implement FragmentDataLoadingListener");
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentDataLoadingListener) {
-            listener = (FragmentDataLoadingListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement FragmentDataLoadingListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 
     @Override
@@ -156,12 +126,9 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateTasks() {
-        DemoApp app = (DemoApp) getActivity().getApplicationContext();
-        Api.Tasks tasksApi = app.getRestProvider().getTasksApi();
-
-        Call<TasksPageDto> tasksPageDtoCall = activeUser.getRole() == Role.MANAGER ?
+        Call<TasksPageDto> pageCall = activeUser.getRole() == Role.MANAGER ?
                 tasksApi.list() : tasksApi.listByUser(activeUser.getUsername());
-        tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
+        pageCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
                 List<Task> tasks = null;
@@ -170,35 +137,14 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
                 } else if (response.code() == HttpCodes.NOT_FOUND) {
                     tasks = Collections.emptyList();
                 }
-                addSubheaderObjects(tasks);
+                TaskUtils.addSubheaderTasksByDateGroups(getActivity(), tasks);
                 putDataToList(tasks);
                 listener.onDataLoaded();
             }
 
-            private void addSubheaderObjects(List<Task> tasks) {
-                int tasksTotal = tasks.size();
-                for (int i = tasksTotal - 1; i >= 0; i--) {
-                    boolean insertSubheader;
-                    Date taskDate = tasks.get(i).getDate();
-                    if (i > 0) {
-                        Date prevTaskDate = tasks.get(i - 1).getDate();
-                        insertSubheader = !taskDate.equals(prevTaskDate);
-                    } else {
-                        insertSubheader = true;
-                    }
-
-                    if (insertSubheader) {
-                        String dateAsStr = DateUtils.dateToString(getActivity(), taskDate);
-                        tasks.add(i, new Task(0, dateAsStr));
-                    }
-                }
-            }
-
             @Override
             public void onFailure(Call<TasksPageDto> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
+                String message = requestFailureMessage(getActivity(), t);
                 listener.onError(message);
             }
         });
@@ -209,4 +155,25 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         adapter.setTasks(tasks);
         adapter.notifyDataSetChanged();
     }
+
+    //region Fragment-Activity attach-detach
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        listener = tryCastAsDataLoadingListener(activity);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        listener = tryCastAsDataLoadingListener(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+    //endregion
 }
