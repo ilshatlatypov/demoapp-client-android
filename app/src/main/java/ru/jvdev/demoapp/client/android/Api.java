@@ -52,7 +52,7 @@ public class Api {
         @PUT("tasks/{id}")
         Call<Void> update(@Path("id") int id, @Body TaskDto task);
 
-        @GET("tasks/{id}")
+        @GET("tasks/{id}?projection=withUser")
         Call<TaskDto> get(@Path("id") int id);
     }
 }
