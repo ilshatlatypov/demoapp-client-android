@@ -17,8 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,7 +24,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
-import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
@@ -37,14 +34,14 @@ import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import ru.jvdev.demoapp.client.android.utils.StringUtils;
 
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 
 public class UserEditActivity extends AppCompatActivity {
 
     private Api.Users usersApi;
-
-    private LinearLayout baseLayout;
-
     private int userId;
+
     private EditText firstnameText;
     private EditText lastnameText;
     private EditText usernameText;
@@ -56,8 +53,20 @@ public class UserEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        baseLayout = (LinearLayout) findViewById(R.id.base_layout);
 
+        initInputs();
+
+        User user = (User) getIntent().getSerializableExtra(OBJECT);
+        if (user != null) {
+            userId = user.getId();
+            fillFieldsWithData(user);
+            getSupportActionBar().setTitle(R.string.title_edit_user);
+        }
+
+        usersApi = rest(this).getUsersApi();
+    }
+
+    private void initInputs() {
         firstnameText = (EditText) findViewById(R.id.firstname_text);
         lastnameText = (EditText) findViewById(R.id.lastname_text);
         usernameText = (EditText) findViewById(R.id.username_text);
@@ -66,7 +75,7 @@ public class UserEditActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    attemptCreateUser();
+                    attemptCreate();
                     return true;
                 }
                 return false;
@@ -79,18 +88,6 @@ public class UserEditActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         positionSpinner.setAdapter(spinnerAdapter);
         positionSpinner.setOnItemSelectedListener(new SpinnerWithChooseItemListener(this));
-
-        User user = (User) getIntent().getSerializableExtra(OBJECT);
-        if (user != null) {
-            userId = user.getId();
-            fillFieldsWithData(user);
-            getSupportActionBar().setTitle(R.string.title_edit_user);
-        } else {
-            getSupportActionBar().setTitle(R.string.title_new_user);
-        }
-
-        DemoApp app = (DemoApp) getApplicationContext();
-        usersApi = app.getRestProvider().getUsersApi();
     }
 
     private void fillFieldsWithData(User user) {
@@ -115,18 +112,19 @@ public class UserEditActivity extends AppCompatActivity {
             finish();
         } else if (id == R.id.action_save) {
             if (userId == 0) {
-                attemptCreateUser();
+                attemptCreate();
             } else {
-                attemptUpdateUser();
+                attemptUpdate();
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void attemptCreateUser() {
+    //region Creation
+    private void attemptCreate() {
         clearFieldErrorsIfAny();
 
-        User user = initUser();
+        User user = init();
         Map<Integer, String> errors = validate(user);
 
         if (errors.isEmpty()) {
@@ -138,10 +136,10 @@ public class UserEditActivity extends AppCompatActivity {
     }
 
     private void sendCreateUserRequest(User user) {
-        Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(content(), R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
-        Call<Void> createUserCall = usersApi.createUser(new UserDto(user));
-        createUserCall.enqueue(new Callback<Void>() {
+        Call<Void> call = usersApi.createUser(new UserDto(user));
+        call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -152,18 +150,18 @@ public class UserEditActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                String message = (t instanceof ConnectException) ?
-                    getString(R.string.error_server_unavailable) :
-                    getString(R.string.error_unknown, t.getMessage());
-                showRequestError(message);
+                String message = requestFailureMessage(UserEditActivity.this, t);
+                showErrorAsSnackbarWithRetry(message);
             }
         });
     }
+    //endregion
 
-    private void attemptUpdateUser() {
+    //region Update
+    private void attemptUpdate() {
         clearFieldErrorsIfAny();
 
-        User user = initUser();
+        User user = init();
         Map<Integer, String> errors = validate(user);
 
         if (errors.isEmpty()) {
@@ -175,10 +173,10 @@ public class UserEditActivity extends AppCompatActivity {
     }
 
     private void sendUpdateUserRequest(int userId, User user) {
-        Snackbar.make(baseLayout, R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(content(), R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
 
-        Call<Void> updateUserCall = usersApi.updateUser(userId, new UserDto(user));
-        updateUserCall.enqueue(new Callback<Void>() {
+        Call<Void> call = usersApi.updateUser(userId, new UserDto(user));
+        call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -190,23 +188,23 @@ public class UserEditActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                String message = (t instanceof ConnectException || t instanceof SocketTimeoutException) ?
-                        getString(R.string.error_server_unavailable) :
-                        getString(R.string.error_unknown, t.getMessage());
-                showRequestError(message);
+                String message = requestFailureMessage(UserEditActivity.this, t);
+                showErrorAsSnackbarWithRetry(message);
             }
         });
     }
+    //endregion
 
     private void clearFieldErrorsIfAny() {
-        for(int i = 0; i < baseLayout.getChildCount(); i++ ) {
-            if (baseLayout.getChildAt(i) instanceof TextInputLayout) {
-                ((TextInputLayout) baseLayout.getChildAt(i)).setError(null);
+        LinearLayout fieldsLayout = (LinearLayout) findViewById(R.id.fields);
+        for(int i = 0; i < fieldsLayout.getChildCount(); i++ ) {
+            if (fieldsLayout.getChildAt(i) instanceof TextInputLayout) {
+                ((TextInputLayout) fieldsLayout.getChildAt(i)).setError(null);
             }
         }
     }
 
-    private User initUser() {
+    private User init() {
         String firstname = firstnameText.getText().toString();
         String lastname = lastnameText.getText().toString();
         String username = usernameText.getText().toString();
@@ -252,13 +250,17 @@ public class UserEditActivity extends AppCompatActivity {
         }
     }
 
-    private void showRequestError(String errorMessage) {
-        Snackbar.make(baseLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
+    private void showErrorAsSnackbarWithRetry(String errorMessage) {
+        Snackbar.make(content(), errorMessage, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        attemptCreateUser();
+                        attemptCreate();
                     }
                 }).show();
+    }
+
+    private View content() {
+        return findViewById(android.R.id.content);
     }
 }

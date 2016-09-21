@@ -16,6 +16,11 @@ public class User implements Serializable {
 
     public User() {}
 
+    public User(String firstname) {
+        this.firstname = firstname;
+        this.role = Role.NO_ROLE;
+    }
+
     public User(String firstname, String lastName, String username, String password, Role role) {
         this.firstname = firstname;
         this.lastname = lastName;
@@ -49,7 +54,10 @@ public class User implements Serializable {
     }
 
     public String getFullname() {
-        return firstname + " " + lastname;
+        if (lastname != null && !lastname.isEmpty())
+            return firstname + " " + lastname;
+        else
+            return firstname;
     }
 
     public String getUsername() {
@@ -77,6 +85,6 @@ public class User implements Serializable {
     }
 
     public String toString() {
-        return firstname + " " + lastname;
+        return getFullname();
     }
 }
