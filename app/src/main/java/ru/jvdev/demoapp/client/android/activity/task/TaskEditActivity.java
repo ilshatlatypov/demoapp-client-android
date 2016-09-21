@@ -1,4 +1,4 @@
-package ru.jvdev.demoapp.client.android.activity;
+package ru.jvdev.demoapp.client.android.activity.task;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -40,7 +40,7 @@ import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
-import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 
 public class TaskEditActivity extends AppCompatActivity {
 

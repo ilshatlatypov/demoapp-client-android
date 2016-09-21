@@ -1,4 +1,4 @@
-package ru.jvdev.demoapp.client.android.activity;
+package ru.jvdev.demoapp.client.android.activity.user;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -19,24 +19,23 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
-import ru.jvdev.demoapp.client.android.entity.Task;
-import ru.jvdev.demoapp.client.android.entity.dto.TaskDto;
-import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
-import ru.jvdev.demoapp.client.android.utils.DateUtils;
+import ru.jvdev.demoapp.client.android.entity.User;
+import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
+import ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
-import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.EDIT;
-import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.EDIT;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
-import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
-import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 
-public class TaskDetailsActivity extends AppCompatActivity {
+public class UserDetailsActivity extends AppCompatActivity {
 
-    private Api.Tasks tasksApi;
-    private int taskId;
-    private Task task;
+    private Api.Users usersApi;
+    private int userId;
+    private User user;
 
     private ViewSwitcher viewSwitcher;
     private Button retryButton;
@@ -48,7 +47,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_details);
+        setContentView(R.layout.activity_user_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewSwitcher = new ViewSwitcher(this, R.id.progress_bar, R.id.main_layout, R.id.error_layout);
@@ -60,15 +59,15 @@ public class TaskDetailsActivity extends AppCompatActivity {
             }
         });
 
-        taskId = getIntent().getIntExtra(ID, 0);
-        tasksApi = rest(this).getTasksApi();
+        userId = getIntent().getIntExtra(ID, 0);
+        usersApi = rest(this).getUsersApi();
 
         sendGetDetailsRequest();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.task_details, menu);
+        getMenuInflater().inflate(R.menu.user_details, menu);
         return true;
     }
 
@@ -95,36 +94,36 @@ public class TaskDetailsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setActionsOnTaskVisible(boolean actionsVisible) {
+    private void setActionsOnUserVisible(boolean actionsVisible) {
         this.actionsVisible = actionsVisible;
         invalidateOptionsMenu();
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.setGroupVisible(R.id.group_task_actions, actionsVisible);
+        menu.setGroupVisible(R.id.group_user_actions, actionsVisible);
         return super.onPrepareOptionsMenu(menu);
     }
 
     //region Deletion
     private void attemptDelete() {
         new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.prompt_delete_task))
+                .setMessage(getString(R.string.prompt_delete_user))
                 .setPositiveButton(getText(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        sendDeleteTaskRequest(taskId);
+                        sendDeleteUserRequest(userId);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
-    private void sendDeleteTaskRequest(int taskId) {
+    private void sendDeleteUserRequest(int userId) {
         Snackbar.make(content(), R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
 
         deletionInProgress = true;
-        Call<Void> deleteUserCall = tasksApi.delete(taskId);
+        Call<Void> deleteUserCall = usersApi.deleteUser(userId);
         deleteUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -137,7 +136,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                String message = requestFailureMessage(TaskDetailsActivity.this, t);
+                String message = requestFailureMessage(UserDetailsActivity.this, t);
                 showErrorAsSnackbarWithRetry(message);
                 deletionInProgress = false;
             }
@@ -149,34 +148,40 @@ public class TaskDetailsActivity extends AppCompatActivity {
     private void sendGetDetailsRequest() {
         viewSwitcher.showProgressBar();
 
-        Call<TaskDto> call = tasksApi.get(taskId);
-        call.enqueue(new Callback<TaskDto>() {
+        Call<UserDto> getUserCall = usersApi.getUser(userId);
+        getUserCall.enqueue(new Callback<UserDto>() {
             @Override
-            public void onResponse(Call<TaskDto> call, Response<TaskDto> response) {
+            public void onResponse(Call<UserDto> call, Response<UserDto> response) {
                 if (response.isSuccessful()) {
-                    task = response.body().toTask();
-                    displayTaskDetails(task);
-                    setActionsOnTaskVisible(true);
+                    user = response.body().toUser();
+                    displayUserDetails(user);
+                    setActionsOnUserVisible(true);
                 } else if (response.code() == HttpCodes.NOT_FOUND) {
-                    showErrorLayout(getString(R.string.error_task_not_found), false);
-                    setActionsOnTaskVisible(false);
+                    showErrorLayout(getString(R.string.error_user_not_found), false);
+                    setActionsOnUserVisible(false);
                     needParentRefresh = true;
                 }
             }
 
             @Override
-            public void onFailure(Call<TaskDto> call, Throwable t) {
-                String message = requestFailureMessage(TaskDetailsActivity.this, t);
+            public void onFailure(Call<UserDto> call, Throwable t) {
+                String message = requestFailureMessage(UserDetailsActivity.this, t);
                 showErrorLayout(message, true);
-                setActionsOnTaskVisible(false);
+                setActionsOnUserVisible(false);
             }
         });
     }
 
-    private void displayTaskDetails(Task task) {
-        ((TextView) findViewById(R.id.title)).setText(task.getTitle());
-        ((TextView) findViewById(R.id.date)).setText(DateUtils.dateToString(this, task.getDate()));
-        ((TextView) findViewById(R.id.user)).setText(task.getUser() != null ? task.getUser().toString() : "не назначен");
+    private void displayUserDetails(User user) {
+        TextView fullnameView = (TextView) findViewById(R.id.fullname);
+        TextView usernameView = (TextView) findViewById(R.id.username);
+        TextView passwordView = (TextView) findViewById(R.id.password);
+        TextView positionView = (TextView) findViewById(R.id.position);
+
+        fullnameView.setText(user.getFullname());
+        usernameView.setText(user.getUsername());
+        passwordView.setText(user.getPassword());
+        positionView.setText(user.getRole().toString());
         viewSwitcher.showMainLayout();
     }
     //endregion
@@ -200,8 +205,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     //region Related Activities
     private void openEditActivity() {
-        Intent intent = new Intent(this, TaskEditActivity.class);
-        intent.putExtra(OBJECT, task);
+        Intent intent = new Intent(this, UserEditActivity.class);
+        intent.putExtra(OBJECT, user);
         startActivityForResult(intent, EDIT);
     }
 
@@ -209,7 +214,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(content(), R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(content(), R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
                 sendGetDetailsRequest();
                 needParentRefresh = true;
             }

@@ -1,4 +1,4 @@
-package ru.jvdev.demoapp.client.android.activity;
+package ru.jvdev.demoapp.client.android.activity.task;
 
 
 import android.app.Activity;
@@ -23,6 +23,8 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.activity.DataLoadingListener;
+import ru.jvdev.demoapp.client.android.activity.RefreshableFragment;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
@@ -30,14 +32,14 @@ import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 import ru.jvdev.demoapp.client.android.utils.TaskUtils;
 
-import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.CREATE;
-import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.DETAILS;
-import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.DELETED;
-import static ru.jvdev.demoapp.client.android.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.CREATE;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.DETAILS;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DELETED;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.tryCastAsDataLoadingListener;
-import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 
 public class TasksFragment extends Fragment implements RefreshableFragment {
 

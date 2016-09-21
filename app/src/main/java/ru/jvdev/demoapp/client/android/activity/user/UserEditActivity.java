@@ -1,4 +1,4 @@
-package ru.jvdev.demoapp.client.android.activity;
+package ru.jvdev.demoapp.client.android.activity.user;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,7 +36,7 @@ import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 import ru.jvdev.demoapp.client.android.utils.StringUtils;
 
-import static ru.jvdev.demoapp.client.android.utils.IntentExtra.OBJECT;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 
 public class UserEditActivity extends AppCompatActivity {
 

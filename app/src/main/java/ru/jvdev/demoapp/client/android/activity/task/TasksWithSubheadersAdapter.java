@@ -1,4 +1,4 @@
-package ru.jvdev.demoapp.client.android.activity;
+package ru.jvdev.demoapp.client.android.activity.task;
 
 import android.content.Context;
 import android.view.LayoutInflater;

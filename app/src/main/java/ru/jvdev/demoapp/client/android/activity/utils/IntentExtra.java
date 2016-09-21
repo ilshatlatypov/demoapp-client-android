@@ -1,4 +1,4 @@
-package ru.jvdev.demoapp.client.android.utils;
+package ru.jvdev.demoapp.client.android.activity.utils;
 
 /**
  * Created by ilshat on 21.09.16.

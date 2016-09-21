@@ -45,9 +45,11 @@ public class DateUtils {
      * Checks if c1 later c2 by some number of days
      */
     private static boolean isLaterByDays(Calendar c1, Calendar c2, int days) {
-        return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)
-                && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH)
-                && c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH) + days;
+        Calendar c2copy = (Calendar) c2.clone();
+        c2copy.add(Calendar.DATE, days);
+
+        return c1.get(Calendar.YEAR) == c2copy.get(Calendar.YEAR) &&
+                c1.get(Calendar.DAY_OF_YEAR) == c2copy.get(Calendar.DAY_OF_YEAR);
     }
 
     public static String dateToString(Context context, Date taskDate) {

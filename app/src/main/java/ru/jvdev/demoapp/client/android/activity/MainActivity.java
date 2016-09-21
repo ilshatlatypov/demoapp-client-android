@@ -20,6 +20,8 @@ import android.widget.TextView;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
+import ru.jvdev.demoapp.client.android.activity.task.TasksFragment;
+import ru.jvdev.demoapp.client.android.activity.user.UsersFragment;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
 
