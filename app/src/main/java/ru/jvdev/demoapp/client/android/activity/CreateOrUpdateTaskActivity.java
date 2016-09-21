@@ -51,10 +51,9 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
 
     private int taskId;
     private EditText titleText;
+    private Date date;
     private EditText dateText;
     private Spinner userSpinner;
-
-    private Date date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +64,7 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
 
         titleText = (EditText) findViewById(R.id.title_text);
 
-        date = Calendar.getInstance().getTime();
         dateText = (EditText) findViewById(R.id.date_text);
-        dateText.setText(df.format(date));
         dateText.setKeyListener(null); // do not show keyboard on focus
         dateText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -93,24 +90,28 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
         if (task != null) {
             getSupportActionBar().setTitle(R.string.title_edit_task);
             taskId = task.getId();
-            fillFieldsWithData(task);
+            titleText.setText(task.getTitle());
             updateUsersInSpinner(task.getUser());
+            setDate(task.getDate());
         } else {
             getSupportActionBar().setTitle(R.string.title_new_task);
+            setDate(Calendar.getInstance().getTime());
             updateUsersInSpinner(null);
         }
     }
 
-    private void fillFieldsWithData(Task task) {
-        titleText.setText(task.getTitle());
-        dateText.setText(df.format(task.getDate()));
+    private void setDate(Date date) {
+        this.date = date;
+        dateText.setText(df.format(date));
     }
 
     private void showDatePicker() {
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
+        Calendar today = Calendar.getInstance();
+        Calendar selectedDate = Calendar.getInstance();
+        selectedDate.setTime(date);
+        int year = selectedDate.get(Calendar.YEAR);
+        int month = selectedDate.get(Calendar.MONTH);
+        int day = selectedDate.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -119,12 +120,10 @@ public class CreateOrUpdateTaskActivity extends AppCompatActivity {
                 c.set(Calendar.YEAR, year);
                 c.set(Calendar.MONTH, month);
                 c.set(Calendar.DAY_OF_MONTH, day);
-
-                date = c.getTime();
-                dateText.setText(df.format(date));
+                setDate(c.getTime());
             }
         }, year, month, day);
-        datePicker.getDatePicker().setMinDate(c.getTimeInMillis());
+        datePicker.getDatePicker().setMinDate(today.getTimeInMillis());
         datePicker.show();
     }
 

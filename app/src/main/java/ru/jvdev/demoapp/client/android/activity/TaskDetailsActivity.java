@@ -1,5 +1,6 @@
 package ru.jvdev.demoapp.client.android.activity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -187,6 +188,17 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 setActionsOnTaskVisible(false);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                Snackbar.make(baseLayout, R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                sendGetTaskDetailsRequest();
+                needParentRefresh = true;
+            }
+        }
     }
 
     private void setActionsOnTaskVisible(boolean actionsVisible) {
