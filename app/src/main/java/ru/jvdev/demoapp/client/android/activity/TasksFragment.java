@@ -30,7 +30,7 @@ import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
-import ru.jvdev.demoapp.client.android.utils.ActivityResult;
+import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
 import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
@@ -112,15 +112,16 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
                 updateTasks();
             }
         } else if (requestCode == DETAILS) {
-            if (resultCode == ActivityResult.DELETED) {
+            if (resultCode == ActivityResultCode.DELETED) {
                 Snackbar.make(tasksListView, R.string.prompt_task_deleted, Snackbar.LENGTH_SHORT).show();
                 updateTasks();
-            } else if (resultCode == ActivityResult.NEED_PARENT_REFRESH) {
+            } else if (resultCode == ActivityResultCode.NEED_PARENT_REFRESH) {
                 updateTasks();
             }
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

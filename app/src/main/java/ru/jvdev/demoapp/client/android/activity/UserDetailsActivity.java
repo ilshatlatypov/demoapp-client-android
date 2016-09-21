@@ -25,7 +25,7 @@ import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
-import ru.jvdev.demoapp.client.android.utils.ActivityResult;
+import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
 import static ru.jvdev.demoapp.client.android.utils.ActivityRequestCode.EDIT;
@@ -102,7 +102,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (needParentRefresh) {
-                setResult(ActivityResult.NEED_PARENT_REFRESH, new Intent());
+                setResult(ActivityResultCode.NEED_PARENT_REFRESH, new Intent());
             }
             finish();
             return true;
@@ -192,7 +192,7 @@ public class UserDetailsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful() || response.code() == HttpCodes.NOT_FOUND) {
-                    setResult(ActivityResult.DELETED, new Intent());
+                    setResult(ActivityResultCode.DELETED, new Intent());
                     finish();
                 }
                 deletionInProgress = false;

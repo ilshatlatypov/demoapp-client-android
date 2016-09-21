@@ -27,7 +27,7 @@ import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
-import ru.jvdev.demoapp.client.android.utils.ActivityResult;
+import ru.jvdev.demoapp.client.android.utils.ActivityResultCode;
 
 import static ru.jvdev.demoapp.client.android.utils.IntentExtra.ID;
 
@@ -106,15 +106,16 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
                 updateUsers();
             }
         } else if (requestCode == DETAILS_REQUEST) {
-            if (resultCode == ActivityResult.DELETED) {
+            if (resultCode == ActivityResultCode.DELETED) {
                 Snackbar.make(usersListView, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
                 updateUsers();
-            } else if (resultCode == ActivityResult.NEED_PARENT_REFRESH) {
+            } else if (resultCode == ActivityResultCode.NEED_PARENT_REFRESH) {
                 updateUsers();
             }
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
