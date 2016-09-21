@@ -64,4 +64,6 @@
     <string name="prompt_date">Дата</string>
     <string name="prompt_task_saved">Задача сохранена</string>
 
+    <string name="prompt_no_tasks">Список задач пуст</string>
+
 </resources>

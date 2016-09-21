@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TasksPageDto;
 import ru.jvdev.demoapp.client.android.utils.DateUtils;
+import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,6 +74,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         tasksListView = (ListView) view.findViewById(R.id.tasks_list_view);
         TasksWithSubheadersAdapter adapter = new TasksWithSubheadersAdapter(getActivity());
         tasksListView.setAdapter(adapter);
+        tasksListView.setEmptyView(view.findViewById(android.R.id.empty));
         tasksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -152,8 +155,12 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         tasksPageDtoCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
-                // TODO no tasks
-                List<Task> tasks = response.body().getTasks();
+                List<Task> tasks = null;
+                if (response.isSuccessful()) {
+                    tasks = response.body().getTasks();
+                } else if (response.code() == HttpCodes.NOT_FOUND) {
+                    tasks = Collections.emptyList();
+                }
                 addSubheaderObjects(tasks);
                 putDataToList(tasks);
                 listener.onDataLoaded();

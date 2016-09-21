@@ -20,18 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="ru.jvdev.demoapp.client.android.activity.MainActivity">
-
-        <ListView
-            android:id="@+id/tasks_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="@dimen/list_top_bottom_padding"
-            android:paddingBottom="@dimen/list_top_bottom_padding"
-            android:clipToPadding="false"
-            android:divider="@android:color/transparent"/>
-
-    </FrameLayout>
+        tools:context="ru.jvdev.demoapp.client.android.activity.MainActivity"/>
 
     <include
         layout="@layout/error_layout"

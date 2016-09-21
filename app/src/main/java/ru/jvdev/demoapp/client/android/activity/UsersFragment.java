@@ -71,6 +71,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
         usersListView = (ListView) view.findViewById(R.id.users_list_view);
         ArrayAdapter<User> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
         usersListView.setAdapter(adapter);
+        usersListView.setEmptyView(view.findViewById(android.R.id.empty));
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
