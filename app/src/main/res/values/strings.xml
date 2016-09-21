@@ -30,7 +30,6 @@
     <string name="prompt_first_name">Имя</string>
     <string name="prompt_last_name">Фамилия</string>
     <string name="prompt_user_saved">Сотрудник сохранен</string>
-    <string name="error_invalid_length">От %1$d до %2$d символов</string>
     <string name="error_only_latin_letters">Только латинские символы</string>
 
     <string name="title_tasks">Задачи</string>
