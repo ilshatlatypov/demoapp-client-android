@@ -12,6 +12,7 @@
         android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:popupTheme="@style/AppTheme.PopupOverlay"/>
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        android:background="@null"/>
 
 </android.support.v7.widget.Toolbar>
