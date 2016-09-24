@@ -5,6 +5,8 @@
     android:layout_height="match_parent"
     tools:context="ru.jvdev.demoapp.client.android.activity.task.TasksFragment">
 
+    <include layout="@layout/layout_progress"/>
+
     <ListView
         android:id="@+id/tasks_list_view"
         android:layout_width="match_parent"
@@ -14,12 +16,15 @@
         android:clipToPadding="false"
         android:divider="@android:color/transparent"/>
 
-    <TextView android:id="@android:id/empty"
+    <TextView
+        android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:textSize="@dimen/regular_text_size"
         android:text="@string/prompt_no_tasks"/>
+
+    <include layout="@layout/layout_error"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

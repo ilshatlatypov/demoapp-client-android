@@ -69,5 +69,9 @@
     <string name="prompt_task_deleted">Задача удалена</string>
     <string name="error_task_not_found">Задача не найдена</string>
     <string name="title_task_user_spinner">Сотрудник</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <!--<string name="section_format">Hello World from section: %1$d</string>-->
+    <string name="title_tasks_my">Мои задачи</string>
+    <string name="title_tasks_done">Выполненные</string>
 
 </resources>

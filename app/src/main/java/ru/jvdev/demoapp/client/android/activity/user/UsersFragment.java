@@ -13,8 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -22,8 +25,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.activity.DataLoadingListener;
 import ru.jvdev.demoapp.client.android.activity.RefreshableFragment;
+import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
 
@@ -42,7 +47,8 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     private Api.Users usersApi;
 
     private ListView usersListView;
-    private DataLoadingListener listener;
+
+    private ViewSwitcher viewSwitcher;
 
     public UsersFragment() {
         // Required empty public constructor
@@ -67,6 +73,7 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
 
         usersListView = (ListView) view.findViewById(R.id.users_list_view);
         ArrayAdapter<User> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
+        adapter.add(new User());
         usersListView.setAdapter(adapter);
         usersListView.setEmptyView(view.findViewById(android.R.id.empty));
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -74,6 +81,15 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User user = (User) parent.getItemAtPosition(position);
                 openDetailsActivity(user);
+            }
+        });
+
+        viewSwitcher = new ViewSwitcher(getActivity(), view, R.id.progress_bar, R.id.users_list_view, R.id.error_layout);
+        Button retryButton = (Button) view.findViewById(R.id.button_retry);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUsers();
             }
         });
 
@@ -118,18 +134,20 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     }
 
     private void updateUsers() {
+        viewSwitcher.showProgressBar();
+
         Call<UsersPageDto> pageCall = usersApi.getUsers();
         pageCall.enqueue(new Callback<UsersPageDto>() {
             @Override
             public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
                 putDataToList(response.body().getUsers());
-                listener.onDataLoaded();
+                viewSwitcher.showMainLayout();
             }
 
             @Override
             public void onFailure(Call<UsersPageDto> call, Throwable t) {
                 String message = requestFailureMessage(getActivity(), t);
-                listener.onError(message);
+                showError(message);
             }
         });
     }
@@ -141,24 +159,9 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
         adapter.notifyDataSetChanged();
     }
 
-    //region Fragment-Activity attach-detach
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        listener = tryCastAsDataLoadingListener(activity);
+    private void showError(String errorMessage) {
+        TextView errorTextView = (TextView) getActivity().findViewById(R.id.error_text);
+        errorTextView.setText(errorMessage);
+        viewSwitcher.showErrorLayout();
     }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        listener = tryCastAsDataLoadingListener(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-    //endregion
 }

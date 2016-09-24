@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.support.annotation.IdRes;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.View;
 
 /**
@@ -13,13 +14,23 @@ import android.view.View;
  */
 public class ViewSwitcher {
 
+    private View view;
     private Activity activity;
+
     private int progressBarResId;
     private int mainLayoutResId;
     private int errorLayoutResId;
 
     public ViewSwitcher(Activity activity, @IdRes int progressBarResId, @IdRes int mainLayoutResId, @IdRes int errorLayoutResId) {
         this.activity = activity;
+        this.progressBarResId = progressBarResId;
+        this.mainLayoutResId = mainLayoutResId;
+        this.errorLayoutResId = errorLayoutResId;
+    }
+
+    public ViewSwitcher(Activity activity, View view, @IdRes int progressBarResId, @IdRes int mainLayoutResId, @IdRes int errorLayoutResId) {
+        this.activity = activity;
+        this.view = view;
         this.progressBarResId = progressBarResId;
         this.mainLayoutResId = mainLayoutResId;
         this.errorLayoutResId = errorLayoutResId;
@@ -39,9 +50,16 @@ public class ViewSwitcher {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void show(int resId) {
-        View progressBar = activity.findViewById(progressBarResId);
-        View mainLayout = activity.findViewById(mainLayoutResId);
-        View errorLayout = activity.findViewById(errorLayoutResId);
+        View progressBar, mainLayout, errorLayout;
+        if (view != null) {
+            progressBar = view.findViewById(progressBarResId);
+            mainLayout = view.findViewById(mainLayoutResId);
+            errorLayout = view.findViewById(errorLayoutResId);
+        } else {
+            progressBar = activity.findViewById(progressBarResId);
+            mainLayout = activity.findViewById(mainLayoutResId);
+            errorLayout = activity.findViewById(errorLayoutResId);
+        }
 
         boolean showProgressBar = (progressBar.getId() == resId);
         boolean showMainLayout = (mainLayout.getId() == resId);

@@ -33,11 +33,18 @@
             android:label="@string/title_new_user" />
         <activity
             android:name=".activity.user.UserDetailsActivity"
-            android:label="@string/title_user_details" />
-        <activity android:name=".activity.task.TaskEditActivity"
-            android:label="@string/title_new_task" />
-        <activity android:name=".activity.task.TaskDetailsActivity"
-            android:label="@string/title_task_details" />
+            android:label="@string/title_user_details"/>
+        <activity
+            android:name=".activity.task.TaskEditActivity"
+            android:label="@string/title_new_task"/>
+        <activity
+            android:name=".activity.task.TaskDetailsActivity"
+            android:label="@string/title_task_details"/>
+        <!--<activity-->
+            <!--android:name=".activity.Main2Activity"-->
+            <!--android:label="@string/title_activity_main2"-->
+            <!--android:theme="@style/AppTheme.NoActionBar">-->
+        <!--</activity>-->
     </application>
 
 </manifest>

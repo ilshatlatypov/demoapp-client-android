@@ -7,24 +7,11 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="ru.jvdev.demoapp.client.android.activity.MainActivity">
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
-
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="ru.jvdev.demoapp.client.android.activity.MainActivity"/>
-
-    <include
-        layout="@layout/error_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </RelativeLayout>
