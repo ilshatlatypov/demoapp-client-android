@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,17 +15,21 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
-import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.activity.task.TasksFragment;
 import ru.jvdev.demoapp.client.android.activity.user.UsersFragment;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
+
+import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_ALL_DONE;
+import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_ALL_TODO;
+import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_CURRENT_DONE;
+import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_CURRENT_TODO;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity
 
     private Fragment activeFragment;
     private int activeNavItemId;
+
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,8 @@ public class MainActivity extends AppCompatActivity
         if (activeUser.getRole() == Role.EMPLOYEE) {
             navigationView.getMenu().findItem(R.id.nav_users).setVisible(false);
         }
+
+        currentUser = ((DemoApp) getApplicationContext()).getActiveUser();
 
         if (savedInstanceState == null) {
             activeNavItemId = R.id.nav_tasks;
@@ -138,20 +145,49 @@ public class MainActivity extends AppCompatActivity
         ab.setCustomView(toolbar);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        String[] toolbarTitles = new String[]{getString(R.string.title_tasks_my), getString(R.string.title_tasks_done)};
-        spinner.setAdapter(new ToolbarSpinnerAdapter(toolbar.getContext(), toolbarTitles));
-
-        String tag = "tasks_fragment";
-        Fragment fragment = getFragmentManager().findFragmentByTag(tag);
-        if (fragment == null) {
-            fragment = TasksFragment.newInstance();
+        String[] toolbarTitles;
+        final int[] taskFilters;
+        if (currentUser.getRole() == Role.MANAGER) {
+            toolbarTitles = new String[]{
+                    getString(R.string.title_tasks_all_todo),
+                    getString(R.string.title_tasks_all_done),
+                    getString(R.string.title_tasks_my_todo),
+                    getString(R.string.title_tasks_my_done)
+            };
+            taskFilters = new int[]{
+                    TASKS_ALL_TODO,
+                    TASKS_ALL_DONE,
+                    TASKS_CURRENT_TODO,
+                    TASKS_CURRENT_DONE
+            };
+        } else {
+            toolbarTitles = new String[]{
+                    getString(R.string.title_tasks_my_todo),
+                    getString(R.string.title_tasks_my_done)
+            };
+            taskFilters = new int[]{
+                    TASKS_CURRENT_TODO,
+                    TASKS_CURRENT_DONE
+            };
         }
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment, tag)
-                .commit();
-        activeFragment = fragment;
-        activeNavItemId = R.id.nav_tasks;
+        spinner.setAdapter(new ToolbarSpinnerAdapter(toolbar.getContext(), toolbarTitles));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                String tag = "tasks_fragment";
+                int tasksFilter = taskFilters[position];
+                Fragment fragment = TasksFragment.newInstance(tasksFilter);
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, fragment, tag)
+                        .commit();
+                activeFragment = fragment;
+                activeNavItemId = R.id.nav_tasks;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 
     private void showUsersFragment() {

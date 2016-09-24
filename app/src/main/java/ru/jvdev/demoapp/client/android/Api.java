@@ -43,8 +43,20 @@ public class Api {
         @GET("tasks?sort=date&projection=withUser")
         Call<TasksPageDto> list();
 
-        @GET("tasks/search/findByUserUsername?sort=date&projection=withUser")
+        @GET("tasks/search/allByUsername?sort=date&projection=withUser")
         Call<TasksPageDto> listByUser(@Query("username") String username);
+
+        @GET("tasks/search/done?sort=date&projection=withUser")
+        Call<TasksPageDto> listDone();
+
+        @GET("tasks/search/notDone?sort=date&projection=withUser")
+        Call<TasksPageDto> listNotDone();
+
+        @GET("tasks/search/doneByUsername?sort=date&projection=withUser")
+        Call<TasksPageDto> listDoneByUser(@Query("username") String username);
+
+        @GET("tasks/search/notDoneByUsername?sort=date&projection=withUser")
+        Call<TasksPageDto> listNotDoneByUser(@Query("username") String username);
 
         @POST("tasks")
         Call<Void> create(@Body TaskDto task);

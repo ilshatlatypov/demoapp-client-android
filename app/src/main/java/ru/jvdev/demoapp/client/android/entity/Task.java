@@ -11,6 +11,7 @@ public class Task implements Serializable {
     private int id;
     private String title;
     private Date date;
+    private boolean done;
     private User user;
 
     public Task() {
@@ -48,6 +49,14 @@ public class Task implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 
     public User getUser() {

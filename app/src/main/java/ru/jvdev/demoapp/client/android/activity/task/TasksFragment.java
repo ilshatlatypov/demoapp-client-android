@@ -3,7 +3,6 @@ package ru.jvdev.demoapp.client.android.activity.task;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,7 +26,6 @@ import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
-import ru.jvdev.demoapp.client.android.activity.DataLoadingListener;
 import ru.jvdev.demoapp.client.android.activity.RefreshableFragment;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
@@ -42,25 +40,34 @@ import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
-import static ru.jvdev.demoapp.client.android.utils.CommonUtils.tryCastAsDataLoadingListener;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
-    private Api.Tasks tasksApi;
+    private static final String ARG_FILTER = "filter";
 
-    private ListView tasksListView;
-
-    private User activeUser;
+    public static final int TASKS_ALL_DONE = 0;
+    public static final int TASKS_ALL_TODO = 1;
+    public static final int TASKS_CURRENT_DONE = 2;
+    public static final int TASKS_CURRENT_TODO = 3;
 
     private ViewSwitcher viewSwitcher;
+    private ListView tasksListView;
+
+    private Api.Tasks tasksApi;
+    private User currentUser;
+    private int filter;
 
     public TasksFragment() {
         // Required empty public constructor
     }
 
-    public static TasksFragment newInstance() {
-        return new TasksFragment();
+    public static TasksFragment newInstance(int filter) {
+        TasksFragment fragment = new TasksFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_FILTER, filter);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -89,8 +96,8 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
             }
         });
 
-        activeUser = ((DemoApp) getActivity().getApplicationContext()).getActiveUser();
-        if (activeUser.getRole() == Role.EMPLOYEE) {
+        currentUser = ((DemoApp) getActivity().getApplicationContext()).getActiveUser();
+        if (currentUser.getRole() == Role.EMPLOYEE) {
             fab.setVisibility(View.GONE);
         }
 
@@ -103,6 +110,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
             }
         });
 
+        filter = getArguments().getInt(ARG_FILTER);
         tasksApi = rest(getActivity()).getTasksApi();
 
         updateTasks();
@@ -145,8 +153,18 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     private void updateTasks() {
         viewSwitcher.showProgressBar();
 
-        Call<TasksPageDto> pageCall = activeUser.getRole() == Role.MANAGER ?
-                tasksApi.list() : tasksApi.listByUser(activeUser.getUsername());
+        String username = currentUser.getUsername();
+        Call<TasksPageDto> pageCall;
+        if (filter == TASKS_ALL_DONE) {
+            pageCall = tasksApi.listDone();
+        } else if (filter == TASKS_ALL_TODO) {
+            pageCall = tasksApi.listNotDone();
+        } else if (filter == TASKS_CURRENT_DONE) {
+            pageCall = tasksApi.listDoneByUser(username);
+        } else { // filter == TASKS_CURRENT_TODO
+            pageCall = tasksApi.listNotDoneByUser(username);
+        }
+
         pageCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {

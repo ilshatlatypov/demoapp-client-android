@@ -71,7 +71,10 @@
     <string name="title_task_user_spinner">Сотрудник</string>
     <string name="title_activity_main2">Main2Activity</string>
     <!--<string name="section_format">Hello World from section: %1$d</string>-->
-    <string name="title_tasks_my">Мои задачи</string>
-    <string name="title_tasks_done">Выполненные</string>
+
+    <string name="title_tasks_all_todo">Текущие задачи</string>
+    <string name="title_tasks_all_done">Все выполненные</string>
+    <string name="title_tasks_my_todo">Мои задачи</string>
+    <string name="title_tasks_my_done">Мои выполненные</string>
 
 </resources>
