@@ -12,14 +12,7 @@
     tools:context="ru.jvdev.demoapp.client.android.activity.LoginActivity">
 
     <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+    <include layout="@layout/layout_progress"/>
 
     <ScrollView
         android:id="@+id/login_form"

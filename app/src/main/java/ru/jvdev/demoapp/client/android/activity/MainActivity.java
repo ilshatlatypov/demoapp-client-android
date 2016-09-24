@@ -65,7 +65,12 @@ public class MainActivity extends AppCompatActivity
         } else {
             activeNavItemId = savedInstanceState.getInt(STATE_ACTIVE_NAV_ITEM);
         }
-        //displayFragmentByNavItemId(activeNavItemId);
+
+        if (activeNavItemId == R.id.nav_users) {
+            showUsersFragment();
+        } else if (activeNavItemId == R.id.nav_tasks) {
+            showTasksFragment();
+        }
     }
 
     @Override
@@ -108,48 +113,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_users) {
-            ActionBar ab = getSupportActionBar();
-            ab.setDisplayShowCustomEnabled(false);
-            ab.setDisplayShowTitleEnabled(true);
-            ab.setTitle(R.string.prompt_users);
-
-            String tag = "users_fragment";
-            Fragment fragment = getFragmentManager().findFragmentByTag(tag);
-            if (fragment == null) {
-                fragment = UsersFragment.newInstance();
-            }
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment, tag)
-                    .commit();
-            activeFragment = fragment;
-            activeNavItemId = R.id.nav_users;
-        } if (id == R.id.nav_tasks) {
-            ActionBar ab = getSupportActionBar();
-
-            View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_with_spinner, null);
-            Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-
-            ab.setTitle("");
-            ab.setDisplayShowTitleEnabled(false);
-            ab.setDisplayShowCustomEnabled(true);
-            ab.setCustomView(toolbar);
-
-            Spinner spinner = (Spinner) findViewById(R.id.spinner);
-            String[] toolbarTitles = new String[]{getString(R.string.title_tasks_my), getString(R.string.title_tasks_done)};
-            spinner.setAdapter(new ToolbarSpinnerAdapter(toolbar.getContext(), toolbarTitles));
-
-            String tag = "tasks_fragment";
-            Fragment fragment = getFragmentManager().findFragmentByTag(tag);
-            if (fragment == null) {
-                fragment = TasksFragment.newInstance();
-            }
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment, tag)
-                    .commit();
-            activeFragment = fragment;
-            activeNavItemId = R.id.nav_tasks;
+            showUsersFragment();
+        } else if (id == R.id.nav_tasks) {
+            showTasksFragment();
         } else if (id == R.id.nav_logout) {
             ((DemoApp) getApplicationContext()).setActiveUser(null);
             gotoLoginActivity();
@@ -158,6 +124,53 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showTasksFragment() {
+        ActionBar ab = getSupportActionBar();
+
+        View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_with_spinner, null);
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+
+        ab.setTitle("");
+        ab.setDisplayShowTitleEnabled(false);
+        ab.setDisplayShowCustomEnabled(true);
+        ab.setCustomView(toolbar);
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        String[] toolbarTitles = new String[]{getString(R.string.title_tasks_my), getString(R.string.title_tasks_done)};
+        spinner.setAdapter(new ToolbarSpinnerAdapter(toolbar.getContext(), toolbarTitles));
+
+        String tag = "tasks_fragment";
+        Fragment fragment = getFragmentManager().findFragmentByTag(tag);
+        if (fragment == null) {
+            fragment = TasksFragment.newInstance();
+        }
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment, tag)
+                .commit();
+        activeFragment = fragment;
+        activeNavItemId = R.id.nav_tasks;
+    }
+
+    private void showUsersFragment() {
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayShowCustomEnabled(false);
+        ab.setDisplayShowTitleEnabled(true);
+        ab.setTitle(R.string.prompt_users);
+
+        String tag = "users_fragment";
+        Fragment fragment = getFragmentManager().findFragmentByTag(tag);
+        if (fragment == null) {
+            fragment = UsersFragment.newInstance();
+        }
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment, tag)
+                .commit();
+        activeFragment = fragment;
+        activeNavItemId = R.id.nav_users;
     }
 
     private void gotoLoginActivity() {
