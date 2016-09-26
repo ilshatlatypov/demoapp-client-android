@@ -6,19 +6,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -134,11 +136,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_refresh) {
             refreshActiveFragment();
         } else if (id == R.id.action_search) {
-            if (!inSearchMode) {
-                enterSearchMode();
-            } else {
-                clearSearchField();
-            }
+            enterSearchMode();
         }
 
         return super.onOptionsItemSelected(item);
@@ -247,7 +245,29 @@ public class MainActivity extends AppCompatActivity
         ActionBar ab = getSupportActionBar();
 
         View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_search, null);
-        EditText searchText = (EditText) view.findViewById(R.id.text_search);
+
+        final EditText searchText = (EditText) view.findViewById(R.id.text_search);
+        final ImageButton clearSearchButton = (ImageButton) view.findViewById(R.id.clear_search_button);
+
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence text, int i, int i1, int i2) {
+                clearSearchButton.setVisibility(text.length() > 0 ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        clearSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchText.setText("");
+            }
+        });
 
         toolbarState = new ToolbarState();
         if (ab.getCustomView() != null) {
@@ -256,7 +276,7 @@ public class MainActivity extends AppCompatActivity
             toolbarState.setTitleState(ab.getTitle());
             ab.setDisplayShowTitleEnabled(false);
         }
-        ab.setCustomView(searchText);
+        ab.setCustomView(view);
         ab.setDisplayShowCustomEnabled(true);
 
         drawerToggle.setDrawerIndicatorEnabled(false);
@@ -264,8 +284,7 @@ public class MainActivity extends AppCompatActivity
 
         searchText.requestFocus();
         KeyboardUtils.showKeyboard(MainActivity.this);
-        menu.findItem(R.id.action_search)
-                .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_close));
+        menu.findItem(R.id.action_search).setVisible(false);
 
         inSearchMode = true;
     }
@@ -282,14 +301,9 @@ public class MainActivity extends AppCompatActivity
         ab.setDisplayHomeAsUpEnabled(false);
         drawerToggle.setDrawerIndicatorEnabled(true);
 
-        menu.findItem(R.id.action_search).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_search));
+        menu.findItem(R.id.action_search).setVisible(true);
         KeyboardUtils.hideKeyboard(MainActivity.this);
         inSearchMode = false;
-    }
-
-    private void clearSearchField() {
-        EditText searchText = (EditText) findViewById(R.id.text_search);
-        searchText.setText("");
     }
 
     private static void setActionBarTitle(ActionBar ab, CharSequence title) {
