@@ -37,6 +37,7 @@ import ru.jvdev.demoapp.client.android.utils.TaskUtils;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.CREATE;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.DETAILS;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DELETED;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.MARKED_AS_DONE;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
@@ -138,6 +139,9 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         } else if (requestCode == DETAILS) {
             if (resultCode == DELETED) {
                 Snackbar.make(tasksListView, R.string.prompt_task_deleted, Snackbar.LENGTH_SHORT).show();
+                updateTasks();
+            } else if (resultCode == MARKED_AS_DONE) {
+                Snackbar.make(tasksListView, R.string.prompt_task_marked_as_done, Snackbar.LENGTH_SHORT).show();
                 updateTasks();
             } else if (resultCode == NEED_PARENT_REFRESH) {
                 updateTasks();

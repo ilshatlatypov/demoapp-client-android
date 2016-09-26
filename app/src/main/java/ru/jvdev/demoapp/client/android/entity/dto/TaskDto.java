@@ -15,6 +15,7 @@ public class TaskDto {
     private int id;
     private String title;
     private Date date;
+    private boolean done;
     @JsonAdapter(UserDtoTypeAdapterFactory.class)
     private UserDto user;
 
@@ -22,6 +23,7 @@ public class TaskDto {
         this.id = task.getId();
         this.title = task.getTitle();
         this.date = task.getDate();
+        this.done = task.isDone();
 
         User user = task.getUser();
         if (user != null) {
@@ -32,6 +34,7 @@ public class TaskDto {
     public Task toTask() {
         Task task = new Task(title, date);
         task.setId(id);
+        task.setDone(done);
         if (user != null) {
             task.setUser(user.toUser());
         }

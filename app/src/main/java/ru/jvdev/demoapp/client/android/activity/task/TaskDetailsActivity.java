@@ -43,7 +43,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     private boolean actionsVisible = false;
     private boolean needParentRefresh = false;
-    private boolean deletionInProgress = false;
+    private boolean updateInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,17 +80,16 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 setResult(NEED_PARENT_REFRESH, new Intent());
             }
             finish();
-            return true;
         } else if (id == R.id.action_edit) {
-            if (!deletionInProgress) {
+            if (!updateInProgress) {
                 openEditActivity();
             }
-            return true;
         } else if (id == R.id.action_delete) {
-            if (!deletionInProgress) {
+            if (!updateInProgress) {
                 attemptDelete();
             }
-            return true;
+        } else if (id == R.id.action_done) {
+            markTaskAsDone();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -104,6 +103,32 @@ public class TaskDetailsActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.setGroupVisible(R.id.group_task_actions, actionsVisible);
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void markTaskAsDone() {
+        Snackbar.make(content(), R.string.prompt_sending_request, Snackbar.LENGTH_INDEFINITE).show();
+
+        updateInProgress = true;
+        Task task = new Task();
+        task.setDone(true);
+        Call<Void> deleteUserCall = tasksApi.patch(taskId, new TaskDto(task));
+        deleteUserCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    setResult(ActivityResultCode.MARKED_AS_DONE, new Intent());
+                    finish();
+                }
+                updateInProgress = false;
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                String message = requestFailureMessage(TaskDetailsActivity.this, t);
+                showErrorAsSnackbarWithMarkAsDoneRetry(message);
+                updateInProgress = false;
+            }
+        });
     }
 
     //region Deletion
@@ -123,23 +148,23 @@ public class TaskDetailsActivity extends AppCompatActivity {
     private void sendDeleteTaskRequest(int taskId) {
         Snackbar.make(content(), R.string.prompt_deletion, Snackbar.LENGTH_INDEFINITE).show();
 
-        deletionInProgress = true;
-        Call<Void> deleteUserCall = tasksApi.delete(taskId);
-        deleteUserCall.enqueue(new Callback<Void>() {
+        updateInProgress = true;
+        Call<Void> deleteCall = tasksApi.delete(taskId);
+        deleteCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful() || response.code() == HttpCodes.NOT_FOUND) {
                     setResult(ActivityResultCode.DELETED, new Intent());
                     finish();
                 }
-                deletionInProgress = false;
+                updateInProgress = false;
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 String message = requestFailureMessage(TaskDetailsActivity.this, t);
-                showErrorAsSnackbarWithRetry(message);
-                deletionInProgress = false;
+                showErrorAsSnackbarWithDeleteRetry(message);
+                updateInProgress = false;
             }
         });
     }
@@ -188,12 +213,22 @@ public class TaskDetailsActivity extends AppCompatActivity {
         viewSwitcher.showErrorLayout();
     }
 
-    private void showErrorAsSnackbarWithRetry(String errorMessage) {
+    private void showErrorAsSnackbarWithDeleteRetry(String errorMessage) {
         Snackbar.make(content(), errorMessage, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         attemptDelete();
+                    }
+                }).show();
+    }
+
+    private void showErrorAsSnackbarWithMarkAsDoneRetry(String errorMessage) {
+        Snackbar.make(content(), errorMessage, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        markTaskAsDone();
                     }
                 }).show();
     }
