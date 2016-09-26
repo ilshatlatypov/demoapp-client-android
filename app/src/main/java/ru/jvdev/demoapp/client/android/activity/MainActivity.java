@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ import ru.jvdev.demoapp.client.android.activity.task.TasksFragment;
 import ru.jvdev.demoapp.client.android.activity.user.UsersFragment;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.User;
+import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
 
 import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_ALL_DONE;
 import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_ALL_TODO;
@@ -41,6 +44,12 @@ public class MainActivity extends AppCompatActivity
 
     private User currentUser;
 
+    private ActionBarDrawerToggle drawerToggle;
+
+    private Menu menu;
+
+    private boolean inSearchMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,10 +58,18 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        drawerToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        drawer.addDrawerListener(drawerToggle);
+        drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (inSearchMode) {
+                    exitSearchMode();
+                }
+            }
+        });
+        drawerToggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -88,16 +105,64 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (inSearchMode) {
+            exitSearchMode();
         } else {
-            super.onBackPressed();
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                super.onBackPressed();
+            }
         }
+    }
+
+    private void enterSearchMode() {
+        ActionBar ab = getSupportActionBar();
+
+        View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_search, null);
+        EditText searchText = (EditText) view.findViewById(R.id.text_search);
+
+        ab.setTitle("");
+        ab.setDisplayShowTitleEnabled(false);
+        ab.setCustomView(searchText);
+        ab.setDisplayShowCustomEnabled(true);
+
+        drawerToggle.setDrawerIndicatorEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        searchText.requestFocus();
+        KeyboardUtils.showKeyboard(MainActivity.this);
+        menu.findItem(R.id.action_search)
+                .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_close));
+
+        inSearchMode = true;
+    }
+
+    private void exitSearchMode() {
+        ActionBar ab = getSupportActionBar();
+
+        ab.setDisplayShowCustomEnabled(false);
+        ab.setTitle("Сотрудники");
+        ab.setDisplayShowTitleEnabled(true);
+
+        ab.setDisplayHomeAsUpEnabled(false);
+        drawerToggle.setDrawerIndicatorEnabled(true);
+
+        KeyboardUtils.hideKeyboard(MainActivity.this);
+
+        menu.findItem(R.id.action_search).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_search));
+        inSearchMode = false;
+    }
+
+    private void clearSearchField() {
+        EditText searchText = (EditText) findViewById(R.id.text_search);
+        searchText.setText("");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -109,6 +174,12 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             refreshActiveFragment();
+        } else if (id == R.id.action_search) {
+            if (!inSearchMode) {
+                enterSearchMode();
+            } else {
+                clearSearchField();
+            }
         }
 
         return super.onOptionsItemSelected(item);

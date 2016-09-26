@@ -36,6 +36,7 @@
 
     <!-- Common -->
     <string name="action_refresh">Обновить</string>
+    <string name="action_search">Поиск</string>
     <string name="action_retry">Повторить</string>
     <string name="action_settings">Настройки</string>
     <string name="error_field_required">Обязательное поле</string>
@@ -76,5 +77,6 @@
     <string name="title_tasks_all_done">Все выполненные</string>
     <string name="title_tasks_my_todo">Мои задачи</string>
     <string name="title_tasks_my_done">Мои выполненные</string>
+    <string name="prompt_search">поиск</string>
 
 </resources>
