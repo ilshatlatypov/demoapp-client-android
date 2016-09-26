@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity
 
     private Menu menu;
 
+    private ToolbarState toolbarState;
     private boolean inSearchMode = false;
 
     @Override
@@ -117,49 +120,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void enterSearchMode() {
-        ActionBar ab = getSupportActionBar();
-
-        View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_search, null);
-        EditText searchText = (EditText) view.findViewById(R.id.text_search);
-
-        ab.setTitle("");
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setCustomView(searchText);
-        ab.setDisplayShowCustomEnabled(true);
-
-        drawerToggle.setDrawerIndicatorEnabled(false);
-        ab.setDisplayHomeAsUpEnabled(true);
-
-        searchText.requestFocus();
-        KeyboardUtils.showKeyboard(MainActivity.this);
-        menu.findItem(R.id.action_search)
-                .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_close));
-
-        inSearchMode = true;
-    }
-
-    private void exitSearchMode() {
-        ActionBar ab = getSupportActionBar();
-
-        ab.setDisplayShowCustomEnabled(false);
-        ab.setTitle("Сотрудники");
-        ab.setDisplayShowTitleEnabled(true);
-
-        ab.setDisplayHomeAsUpEnabled(false);
-        drawerToggle.setDrawerIndicatorEnabled(true);
-
-        KeyboardUtils.hideKeyboard(MainActivity.this);
-
-        menu.findItem(R.id.action_search).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_search));
-        inSearchMode = false;
-    }
-
-    private void clearSearchField() {
-        EditText searchText = (EditText) findViewById(R.id.text_search);
-        searchText.setText("");
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
@@ -206,13 +166,8 @@ public class MainActivity extends AppCompatActivity
 
     private void showTasksFragment() {
         ActionBar ab = getSupportActionBar();
-
         Spinner spinner = (Spinner) LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_spinner, null);
-
-        ab.setTitle("");
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setDisplayShowCustomEnabled(true);
-        ab.setCustomView(spinner);
+        setActionBarCustomView(ab, spinner);
 
         String[] toolbarTitles;
         final int[] taskFilters;
@@ -262,9 +217,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showUsersFragment() {
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowCustomEnabled(false);
-        ab.setDisplayShowTitleEnabled(true);
-        ab.setTitle(R.string.prompt_users);
+        setActionBarTitle(ab, R.string.prompt_users);
 
         String tag = "users_fragment";
         Fragment fragment = getFragmentManager().findFragmentByTag(tag);
@@ -288,6 +241,103 @@ public class MainActivity extends AppCompatActivity
     private void refreshActiveFragment() {
         if (activeFragment != null && activeFragment instanceof RefreshableFragment) {
             ((RefreshableFragment) activeFragment).refreshFragmentData();
+        }
+    }
+
+    private void enterSearchMode() {
+        ActionBar ab = getSupportActionBar();
+
+        View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_search, null);
+        EditText searchText = (EditText) view.findViewById(R.id.text_search);
+
+        toolbarState = new ToolbarState();
+        if (ab.getCustomView() != null) {
+            toolbarState.setCustomViewState(ab.getCustomView());
+        } else {
+            toolbarState.setTitleState(ab.getTitle());
+            ab.setDisplayShowTitleEnabled(false);
+        }
+        ab.setCustomView(searchText);
+        ab.setDisplayShowCustomEnabled(true);
+
+        drawerToggle.setDrawerIndicatorEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        searchText.requestFocus();
+        KeyboardUtils.showKeyboard(MainActivity.this);
+        menu.findItem(R.id.action_search)
+                .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_close));
+
+        inSearchMode = true;
+    }
+
+    private void exitSearchMode() {
+        ActionBar ab = getSupportActionBar();
+
+        if (toolbarState.isCustomViewState()) {
+            ab.setCustomView(toolbarState.getCustomView());
+        } else {
+            setActionBarTitle(ab, toolbarState.getTitle());
+        }
+
+        ab.setDisplayHomeAsUpEnabled(false);
+        drawerToggle.setDrawerIndicatorEnabled(true);
+
+        menu.findItem(R.id.action_search).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_search));
+        KeyboardUtils.hideKeyboard(MainActivity.this);
+        inSearchMode = false;
+    }
+
+    private void clearSearchField() {
+        EditText searchText = (EditText) findViewById(R.id.text_search);
+        searchText.setText("");
+    }
+
+    private static void setActionBarTitle(ActionBar ab, CharSequence title) {
+        ab.setDisplayShowCustomEnabled(false);
+        ab.setCustomView(null);
+        ab.setTitle(title);
+        ab.setDisplayShowTitleEnabled(true);
+    }
+
+    private static void setActionBarTitle(ActionBar ab, @StringRes int titleRes) {
+        ab.setDisplayShowCustomEnabled(false);
+        ab.setCustomView(null);
+        ab.setTitle(titleRes);
+        ab.setDisplayShowTitleEnabled(true);
+    }
+
+    private static void setActionBarCustomView(ActionBar ab, View view) {
+        ab.setDisplayShowTitleEnabled(false);
+        ab.setTitle(null);
+        ab.setCustomView(view);
+        ab.setDisplayShowCustomEnabled(true);
+    }
+
+    private static class ToolbarState {
+        private View customView;
+        private CharSequence title;
+
+        public void setCustomViewState(View customView) {
+            this.customView = customView;
+            this.title = null;
+        }
+
+        public void setTitleState(CharSequence title) {
+            this.title = title;
+            this.customView = null;
+        }
+
+        public boolean isCustomViewState() {
+            return customView != null;
+        }
+
+        public View getCustomView() {
+            return customView;
+        }
+
+        public CharSequence getTitle() {
+            return title;
         }
     }
 }
