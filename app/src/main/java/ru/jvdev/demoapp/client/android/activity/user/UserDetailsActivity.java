@@ -19,17 +19,17 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
+import ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UserDto;
-import ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.EDIT;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
-import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
-import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 
 public class UserDetailsActivity extends AppCompatActivity {
 

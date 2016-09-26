@@ -1,9 +1,7 @@
 package ru.jvdev.demoapp.client.android.activity.user;
 
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,7 +15,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -26,9 +23,7 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
-import ru.jvdev.demoapp.client.android.activity.DataLoadingListener;
 import ru.jvdev.demoapp.client.android.activity.RefreshableFragment;
-import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
 
@@ -37,10 +32,9 @@ import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.DETAILS;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DELETED;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
-import static ru.jvdev.demoapp.client.android.utils.CommonUtils.tryCastAsDataLoadingListener;
-import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 
 public class UsersFragment extends Fragment implements RefreshableFragment {
 

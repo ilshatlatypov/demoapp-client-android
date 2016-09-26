@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.support.annotation.IdRes;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.View;
 
 /**

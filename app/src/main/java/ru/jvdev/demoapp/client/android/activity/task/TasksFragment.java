@@ -38,9 +38,9 @@ import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.DETAILS;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DELETED;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
-import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 
 public class TasksFragment extends Fragment implements RefreshableFragment {
 
