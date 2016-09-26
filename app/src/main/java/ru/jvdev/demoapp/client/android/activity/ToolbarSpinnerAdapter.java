@@ -19,7 +19,7 @@ public class ToolbarSpinnerAdapter extends ArrayAdapter<String> implements Theme
     private final ThemedSpinnerAdapter.Helper mDropDownHelper;
 
     public ToolbarSpinnerAdapter(Context context, String[] objects) {
-        super(context, R.layout.toolbar_spinner, objects);
+        super(context, R.layout.toolbar_spinner_layout, objects);
         mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
     }
 

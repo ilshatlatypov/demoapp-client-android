@@ -207,15 +207,13 @@ public class MainActivity extends AppCompatActivity
     private void showTasksFragment() {
         ActionBar ab = getSupportActionBar();
 
-        View view = LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_with_spinner, null);
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Spinner spinner = (Spinner) LayoutInflater.from(ab.getThemedContext()).inflate(R.layout.toolbar_spinner, null);
 
         ab.setTitle("");
         ab.setDisplayShowTitleEnabled(false);
         ab.setDisplayShowCustomEnabled(true);
-        ab.setCustomView(toolbar);
+        ab.setCustomView(spinner);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
         String[] toolbarTitles;
         final int[] taskFilters;
         if (currentUser.getRole() == Role.MANAGER) {
@@ -241,7 +239,8 @@ public class MainActivity extends AppCompatActivity
                     TASKS_CURRENT_DONE
             };
         }
-        spinner.setAdapter(new ToolbarSpinnerAdapter(toolbar.getContext(), toolbarTitles));
+
+        spinner.setAdapter(new ToolbarSpinnerAdapter(spinner.getContext(), toolbarTitles));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
