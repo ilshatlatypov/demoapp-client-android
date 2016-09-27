@@ -17,10 +17,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
 import ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode;
+import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
+import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.TaskDto;
 import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
@@ -45,6 +48,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
     private boolean needParentRefresh = false;
     private boolean updateInProgress = false;
 
+    private User currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +67,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
         taskId = getIntent().getIntExtra(ID, 0);
         tasksApi = rest(this).getTasksApi();
+
+        currentUser = ((DemoApp) getApplicationContext()).getActiveUser();
 
         sendGetDetailsRequest();
     }
@@ -101,7 +108,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.setGroupVisible(R.id.group_task_actions, actionsVisible);
+        menu.setGroupVisible(R.id.group_manager_actions, actionsVisible && (currentUser.getRole() == Role.MANAGER));
+        menu.setGroupVisible(R.id.group_common_actions, actionsVisible);
         return super.onPrepareOptionsMenu(menu);
     }
 
