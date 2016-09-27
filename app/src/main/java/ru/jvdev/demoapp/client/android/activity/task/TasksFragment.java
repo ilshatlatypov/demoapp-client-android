@@ -38,8 +38,9 @@ import ru.jvdev.demoapp.client.android.utils.TaskUtils;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.CREATE;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.DETAILS;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DELETED;
-import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.MARKED_AS_DONE;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DONE_STATE_CHANGED;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.DONE;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
@@ -141,13 +142,15 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
             if (resultCode == DELETED) {
                 Snackbar.make(tasksListView, R.string.prompt_task_deleted, Snackbar.LENGTH_SHORT).show();
                 updateTasks();
-            } else if (resultCode == MARKED_AS_DONE) {
-                final int doneTaskId = data.getIntExtra(ID, 0);
-                Snackbar.make(tasksListView, R.string.prompt_task_marked_as_done, Snackbar.LENGTH_LONG)
+            } else if (resultCode == DONE_STATE_CHANGED) {
+                final int taskId = data.getIntExtra(ID, 0);
+                final boolean actualDoneState = data.getBooleanExtra(DONE, false);
+                int messageResId = actualDoneState ? R.string.prompt_task_marked_as_done : R.string.prompt_task_marked_as_not_done;
+                Snackbar.make(tasksListView, messageResId, Snackbar.LENGTH_LONG)
                         .setAction(R.string.action_cancel, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                markTaskAsNotDone(doneTaskId);
+                                revertTaskDoneState(taskId, actualDoneState);
                             }
                         }).show();
                 updateTasks();
@@ -211,17 +214,20 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         viewSwitcher.showErrorLayout();
     }
 
-    private void markTaskAsNotDone(final int taskId) {
+    private void revertTaskDoneState(final int taskId, final boolean actualDoneState) {
         Snackbar.make(tasksListView, R.string.prompt_sending_request, Snackbar.LENGTH_INDEFINITE).show();
 
+        final boolean revertedDoneState = !actualDoneState;
         Task task = new Task();
-        task.setDone(false);
+        task.setDone(revertedDoneState);
+
         Call<Void> deleteUserCall = tasksApi.patch(taskId, new TaskDto(task));
         deleteUserCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Snackbar.make(tasksListView, R.string.prompt_task_done_canceled, Snackbar.LENGTH_SHORT).show();
+                    int messageResId = revertedDoneState ? R.string.prompt_task_undone_canceled : R.string.prompt_task_done_canceled;
+                    Snackbar.make(tasksListView, messageResId, Snackbar.LENGTH_SHORT).show();
                     updateTasks();
                 }
             }
@@ -229,17 +235,17 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 String message = requestFailureMessage(getActivity(), t);
-                showErrorAsSnackbarWithMarkAsNotDoneRetry(message, taskId);
+                showErrorAsSnackbarWithRevertTaskDoneStateRetry(message, taskId, actualDoneState);
             }
         });
     }
 
-    private void showErrorAsSnackbarWithMarkAsNotDoneRetry(String errorMessage, final int taskId) {
+    private void showErrorAsSnackbarWithRevertTaskDoneStateRetry(String errorMessage, final int taskId, final boolean actualDoneState) {
         Snackbar.make(tasksListView, errorMessage, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        markTaskAsNotDone(taskId);
+                        revertTaskDoneState(taskId, actualDoneState);
                     }
                 }).show();
     }

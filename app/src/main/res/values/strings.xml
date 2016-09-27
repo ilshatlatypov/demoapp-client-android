@@ -78,10 +78,15 @@
     <string name="title_tasks_my_todo">Мои задачи</string>
     <string name="title_tasks_my_done">Мои выполненные</string>
     <string name="prompt_search">поиск</string>
-    <string name="action_mark_as_done">Отметить как выполненную</string>
-    <string name="prompt_task_marked_as_done">Задача отмечена как выполненная</string>
-    <string name="prompt_sending_request">Отправка запроса...</string>
+
+    <string name="prompt_sending_request">Отправка запроса…</string>
     <string name="action_cancel">отмена</string>
-    <string name="prompt_task_done_canceled">Задача возвращена в состояние \'невыполнена\'</string>
+
+    <string name="action_mark_as_done">Отметить как выполненную</string>
+    <string name="action_mark_as_not_done">Отметить как невыполненную</string>
+    <string name="prompt_task_marked_as_done">Задача отмечена как выполненная</string>
+    <string name="prompt_task_marked_as_not_done">Задача отмечена как невыполненная</string>
+    <string name="prompt_task_done_canceled">Задача возвращена в состояние невыполнена</string>
+    <string name="prompt_task_undone_canceled">Задача возвращена в состояние выполнена</string>
 
 </resources>

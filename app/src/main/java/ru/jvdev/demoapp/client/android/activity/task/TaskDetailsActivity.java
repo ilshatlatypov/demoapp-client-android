@@ -29,7 +29,9 @@ import ru.jvdev.demoapp.client.android.utils.DateUtils;
 import ru.jvdev.demoapp.client.android.utils.HttpCodes;
 
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityRequestCode.EDIT;
+import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.DONE_STATE_CHANGED;
 import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.NEED_PARENT_REFRESH;
+import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.DONE;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
@@ -96,7 +98,9 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 attemptDelete();
             }
         } else if (id == R.id.action_done) {
-            markTaskAsDone();
+            if (!updateInProgress) {
+                changeTaskDoneState(!task.isDone());
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -110,23 +114,27 @@ public class TaskDetailsActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.setGroupVisible(R.id.group_manager_actions, actionsVisible && (currentUser.getRole() == Role.MANAGER));
         menu.setGroupVisible(R.id.group_common_actions, actionsVisible);
+        if (task != null) {
+            menu.findItem(R.id.action_done)
+                    .setTitle(task.isDone() ? R.string.action_mark_as_not_done : R.string.action_mark_as_done);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private void markTaskAsDone() {
+    private void changeTaskDoneState(final boolean newDoneState) {
         Snackbar.make(content(), R.string.prompt_sending_request, Snackbar.LENGTH_INDEFINITE).show();
 
         updateInProgress = true;
         Task task = new Task();
-        task.setDone(true);
-        Call<Void> deleteUserCall = tasksApi.patch(taskId, new TaskDto(task));
-        deleteUserCall.enqueue(new Callback<Void>() {
+        task.setDone(newDoneState);
+        tasksApi.patch(taskId, new TaskDto(task)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Intent intent = new Intent();
                     intent.putExtra(ID, taskId);
-                    setResult(ActivityResultCode.MARKED_AS_DONE, intent);
+                    intent.putExtra(DONE, newDoneState);
+                    setResult(DONE_STATE_CHANGED, intent);
                     finish();
                 }
                 updateInProgress = false;
@@ -135,7 +143,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 String message = requestFailureMessage(TaskDetailsActivity.this, t);
-                showErrorAsSnackbarWithMarkAsDoneRetry(message);
+                showErrorAsSnackbarWithMarkAsDoneRetry(message, newDoneState);
                 updateInProgress = false;
             }
         });
@@ -233,12 +241,12 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 }).show();
     }
 
-    private void showErrorAsSnackbarWithMarkAsDoneRetry(String errorMessage) {
+    private void showErrorAsSnackbarWithMarkAsDoneRetry(String errorMessage, final boolean done) {
         Snackbar.make(content(), errorMessage, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        markTaskAsDone();
+                        changeTaskDoneState(done);
                     }
                 }).show();
     }
