@@ -116,7 +116,9 @@ public class TaskDetailsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    setResult(ActivityResultCode.MARKED_AS_DONE, new Intent());
+                    Intent intent = new Intent();
+                    intent.putExtra(ID, taskId);
+                    setResult(ActivityResultCode.MARKED_AS_DONE, intent);
                     finish();
                 }
                 updateInProgress = false;
