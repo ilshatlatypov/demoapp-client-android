@@ -36,6 +36,7 @@ import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_
 import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_ALL_TODO;
 import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_CURRENT_DONE;
 import static ru.jvdev.demoapp.client.android.activity.task.TasksFragment.TASKS_CURRENT_TODO;
+import static ru.jvdev.demoapp.client.android.utils.StringConstants.EMPTY;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -236,8 +237,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void refreshActiveFragment() {
-        if (activeFragment != null && activeFragment instanceof RefreshableFragment) {
-            ((RefreshableFragment) activeFragment).refreshFragmentData();
+        if (activeFragment != null && activeFragment instanceof Refreshable) {
+            ((Refreshable) activeFragment).refreshData();
         }
     }
 
@@ -253,6 +254,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence text, int i, int i1, int i2) {
                 clearSearchButton.setVisibility(text.length() > 0 ? View.VISIBLE : View.GONE);
+                ((Searchable) activeFragment).applySearch(text.toString());
             }
 
             @Override
@@ -265,7 +267,7 @@ public class MainActivity extends AppCompatActivity
         clearSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchText.setText("");
+                searchText.setText(EMPTY);
             }
         });
 
@@ -291,6 +293,8 @@ public class MainActivity extends AppCompatActivity
 
     private void exitSearchMode() {
         ActionBar ab = getSupportActionBar();
+        EditText searchText = (EditText) ab.getCustomView().findViewById(R.id.text_search);
+        searchText.setText(EMPTY);
 
         if (toolbarState.isCustomViewState()) {
             ab.setCustomView(toolbarState.getCustomView());

@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +27,8 @@ import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
-import ru.jvdev.demoapp.client.android.activity.RefreshableFragment;
+import ru.jvdev.demoapp.client.android.activity.Refreshable;
+import ru.jvdev.demoapp.client.android.activity.Searchable;
 import ru.jvdev.demoapp.client.android.entity.Role;
 import ru.jvdev.demoapp.client.android.entity.Task;
 import ru.jvdev.demoapp.client.android.entity.User;
@@ -45,7 +47,7 @@ import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 
-public class TasksFragment extends Fragment implements RefreshableFragment {
+public class TasksFragment extends Fragment implements Refreshable, Searchable {
 
     private static final String ARG_FILTER = "filter";
 
@@ -56,6 +58,7 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
 
     private ViewSwitcher viewSwitcher;
     private ListView tasksListView;
+    private List<Task> allTasks;
 
     private Api.Tasks tasksApi;
     private User currentUser;
@@ -161,8 +164,25 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
     }
 
     @Override
-    public void refreshFragmentData() {
+    public void refreshData() {
         updateTasks();
+    }
+
+    @Override
+    public void applySearch(String searchString) {
+        if (allTasks == null) {
+            return;
+        }
+
+        List<Task> filtered = new ArrayList<>();
+        for (Task t : allTasks) {
+            if (t.getTitle().toLowerCase().contains(searchString.toLowerCase())) {
+                filtered.add(t);
+            }
+        }
+        List<Task> filteredWithSubheaders =
+                TaskUtils.addSubheaderTasksByDateGroups(getActivity(), filtered);
+        putDataToList(filteredWithSubheaders);
     }
 
     private void updateTasks() {
@@ -183,19 +203,20 @@ public class TasksFragment extends Fragment implements RefreshableFragment {
         pageCall.enqueue(new Callback<TasksPageDto>() {
             @Override
             public void onResponse(Call<TasksPageDto> call, Response<TasksPageDto> response) {
-                List<Task> tasks = null;
                 if (response.isSuccessful()) {
-                    tasks = response.body().getTasks();
+                    allTasks = response.body().getTasks();
                 } else if (response.code() == HttpCodes.NOT_FOUND) {
-                    tasks = Collections.emptyList();
+                    allTasks = Collections.emptyList();
                 }
-                TaskUtils.addSubheaderTasksByDateGroups(getActivity(), tasks);
-                putDataToList(tasks);
+                List<Task> tasksWithSubheaders =
+                        TaskUtils.addSubheaderTasksByDateGroups(getActivity(), allTasks);
+                putDataToList(tasksWithSubheaders);
                 viewSwitcher.showMainLayout();
             }
 
             @Override
             public void onFailure(Call<TasksPageDto> call, Throwable t) {
+                allTasks = null;
                 String message = requestFailureMessage(getActivity(), t);
                 showError(message);
             }

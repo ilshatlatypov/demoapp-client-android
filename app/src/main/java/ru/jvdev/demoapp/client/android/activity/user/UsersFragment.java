@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -23,7 +26,8 @@ import retrofit2.Response;
 import ru.jvdev.demoapp.client.android.Api;
 import ru.jvdev.demoapp.client.android.R;
 import ru.jvdev.demoapp.client.android.ViewSwitcher;
-import ru.jvdev.demoapp.client.android.activity.RefreshableFragment;
+import ru.jvdev.demoapp.client.android.activity.Refreshable;
+import ru.jvdev.demoapp.client.android.activity.Searchable;
 import ru.jvdev.demoapp.client.android.entity.User;
 import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
 
@@ -36,11 +40,12 @@ import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
 
-public class UsersFragment extends Fragment implements RefreshableFragment {
+public class UsersFragment extends Fragment implements Refreshable, Searchable {
 
     private Api.Users usersApi;
 
     private ListView usersListView;
+    private List<User> allUsers;
 
     private ViewSwitcher viewSwitcher;
 
@@ -123,8 +128,24 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
     }
 
     @Override
-    public void refreshFragmentData() {
+    public void refreshData() {
         updateUsers();
+    }
+
+    @Override
+    public void applySearch(final String searchString) {
+        if (allUsers == null) {
+            return;
+        }
+
+        List<User> filtered = new ArrayList<>();
+        for (User u : allUsers) {
+            if (StringUtils.startsWithIgnoreCase(u.getFirstname(), searchString)
+                    || StringUtils.startsWithIgnoreCase(u.getLastname(), searchString)) {
+                filtered.add(u);
+            }
+        }
+        putDataToList(filtered);
     }
 
     private void updateUsers() {
@@ -134,12 +155,14 @@ public class UsersFragment extends Fragment implements RefreshableFragment {
         pageCall.enqueue(new Callback<UsersPageDto>() {
             @Override
             public void onResponse(Call<UsersPageDto> call, Response<UsersPageDto> response) {
-                putDataToList(response.body().getUsers());
+                allUsers = response.body().getUsers();
+                putDataToList(allUsers);
                 viewSwitcher.showMainLayout();
             }
 
             @Override
             public void onFailure(Call<UsersPageDto> call, Throwable t) {
+                allUsers = null;
                 String message = requestFailureMessage(getActivity(), t);
                 showError(message);
             }

@@ -2,6 +2,7 @@ package ru.jvdev.demoapp.client.android.utils;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,22 +16,25 @@ public class TaskUtils {
 
     private TaskUtils() {}
 
-    public static void addSubheaderTasksByDateGroups(Context ctx, List<Task> tasksSortedByDate) {
+    public static List<Task> addSubheaderTasksByDateGroups(Context ctx, List<Task> tasksSortedByDate) {
+        List<Task> tasksWithSubheaders = new ArrayList<>();
+
         int tasksTotal = tasksSortedByDate.size();
-        for (int i = tasksTotal - 1; i >= 0; i--) {
-            boolean insertSubheader;
-            Date taskDate = tasksSortedByDate.get(i).getDate();
-            if (i > 0) {
-                Date prevTaskDate = tasksSortedByDate.get(i - 1).getDate();
-                insertSubheader = !taskDate.equals(prevTaskDate);
-            } else {
-                insertSubheader = true;
+        Date prevTaskDate = null;
+
+        for (int i = 0; i < tasksTotal; i++) {
+            Task task = tasksSortedByDate.get(i);
+            Date taskDate = task.getDate();
+
+            if (i == 0 || !taskDate.equals(prevTaskDate)) {
+                String dateAsStr = DateUtils.dateToString(ctx, taskDate);
+                Task subheaderTask = new Task(0, dateAsStr);
+                tasksWithSubheaders.add(subheaderTask);
             }
 
-            if (insertSubheader) {
-                String dateAsStr = DateUtils.dateToString(ctx, taskDate);
-                tasksSortedByDate.add(i, new Task(0, dateAsStr));
-            }
+            tasksWithSubheaders.add(task);
+            prevTaskDate = taskDate;
         }
+        return tasksWithSubheaders;
     }
 }
