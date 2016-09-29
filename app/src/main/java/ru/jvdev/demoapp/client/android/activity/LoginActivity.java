@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void sendLoginRequest(final String username, String password) {
+    private void sendLoginRequest(final String username, final String password) {
         showProgress(true);
 
         RestProvider restProvider = new RestProvider(username, password);
@@ -117,6 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     User user = response.body().toUser();
                     ((DemoApp) getApplicationContext()).setActiveUser(user);
+                    ((DemoApp) getApplicationContext()).setRestCredentials(username, password);
                     gotoMainActivity();
                 } else if (response.code() == HttpCodes.UNAUTHORIZED) {
                     String message = getString(R.string.error_incorrect_login_password);

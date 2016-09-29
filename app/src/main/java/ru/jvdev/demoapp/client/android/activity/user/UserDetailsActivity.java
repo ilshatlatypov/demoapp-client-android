@@ -175,12 +175,10 @@ public class UserDetailsActivity extends AppCompatActivity {
     private void displayUserDetails(User user) {
         TextView fullnameView = (TextView) findViewById(R.id.fullname);
         TextView usernameView = (TextView) findViewById(R.id.username);
-        TextView passwordView = (TextView) findViewById(R.id.password);
         TextView positionView = (TextView) findViewById(R.id.position);
 
         fullnameView.setText(user.getFullname());
         usernameView.setText(user.getUsername());
-        passwordView.setText(user.getPassword());
         positionView.setText(user.getRole().toString());
         viewSwitcher.showMainLayout();
     }

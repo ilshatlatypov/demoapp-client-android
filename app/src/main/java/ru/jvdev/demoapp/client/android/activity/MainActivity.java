@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity
             showTasksFragment();
         } else if (id == R.id.nav_logout) {
             ((DemoApp) getApplicationContext()).setActiveUser(null);
+            ((DemoApp) getApplicationContext()).setRestCredentials(null, null);
             gotoLoginActivity();
         }
 

@@ -12,7 +12,6 @@ public class UserDto {
     private String firstname;
     private String lastname;
     private String username;
-    private String password;
     private Role role;
 
     public UserDto(User user) {
@@ -20,12 +19,11 @@ public class UserDto {
         this.firstname = user.getFirstname();
         this.lastname = user.getLastname();
         this.username = user.getUsername();
-        this.password = user.getPassword();
         this.role = user.getRole();
     }
 
     public User toUser() {
-        User user = new User(firstname, lastname, username, password, role);
+        User user = new User(firstname, lastname, username, role);
         user.setId(id);
         return user;
     }

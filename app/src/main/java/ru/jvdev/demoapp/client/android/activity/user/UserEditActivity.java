@@ -6,16 +6,13 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,7 +42,6 @@ public class UserEditActivity extends AppCompatActivity {
     private EditText firstnameText;
     private EditText lastnameText;
     private EditText usernameText;
-    private EditText passwordText;
     private Spinner positionSpinner;
 
     @Override
@@ -70,17 +66,6 @@ public class UserEditActivity extends AppCompatActivity {
         firstnameText = (EditText) findViewById(R.id.firstname_text);
         lastnameText = (EditText) findViewById(R.id.lastname_text);
         usernameText = (EditText) findViewById(R.id.username_text);
-        passwordText = (EditText) findViewById(R.id.password_text);
-        passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    attemptCreate();
-                    return true;
-                }
-                return false;
-            }
-        });
 
         positionSpinner = (Spinner) findViewById(R.id.position_spinner);
         ArrayAdapter<Role> spinnerAdapter =
@@ -94,7 +79,6 @@ public class UserEditActivity extends AppCompatActivity {
         firstnameText.setText(user.getFirstname());
         lastnameText.setText(user.getLastname());
         usernameText.setText(user.getUsername());
-        passwordText.setText(user.getPassword());
         int pos = ((ArrayAdapter<Role>) positionSpinner.getAdapter()).getPosition(user.getRole());
         positionSpinner.setSelection(pos);
     }
@@ -208,9 +192,8 @@ public class UserEditActivity extends AppCompatActivity {
         String firstname = firstnameText.getText().toString();
         String lastname = lastnameText.getText().toString();
         String username = usernameText.getText().toString();
-        String password = passwordText.getText().toString();
         Role role = (Role) positionSpinner.getSelectedItem();
-        return new User(firstname, lastname, username, password, role);
+        return new User(firstname, lastname, username, role);
     }
 
     private Map<Integer, String> validate(User user) {
@@ -229,10 +212,6 @@ public class UserEditActivity extends AppCompatActivity {
         }
         if (TextUtils.isEmpty(user.getUsername())) {
             errors.put(R.id.username_layout, getString(R.string.error_field_required));
-        }
-
-        if (TextUtils.isEmpty(user.getPassword())) {
-            errors.put(R.id.password_layout, getString(R.string.error_field_required));
         }
         return errors;
     }

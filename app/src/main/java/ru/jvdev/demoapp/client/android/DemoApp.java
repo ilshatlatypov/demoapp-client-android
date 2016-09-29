@@ -20,12 +20,11 @@ public class DemoApp extends Application {
 
     public void setActiveUser(User user) {
         this.activeUser = user;
-        updateRestCredentials();
     }
 
-    private void updateRestCredentials() {
-        if (activeUser != null) {
-            restProvider = new RestProvider(activeUser.getUsername(), activeUser.getPassword());
+    public void setRestCredentials(String username, String password) {
+        if (username != null && password != null) {
+            restProvider = new RestProvider(username, password);
         } else {
             restProvider = new RestProvider();
         }
