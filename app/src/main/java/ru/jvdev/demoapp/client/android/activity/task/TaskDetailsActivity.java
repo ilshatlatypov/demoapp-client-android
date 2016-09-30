@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -116,8 +117,12 @@ public class TaskDetailsActivity extends AppCompatActivity {
         menu.setGroupVisible(R.id.group_manager_actions, actionsVisible && (currentUser.getRole() == Role.MANAGER));
         menu.setGroupVisible(R.id.group_common_actions, actionsVisible);
         if (task != null) {
-            menu.findItem(R.id.action_done)
-                    .setTitle(task.isDone() ? R.string.action_mark_as_not_done : R.string.action_mark_as_done);
+            int titleResId = task.isDone() ? R.string.action_mark_as_not_done : R.string.action_mark_as_done;
+            int iconResId = task.isDone() ? R.drawable.ic_check_circle : R.drawable.ic_done;
+
+            MenuItem doneButton = menu.findItem(R.id.action_done);
+            doneButton.setTitle(titleResId);
+            doneButton.setIcon(ContextCompat.getDrawable(this, iconResId));
         }
         return super.onPrepareOptionsMenu(menu);
     }

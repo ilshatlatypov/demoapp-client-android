@@ -35,6 +35,7 @@ import ru.jvdev.demoapp.client.android.entity.dto.UsersPageDto;
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemArrayAdapter;
 import ru.jvdev.demoapp.client.android.spinner.SpinnerWithChooseItemListener;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
+import ru.jvdev.demoapp.client.android.utils.SnackbarCustom;
 
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
@@ -242,7 +243,7 @@ public class TaskEditActivity extends AppCompatActivity {
     }
 
     private void sendUpdateTaskRequest(int taskId, Task task) {
-        Snackbar.make(content(), R.string.prompt_saving, LENGTH_SHORT).show();
+        Snackbar.make(content(), R.string.prompt_saving, SnackbarCustom.LENGTH_SHORT).show();
 
         Call<Void> updateTaskCall = tasksApi.update(taskId, new TaskDto(task));
         updateTaskCall.enqueue(new Callback<Void>() {
