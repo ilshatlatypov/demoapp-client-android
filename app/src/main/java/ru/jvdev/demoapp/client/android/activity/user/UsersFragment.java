@@ -39,6 +39,7 @@ import static ru.jvdev.demoapp.client.android.activity.utils.ActivityResultCode.
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.SnackbarCustom.LENGTH_SHORT;
 
 public class UsersFragment extends Fragment implements Refreshable, Searchable {
 
@@ -114,12 +115,12 @@ public class UsersFragment extends Fragment implements Refreshable, Searchable {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CREATE) {
             if (resultCode == RESULT_OK) {
-                Snackbar.make(usersListView, R.string.prompt_user_saved, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(usersListView, R.string.prompt_user_saved, LENGTH_SHORT).show();
                 updateUsers();
             }
         } else if (requestCode == DETAILS) {
             if (resultCode == DELETED) {
-                Snackbar.make(usersListView, R.string.prompt_user_deleted, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(usersListView, R.string.prompt_user_deleted, LENGTH_SHORT).show();
                 updateUsers();
             } else if (resultCode == NEED_PARENT_REFRESH) {
                 updateUsers();

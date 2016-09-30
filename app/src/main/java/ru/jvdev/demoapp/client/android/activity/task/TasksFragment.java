@@ -46,6 +46,8 @@ import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.DONE;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.SnackbarCustom.LENGTH_LONG;
+import static ru.jvdev.demoapp.client.android.utils.SnackbarCustom.LENGTH_SHORT;
 
 public class TasksFragment extends Fragment implements Refreshable, Searchable {
 
@@ -138,18 +140,18 @@ public class TasksFragment extends Fragment implements Refreshable, Searchable {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CREATE) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(tasksListView, R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(tasksListView, R.string.prompt_task_saved, LENGTH_SHORT).show();
                 updateTasks();
             }
         } else if (requestCode == DETAILS) {
             if (resultCode == DELETED) {
-                Snackbar.make(tasksListView, R.string.prompt_task_deleted, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(tasksListView, R.string.prompt_task_deleted, LENGTH_SHORT).show();
                 updateTasks();
             } else if (resultCode == DONE_STATE_CHANGED) {
                 final int taskId = data.getIntExtra(ID, 0);
                 final boolean actualDoneState = data.getBooleanExtra(DONE, false);
                 int messageResId = actualDoneState ? R.string.prompt_task_marked_as_done : R.string.prompt_task_marked_as_not_done;
-                Snackbar.make(tasksListView, messageResId, Snackbar.LENGTH_LONG)
+                Snackbar.make(tasksListView, messageResId, LENGTH_LONG)
                         .setAction(R.string.action_cancel, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -248,7 +250,7 @@ public class TasksFragment extends Fragment implements Refreshable, Searchable {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     int messageResId = revertedDoneState ? R.string.prompt_task_undone_canceled : R.string.prompt_task_done_canceled;
-                    Snackbar.make(tasksListView, messageResId, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(tasksListView, messageResId, LENGTH_SHORT).show();
                     updateTasks();
                 }
             }

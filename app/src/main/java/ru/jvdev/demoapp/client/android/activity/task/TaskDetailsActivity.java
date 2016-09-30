@@ -36,6 +36,7 @@ import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.ID;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.SnackbarCustom.LENGTH_SHORT;
 
 public class TaskDetailsActivity extends AppCompatActivity {
 
@@ -262,7 +263,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(content(), R.string.prompt_task_saved, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(content(), R.string.prompt_task_saved, LENGTH_SHORT).show();
                 sendGetDetailsRequest();
                 needParentRefresh = true;
             }

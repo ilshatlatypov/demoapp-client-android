@@ -33,6 +33,7 @@ import ru.jvdev.demoapp.client.android.utils.StringUtils;
 import static ru.jvdev.demoapp.client.android.activity.utils.IntentExtra.OBJECT;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.requestFailureMessage;
 import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.SnackbarCustom.LENGTH_SHORT;
 
 public class UserEditActivity extends AppCompatActivity {
 
@@ -120,7 +121,7 @@ public class UserEditActivity extends AppCompatActivity {
     }
 
     private void sendCreateUserRequest(User user) {
-        Snackbar.make(content(), R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(content(), R.string.prompt_saving, LENGTH_SHORT).show();
 
         Call<Void> call = usersApi.createUser(new UserDto(user));
         call.enqueue(new Callback<Void>() {
@@ -157,7 +158,7 @@ public class UserEditActivity extends AppCompatActivity {
     }
 
     private void sendUpdateUserRequest(int userId, User user) {
-        Snackbar.make(content(), R.string.prompt_saving, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(content(), R.string.prompt_saving, LENGTH_SHORT).show();
 
         Call<Void> call = usersApi.updateUser(userId, new UserDto(user));
         call.enqueue(new Callback<Void>() {
