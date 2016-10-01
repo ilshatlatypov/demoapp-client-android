@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -92,6 +93,17 @@ public class TaskEditActivity extends AppCompatActivity {
                     KeyboardUtils.hideKeyboard(TaskEditActivity.this);
                     showDatePicker();
                 }
+            }
+        });
+        dateText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (MotionEvent.ACTION_UP == motionEvent.getAction() && view.hasFocus()) {
+                    KeyboardUtils.hideKeyboard(TaskEditActivity.this);
+                    showDatePicker();
+                    return true;
+                }
+                return false;
             }
         });
 
