@@ -11,8 +11,6 @@
         android:id="@+id/tasks_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="@dimen/list_top_bottom_padding"
-        android:paddingBottom="@dimen/list_top_bottom_padding"
         android:clipToPadding="false"
         android:divider="@android:color/transparent"/>
 
