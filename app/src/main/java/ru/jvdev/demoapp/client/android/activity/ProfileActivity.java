@@ -41,21 +41,25 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String[] profileActions = new String[] { getString(R.string.prompt_change_password) };
+        String[] profileActions = new String[] { getString(R.string.action_change_password) };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, profileActions);
 
         profileActionsView = (ListView) findViewById(R.id.profile_actions);
         profileActionsView.setAdapter(adapter);
+        profileActionsView.addHeaderView(new View(this));
         profileActionsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                if (position == 0) {
+                if (position == 1) {
                     showChangePasswordDialog();
                 }
             }
         });
 
         currentUser = ((DemoApp) getApplicationContext()).getActiveUser();
+
+        ((TextView) findViewById(R.id.fullname)).setText(currentUser.getFullname());
+        ((TextView) findViewById(R.id.username)).setText(getString(R.string.username_format, currentUser.getUsername()));
     }
 
     @Override

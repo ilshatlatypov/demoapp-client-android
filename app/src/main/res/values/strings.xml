@@ -89,7 +89,8 @@
     <string name="prompt_task_undone_canceled">Задача возвращена в состояние выполнена</string>
 
     <string name="title_profile">Профиль</string>
-    <string name="prompt_change_password">Изменить пароль</string>
+    <string name="username_format">Логин: %1$s</string>
+    <string name="action_change_password">Изменить пароль</string>
     <string name="title_change_password">Изменение пароля</string>
     <string name="prompt_new_password">Новый пароль</string>
     <string name="prompt_new_password_confirm">Новый пароль (еще раз)</string>
