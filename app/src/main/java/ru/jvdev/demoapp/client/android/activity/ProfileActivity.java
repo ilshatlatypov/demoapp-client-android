@@ -103,14 +103,19 @@ public class ProfileActivity extends AppCompatActivity {
         CharSequence passwordConfirm = passwordConfirmText.getText();
 
         View errorField = null;
-        if (TextUtils.isEmpty(passwordText.getText())) {
+        if (TextUtils.isEmpty(password)) {
             passwordLayout.setError(getString(R.string.error_field_required));
+            errorField = passwordText;
+        } else if (password.length() < 3) {
+            passwordLayout.setError(getString(R.string.error_min_length, 3));
+            errorField = passwordText;
+        } else if (password.length() > 20) {
+            passwordLayout.setError(getString(R.string.error_max_length, 20));
             errorField = passwordText;
         } else if (!TextUtils.equals(password, passwordConfirm)) {
             passwordConfirmLayout.setError(getString(R.string.error_passwords_match));
             errorField = passwordConfirmText;
         }
-        // TODO password length, characters
 
         if (errorField == null) {
             KeyboardUtils.hideKeyboard(this);

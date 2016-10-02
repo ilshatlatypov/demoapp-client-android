@@ -40,6 +40,8 @@
     <string name="action_retry">Повторить</string>
     <string name="action_settings">Настройки</string>
     <string name="error_field_required">Обязательное поле</string>
+    <string name="error_min_length">Минимум %1$d символа</string>
+    <string name="error_max_length">Максимум %1$d символов</string>
     <string name="action_save">Сохранить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_edit">Редактировать</string>
