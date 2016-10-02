@@ -1,6 +1,7 @@
 package ru.jvdev.demoapp.client.android.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,15 +12,30 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import ru.jvdev.demoapp.client.android.Api;
+import ru.jvdev.demoapp.client.android.DemoApp;
 import ru.jvdev.demoapp.client.android.R;
+import ru.jvdev.demoapp.client.android.ViewSwitcher;
+import ru.jvdev.demoapp.client.android.entity.User;
+import ru.jvdev.demoapp.client.android.utils.CommonUtils;
 import ru.jvdev.demoapp.client.android.utils.KeyboardUtils;
+
+import static ru.jvdev.demoapp.client.android.utils.CommonUtils.rest;
+import static ru.jvdev.demoapp.client.android.utils.SnackbarCustom.LENGTH_SHORT;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    AlertDialog changePasswordDialog;
+    private ListView profileActionsView;
+    private AlertDialog changePasswordDialog;
+    private ViewSwitcher viewSwitcher;
 
-    @Override
+    private User currentUser;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
@@ -28,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
         String[] profileActions = new String[] { getString(R.string.prompt_change_password) };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, profileActions);
 
-        ListView profileActionsView = (ListView) findViewById(R.id.profile_actions);
+        profileActionsView = (ListView) findViewById(R.id.profile_actions);
         profileActionsView.setAdapter(adapter);
         profileActionsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -38,6 +54,8 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         });
+
+        currentUser = ((DemoApp) getApplicationContext()).getActiveUser();
     }
 
     @Override
@@ -65,6 +83,7 @@ public class ProfileActivity extends AppCompatActivity {
                 attemptChangePassword();
             }
         });
+        viewSwitcher = new ViewSwitcher(this, changePasswordDialog, R.id.progress_bar, R.id.new_password_form);
     }
 
     private void attemptChangePassword() {
@@ -87,6 +106,7 @@ public class ProfileActivity extends AppCompatActivity {
             passwordConfirmLayout.setError(getString(R.string.error_passwords_match));
             errorField = passwordConfirmText;
         }
+        // TODO password length, characters
 
         if (errorField == null) {
             KeyboardUtils.hideKeyboard(this);
@@ -96,7 +116,33 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void sendChangePasswordRequest(String newPassword) {
-        changePasswordDialog.dismiss();
+    private void sendChangePasswordRequest(final String newPassword) {
+        viewSwitcher.showProgressBar();
+
+        Api.Users usersApi = rest(this).getUsersApi();
+        usersApi.setPassword(currentUser.getId(), newPassword).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    ((DemoApp) getApplicationContext()).setRestCredentials(currentUser.getUsername(), newPassword);
+                    viewSwitcher.showMainLayout();
+                    changePasswordDialog.dismiss();
+                    Snackbar.make(profileActionsView, R.string.prompt_password_changed, LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                String message = CommonUtils.requestFailureMessage(ProfileActivity.this, t);
+                showRequestError(message);
+            }
+        });
+    }
+
+    private void showRequestError(String errorMessage) {
+        TextView errorTextView = (TextView) changePasswordDialog.findViewById(R.id.error_text);
+        errorTextView.setText(errorMessage);
+        errorTextView.setVisibility(View.VISIBLE);
+        viewSwitcher.showMainLayout();
     }
 }

@@ -15,6 +15,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 import ru.jvdev.demoapp.client.android.Api;
 
 /**
@@ -31,6 +32,7 @@ public class RestProvider {
 
     private static Retrofit.Builder builder = new Retrofit.Builder()
             .baseUrl("http://192.168.0.100:8080/")
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson));
 
     public RestProvider() {

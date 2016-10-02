@@ -94,5 +94,6 @@
     <string name="prompt_new_password">Новый пароль</string>
     <string name="prompt_new_password_confirm">Новый пароль (еще раз)</string>
     <string name="error_passwords_match">Пароли должны совпадать</string>
+    <string name="prompt_password_changed">Пароль изменен</string>
 
 </resources>

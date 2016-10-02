@@ -38,6 +38,9 @@ public class Api {
         @DELETE("users/{id}")
         Call<Void> deleteUser(@Path("id") int id);
 
+        @POST("users/{id}/setPassword")
+        Call<Void> setPassword(@Path("id") int id, @Body String newPassword);
+
     }
 
     public interface Tasks {

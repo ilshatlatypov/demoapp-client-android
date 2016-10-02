@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Build;
 import android.support.annotation.IdRes;
 import android.view.View;
@@ -13,23 +14,40 @@ import android.view.View;
  */
 public class ViewSwitcher {
 
-    private View view;
     private Activity activity;
+    private Object parent; // Activity, View or Dialog
 
     private int progressBarResId;
     private int mainLayoutResId;
     private int errorLayoutResId;
 
-    public ViewSwitcher(Activity activity, @IdRes int progressBarResId, @IdRes int mainLayoutResId, @IdRes int errorLayoutResId) {
-        this.activity = activity;
-        this.progressBarResId = progressBarResId;
-        this.mainLayoutResId = mainLayoutResId;
-        this.errorLayoutResId = errorLayoutResId;
+    public ViewSwitcher(Activity activity, Dialog dialog,
+                        @IdRes int progressBarResId,
+                        @IdRes int mainLayoutResId) {
+        this(activity, dialog, progressBarResId, mainLayoutResId, 0);
+
     }
 
-    public ViewSwitcher(Activity activity, View view, @IdRes int progressBarResId, @IdRes int mainLayoutResId, @IdRes int errorLayoutResId) {
+    public ViewSwitcher(Activity activity,
+                        @IdRes int progressBarResId,
+                        @IdRes int mainLayoutResId,
+                        @IdRes int errorLayoutResId) {
+        this(activity, activity, progressBarResId, mainLayoutResId, errorLayoutResId);
+    }
+
+    public ViewSwitcher(Activity activity, View view,
+                        @IdRes int progressBarResId,
+                        @IdRes int mainLayoutResId,
+                        @IdRes int errorLayoutResId) {
+        this(activity, (Object) view, progressBarResId, mainLayoutResId, errorLayoutResId);
+    }
+
+    private ViewSwitcher(Activity activity, Object parent,
+                         @IdRes int progressBarResId,
+                         @IdRes int mainLayoutResId,
+                         @IdRes int errorLayoutResId) {
         this.activity = activity;
-        this.view = view;
+        this.parent = parent;
         this.progressBarResId = progressBarResId;
         this.mainLayoutResId = mainLayoutResId;
         this.errorLayoutResId = errorLayoutResId;
@@ -50,23 +68,32 @@ public class ViewSwitcher {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void show(int resId) {
         View progressBar, mainLayout, errorLayout;
-        if (view != null) {
-            progressBar = view.findViewById(progressBarResId);
-            mainLayout = view.findViewById(mainLayoutResId);
-            errorLayout = view.findViewById(errorLayoutResId);
+        if (parent instanceof Activity) {
+            progressBar = ((Activity) parent).findViewById(progressBarResId);
+            mainLayout = ((Activity) parent).findViewById(mainLayoutResId);
+            errorLayout = ((Activity) parent).findViewById(errorLayoutResId);
+        } else if (parent instanceof View) {
+            progressBar = ((View) parent).findViewById(progressBarResId);
+            mainLayout = ((View) parent).findViewById(mainLayoutResId);
+            errorLayout = ((View) parent).findViewById(errorLayoutResId);
+        } else if (parent instanceof Dialog) {
+            progressBar = ((Dialog) parent).findViewById(progressBarResId);
+            mainLayout = ((Dialog) parent).findViewById(mainLayoutResId);
+            errorLayout = ((Dialog) parent).findViewById(errorLayoutResId);
         } else {
-            progressBar = activity.findViewById(progressBarResId);
-            mainLayout = activity.findViewById(mainLayoutResId);
-            errorLayout = activity.findViewById(errorLayoutResId);
+            throw new IllegalArgumentException("Unexpected parent type: " + parent.getClass().toString());
         }
 
         boolean showProgressBar = (progressBar.getId() == resId);
-        boolean showMainLayout = (mainLayout.getId() == resId);
-        boolean showErrorLayout = (errorLayout.getId() == resId);
-
         showView(progressBar, showProgressBar);
+
+        boolean showMainLayout = (mainLayout.getId() == resId);
         showView(mainLayout, showMainLayout);
-        showView(errorLayout, showErrorLayout);
+
+        if (errorLayout != null) {
+            boolean showErrorLayout = (errorLayout.getId() == resId);
+            showView(errorLayout, showErrorLayout);
+        }
     }
 
     private void showView(final View view, final boolean show) {
