@@ -88,14 +88,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        User activeUser = ((DemoApp) getApplicationContext()).getActiveUser();
-        ((TextView) header.findViewById(R.id.username)).setText(activeUser.getFullname());
+        currentUser = ((DemoApp) getApplicationContext()).getActiveUser();
+        ((TextView) header.findViewById(R.id.fullname)).setText(currentUser.getFullname());
+        ((TextView) header.findViewById(R.id.username)).setText(currentUser.getUsername());
 
-        if (activeUser.getRole() == Role.EMPLOYEE) {
+        if (currentUser.getRole() == Role.EMPLOYEE) {
             navigationView.getMenu().findItem(R.id.nav_users).setVisible(false);
         }
-
-        currentUser = ((DemoApp) getApplicationContext()).getActiveUser();
 
         if (savedInstanceState == null) {
             activeNavItemId = R.id.nav_tasks;
