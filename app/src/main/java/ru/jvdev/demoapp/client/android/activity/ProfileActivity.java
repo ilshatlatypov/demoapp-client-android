@@ -45,8 +45,8 @@ public class ProfileActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, profileActions);
 
         profileActionsView = (ListView) findViewById(R.id.profile_actions);
-        profileActionsView.setAdapter(adapter);
         profileActionsView.addHeaderView(new View(this));
+        profileActionsView.setAdapter(adapter);
         profileActionsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
