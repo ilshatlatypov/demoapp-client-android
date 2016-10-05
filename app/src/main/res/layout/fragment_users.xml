@@ -14,7 +14,7 @@
         android:paddingTop="@dimen/list_top_bottom_padding"
         android:paddingBottom="@dimen/list_top_bottom_padding"
         android:clipToPadding="false"
-        android:divider="@android:color/transparent"/>
+        android:footerDividersEnabled="false"/>
 
     <TextView
         android:id="@android:id/empty"
